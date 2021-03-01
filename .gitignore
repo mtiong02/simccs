@@ -6,4 +6,7 @@
 build
 out
 
+data/*
+!*/.gitkeep
+
 *.log
