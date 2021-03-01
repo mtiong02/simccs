@@ -1,0 +1,34 @@
+The compilation instructions for this code is as follows:
+
+1. Download javafx-sdk-11.0.2 (Public version) libraries from the link https://gluonhq.com/products/javafx/
+
+2. Unzip and save it in a location of your choice. 
+
+3. Create a gradle.properties file in the following location 
+
+The global properties file should be located in your home directory:
+On Windows: C:\Users\<you>\.gradle\gradle.properties
+On Mac/Linux: /Users/<you>/.gradle/gradle.properties
+
+The .gradle is a hidden folder. In the gradle.properties file add the following line (use the path where the javafx in step 1 was downloaded)
+
+javafxLibPath=/path/to/javafx-sdk-11.0.2/lib 
+
+4. Download the code to a location of your choice. 
+
+5. Navigate to that folder using a terminal or command prompt and type the following commands 
+
+(a) ./gradlew build  (for Windows ./gradlew.bat build)
+(b) ./gradlew shadowJar (for Windows ./gradlew.bat shadowJar)
+(c) ./gradlew runShadow (for Windows ./gradlew.bat runShadow)
+
+(a) will compile the code (b) will package the code into a SimCCS-full.jar file and (c) will run the .jar file.
+
+Optionally:
+
+1. You can install gradle and replace the ./gradlew or ./gradlew.bat with the command gradle (that has been added to the path). If you decide not to do this, the gradlew batch file will do it for you locally for that project alone. 
+
+2. Optionally, you can also import the project in an IDE of your choice (I use Intellij, Eclipse also works). Both should pick up the gradle build files and then you can do everything in the GUI using button clicks. 
+
+
+ 

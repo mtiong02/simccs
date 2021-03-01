@@ -1,0 +1,5 @@
+set logfile *
+read /Users/kaarthik/Documents/codes/SimCCS-public/Datasets/SoutheastUS/Scenarios/capScenario/Results/cap24022021-10150007/cap.mps
+opt
+write /Users/kaarthik/Documents/codes/SimCCS-public/Datasets/SoutheastUS/Scenarios/capScenario/Results/cap24022021-10150007/solution.sol
+quit
