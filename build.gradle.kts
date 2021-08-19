@@ -6,46 +6,37 @@
  * User Manual available at https://docs.gradle.org/6.8.3/userguide/building_java_projects.html
  */
 
+plugins {
+    id("application")
+    id("org.openjfx.javafxplugin") version "0.0.9"
+    id("com.github.johnrengelman.shadow") version "6.1.0"
+}
 
 application {
     // Define the main class for the application.
-    mainClassName = "gui.Gui"
-    val javafxLibPath: String by project
+    mainClass.set("gui.Gui")
     applicationDefaultJvmArgs = listOf(
-        "--module-path", "$javafxLibPath",
         "--add-modules=ALL-MODULE-PATH",
-        "--add-exports", "javafx.graphics/com.sun.javafx.sg.prism=ALL-UNNAMED"
+        "--add-exports", "javafx.graphics/com.sun.javafx.sg.prism=ALL-UNNAMED",
+        "--add-exports", "jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED"
     )
 }
 
-plugins {
-    // Apply the application plugin to add support for building a CLI application in Java.
-    application
-    id("org.openjfx.javafxplugin") version "0.0.8"
-
-    id("com.github.johnrengelman.shadow") version "6.1.0"
-}
 
 javafx {
     modules("javafx.controls", "javafx.fxml", "javafx.swing", "javafx.base", "javafx.graphics", "javafx.web")
 }
 
 repositories {
-    // Use JCenter for resolving dependencies.
-    jcenter()
-
-    maven { 
-        url = uri("https://jitpack.io") 
+    maven {
+        url = uri("https://jitpack.io")
     }
+    mavenCentral()
 }
 
 dependencies {
-    // Use JUnit test framework.
     testImplementation("junit:junit:4.13")
-
-    // This dependency is used by the application.
     implementation("com.google.guava:guava:29.0-jre")
-
     implementation("com.github.OpenMap-java:openmap:v5.1.15")
 }
 
