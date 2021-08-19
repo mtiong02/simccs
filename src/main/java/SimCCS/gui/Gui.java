@@ -387,9 +387,11 @@ public class Gui extends Application {
 
         RadioButton capVersion = new RadioButton("Cap");
         RadioButton priceVersion = new RadioButton("Price");
+        RadioButton timeVersion = new RadioButton("Time");
         ToggleGroup capVsPrice = new ToggleGroup();
         capVersion.setToggleGroup(capVsPrice);
         priceVersion.setToggleGroup(capVsPrice);
+        timeVersion.setToggleGroup(capVsPrice);
 
         capVersion.setLayoutX(5);
         capVersion.setLayoutY(94);
@@ -400,13 +402,14 @@ public class Gui extends Application {
             public void changed(ObservableValue<? extends Boolean> selected, Boolean oldVal, Boolean show) {
                 if (!oldVal) {
                     priceVersion.setSelected(false);
+                    timeVersion.setSelected(false);
                     paramLabel.setText("Capture Target (MT/y)");
                     paramValue.setText("15");
                 }
             }
         });
 
-        priceVersion.setLayoutX(60);
+        priceVersion.setLayoutX(65);
         priceVersion.setLayoutY(94);
         formulationPane.getChildren().add(priceVersion);
         priceVersion.selectedProperty().addListener(new ChangeListener<Boolean>() {
@@ -414,7 +417,23 @@ public class Gui extends Application {
             public void changed(ObservableValue<? extends Boolean> selected, Boolean oldVal, Boolean show) {
                 if (!oldVal) {
                     capVersion.setSelected(false);
+                    timeVersion.setSelected(false);
                     paramLabel.setText("Tax/Credit ($/t)");
+                    paramValue.setText("0");
+                }
+            }
+        });
+
+        timeVersion.setLayoutX(125);
+        timeVersion.setLayoutY(94);
+        formulationPane.getChildren().add(timeVersion);
+        timeVersion.selectedProperty().addListener(new ChangeListener<Boolean>() {
+            @Override
+            public void changed(ObservableValue<? extends Boolean> selected, Boolean oldVal, Boolean show) {
+                if (!oldVal) {
+                    capVersion.setSelected(false);
+                    priceVersion.setSelected(false);
+                    paramLabel.setText("(some text)");
                     paramValue.setText("0");
                 }
             }
