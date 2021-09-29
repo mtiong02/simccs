@@ -1,13 +1,16 @@
 package gui;
 
 import java.io.File;
+
 import javafx.application.Application;
 import static javafx.application.Application.launch;
 import javafx.beans.value.ChangeListener;
+import javafx.collections.FXCollections;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.geometry.Insets;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -20,11 +23,15 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TitledPane;
 import javafx.scene.control.ToggleGroup;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.DirectoryChooser;
@@ -52,6 +59,7 @@ public class Gui extends Application {
     @Override
     public void start(Stage stage) {
         Scene scene = buildGUI(stage);
+        scene.getRoot().setStyle("-fx-font-family: 'serif'");
         stage.setScene(scene);
         stage.setTitle("SimCCS");
         stage.show();
@@ -198,6 +206,7 @@ public class Gui extends Application {
         buttonPane.setPrefSize(190, 30);
         buttonPane.setMinSize(0, 0);
         buttonPane.getChildren().addAll(candidateNetwork);
+
         TitledPane networkContainer = new TitledPane("Network Generation", buttonPane);
         networkContainer.setCollapsible(false);
         networkContainer.setPrefSize(192, 63);
@@ -214,6 +223,7 @@ public class Gui extends Application {
         dispDelaunayEdges.setLayoutX(4);
         dispDelaunayEdges.setLayoutY(83);
         selectionPane.getChildren().add(dispDelaunayEdges);
+
         Pane rawDelaunayLayer = new Pane();
         sceneGestures.addEntityToResize(rawDelaunayLayer);
         displayPane.getChildren().add(rawDelaunayLayer);
@@ -251,6 +261,7 @@ public class Gui extends Application {
         sourceVisible.setLayoutX(62);
         sourceVisible.setLayoutY(4);
         selectionPane.getChildren().add(sourceVisible);
+
         Pane sourcesLayer = new Pane();
         displayPane.getChildren().add(sourcesLayer);
         controlActions.addSourceLocationsLayer(sourcesLayer);
@@ -269,6 +280,7 @@ public class Gui extends Application {
         sourceLabeled.setLayoutX(131);
         sourceLabeled.setLayoutY(4);
         selectionPane.getChildren().add(sourceLabeled);
+
         Pane sourceLabelsLayer = new Pane();
         displayPane.getChildren().add(sourceLabelsLayer);
         controlActions.addSourceLabelsLayer(sourceLabelsLayer);
@@ -433,11 +445,54 @@ public class Gui extends Application {
                 if (!oldVal) {
                     capVersion.setSelected(false);
                     priceVersion.setSelected(false);
-                    paramLabel.setText("(some text)");
+                    paramLabel.setText("Time Intervals");
                     paramValue.setText("0");
                 }
             }
         });
+
+        //////////////////////////////////////////////////////////////////
+        // TIME SETTINGS PANE
+        //////////////////////////////////////////////////////////////////
+
+        ObservableList<TimeIntervalProto> data = FXCollections.observableArrayList(
+            new TimeIntervalProto("1-2", "20"),
+            new TimeIntervalProto("3-5", "15")
+        );
+
+        AnchorPane timeSettingsPane = new AnchorPane();
+        timeSettingsPane.setPrefSize(206, 600);
+        timeSettingsPane.setMinSize(0, 0);
+
+        TableView timeIntervalsTable = new TableView();
+        timeIntervalsTable.setEditable(true);
+        timeIntervalsTable.setItems(data);
+
+        TableColumn timeIntervalsNumberCol = new TableColumn("#");
+        timeIntervalsNumberCol.setMinWidth(20);
+        timeIntervalsNumberCol.setSortable(false);
+        //timeIntervalsTICol.setCellValueFactory(new PropertyValueFactory<TimeIntervalProto, String>("id"));
+
+        TableColumn timeIntervalsTICol = new TableColumn("Interval");
+        timeIntervalsTICol.setMinWidth(50);
+        timeIntervalsTICol.setSortable(false);
+        timeIntervalsTICol.setCellValueFactory(new PropertyValueFactory<TimeIntervalProto, String>("timeInterval"));
+
+        TableColumn timeIntervalsCTCol = new TableColumn("Capture Target");
+        timeIntervalsCTCol.setMinWidth(50);
+        timeIntervalsCTCol.setSortable(false);
+        timeIntervalsCTCol.setCellValueFactory(new PropertyValueFactory<TimeIntervalProto, String>("captureTarget"));
+
+        //timeIntervalsTable.getColumns().addAll(timeIntervalsTICol, timeIntervalsCTCol);
+        timeIntervalsTable.getColumns().addAll(timeIntervalsNumberCol, timeIntervalsTICol, timeIntervalsCTCol);
+
+        final VBox timeIntervalsVbox = new VBox();
+        //timeIntervalsVbox.setSpacing(5);
+        //timeIntervalsVbox.setPadding(new Insets(10, 0, 0, 10));
+        timeIntervalsVbox.getChildren().addAll(timeIntervalsTable);
+        timeSettingsPane.getChildren().addAll(timeIntervalsVbox);
+
+        //////////////////////////////////////////////////////////////////
 
         // Populate model pane.
         TitledPane modelContainer = new TitledPane("Problem Formulation", formulationPane);
@@ -446,6 +501,14 @@ public class Gui extends Application {
         modelContainer.setLayoutX(14);
         modelContainer.setLayoutY(5);
         modelPane.getChildren().add(modelContainer);
+
+        TitledPane timeSettingsContainer = new TitledPane("Time Intervals", timeSettingsPane);
+        timeSettingsContainer.setCollapsible(true);
+        timeSettingsContainer.setPrefSize(192, 282);
+        timeSettingsContainer.setLayoutX(14);
+        timeSettingsContainer.setLayoutY(259);
+        modelPane.getChildren().add(timeSettingsContainer);
+        //TableView tableView = new TableView();
 
         // Solution pane.
         AnchorPane mipSolutionPane = new AnchorPane();
@@ -464,9 +527,17 @@ public class Gui extends Application {
                     modelVersion = "c";
                 } else if (priceVersion.isSelected()) {
                     modelVersion = "p";
+                } else if (timeVersion.isSelected()) {
+                    modelVersion = "t";
                 }
 
-                controlActions.generateMPSFile(crfValue.getText(), yearValue.getText(), paramValue.getText(), modelVersion);
+                controlActions.generateMPSFile(
+                    crfValue.getText(),
+                    yearValue.getText(),
+                    paramValue.getText(),
+                    // add time params here
+                    modelVersion
+                );
             }
         });
 
@@ -650,6 +721,34 @@ public class Gui extends Application {
         // Add everything to group and display.
         group.getChildren().addAll(displayPane, tabPane, messengerPane);
         return new Scene(group, 1050, 660);
+    }
+
+    public static class TimeIntervalProto {
+        private String timeInterval;
+        private String captureTarget;
+        private static String id = "0";
+
+        private TimeIntervalProto(String time_interval, String capture_target) {
+            TimeIntervalProto.id = String.valueOf(Integer.parseInt(id) + 1);
+            this.timeInterval = time_interval;
+            this.captureTarget = capture_target;
+        }
+
+        public String getTimeInterval() {
+            return this.timeInterval;
+        }
+
+        public void setTimeInterval(String time_interval) {
+            this.timeInterval = time_interval;
+        }
+        public String getCaptureTarget() {
+            return this.captureTarget;
+        }
+
+        public void setCaptureTarget(String capture_target) {
+            this.captureTarget = capture_target;
+        }
+
     }
 
     public void displayCostSurface() {

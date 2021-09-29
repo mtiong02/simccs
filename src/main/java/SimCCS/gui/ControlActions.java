@@ -48,6 +48,7 @@ import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.StrokeLineCap;
 import javax.imageio.ImageIO;
 import solver.MPSWriter;
+import solver.MPSWriterTime;
 import solver.Solver;
 
 import static utilities.Utilities.*;
@@ -239,7 +240,7 @@ public class ControlActions {
             //    c.setStroke(Color.ORANGE);
             //    c.setFill(Color.ORANGE);
             //    sinkLocationsLayer.getChildren().add(c);
-            //    
+            //
             //    rawXYLocation = dataStorer.cellLocationToRawXY(e.v2);
             //    Circle c2 = new Circle(rawXtoDisplayX(rawXYLocation[0]), rawYtoDisplayY(rawXYLocation[1]), 1);
             //    c2.setStroke(Color.ORANGE);
@@ -287,6 +288,9 @@ public class ControlActions {
             System.out.println("Writing MPS File...");
             if (modelVersion.equals("c") || modelVersion.equals("p")) {
                 MPSWriter.writeCapPriceMPS(data, Double.parseDouble(crf), Double.parseDouble(numYears), Double.parseDouble(modelParamValue), basePath, dataset, scenario, modelVersion);
+            } else if (modelVersion.equals("t")) {
+                System.out.println("Writing cap price MPS time...");
+                MPSWriterTime.writeCapPriceMPS(data, Double.parseDouble(crf), Double.parseDouble(numYears), Double.parseDouble(modelParamValue), basePath, dataset, scenario, modelVersion);
             }
         }
     }
