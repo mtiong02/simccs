@@ -22,6 +22,23 @@ application {
     )
 }
 
+//tasks {
+//    run {
+//        debugOptions.enabled = true
+//        debugOptions.port = 5050
+//        debugOptions.server = true
+//        debugOptions.suspend = false
+//    }
+//}
+
+//task runApp(type: JavaExec) {
+//   debugOptions {
+//       enabled = true
+//       port = 5566
+//       server = true
+//       suspend = false
+//   }
+//}
 
 javafx {
     modules("javafx.controls", "javafx.fxml", "javafx.swing", "javafx.base", "javafx.graphics", "javafx.web")
