@@ -161,6 +161,7 @@ public class Gui extends Application {
         scenarioContainer.setLayoutY(73);
         dataPane.getChildren().add(scenarioContainer);
         runChoice = new ChoiceBox();
+
         scenarioChoice.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<String>() {
             @Override
             public void changed(ObservableValue<? extends String> selected, String oldScenario, String newScenario) {
@@ -523,6 +524,7 @@ public class Gui extends Application {
             @Override
             public void handle(ActionEvent e) {
                 String modelVersion = "";
+
                 if (capVersion.isSelected()) {
                     modelVersion = "c";
                 } else if (priceVersion.isSelected()) {
@@ -530,6 +532,7 @@ public class Gui extends Application {
                 } else if (timeVersion.isSelected()) {
                     modelVersion = "t";
                 }
+
 
                 controlActions.generateMPSFile(
                     crfValue.getText(),

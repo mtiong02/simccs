@@ -29,8 +29,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
 import javafx.collections.FXCollections;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.control.ChoiceBox;
@@ -290,7 +289,13 @@ public class ControlActions {
                 MPSWriter.writeCapPriceMPS(data, Double.parseDouble(crf), Double.parseDouble(numYears), Double.parseDouble(modelParamValue), basePath, dataset, scenario, modelVersion);
             } else if (modelVersion.equals("t")) {
                 System.out.println("Writing cap price MPS time...");
-                MPSWriterTime.writeCapPriceMPS(data, Double.parseDouble(crf), Double.parseDouble(numYears), Double.parseDouble(modelParamValue), basePath, dataset, scenario, modelVersion);
+                Double tmp_crf = 0.1; // Double.parseDouble(crf)
+                Double tmp_numYears = 30.0; // Double.parseDouble(numYears)
+                Double tmp_paramValue = 6.0; // Double.parseDouble(modelParamValue)
+
+                MPSWriterTime.writeCapPriceMPS(data, tmp_crf, tmp_numYears, tmp_paramValue, basePath, dataset, scenario, modelVersion);
+                //MPSWriterTime.writeCapPriceMPS(data, tmp_crf, tmp_numYears, tmp_paramValue, basePath, dataset, scenario, modelVersion);
+                //solver.MPSWriterTimeORIGINAL.writeCapPriceMPS(data, Double.parseDouble(crf), Double.parseDouble(numYears), Double.parseDouble(modelParamValue), basePath, dataset, scenario, modelVersion);
             }
         }
     }
@@ -316,6 +321,10 @@ public class ControlActions {
                         modelVersion = "p";
                         run = "price";
                         mpsFileName = "price.mps";
+                    } else if (f.getName().startsWith("time")) {
+                        modelVersion = "t";
+                        run = "time";
+                        mpsFileName = "time.mps";
                     }
                 }
             }
