@@ -92,11 +92,9 @@ public class MPSWriterTime {
             index++;
         }
 
-        // TODO ///////////////////
-        // Change: numYears = 6.0
-
         TimeInterval intervals = new TimeInterval();
-        intervals.addInterval(3.0, 3.0);
+        //intervals.addInterval(6.0, 6.0);
+        intervals.addInterval(3.0, 6.0);
         intervals.addInterval(3.0, 6.0);
 
         Integer num_intervals = intervals.numIntervals();
@@ -349,14 +347,14 @@ public class MPSWriterTime {
         for (int t = 0; t < num_intervals; t++) {
             String constr = "H[1][" + t + "]";
             if (modelVersion.equals("c")) {
-                contVariableToConstraints.put("captureTarget", new HashSet<ConstraintTerm>());
-                contVariableToConstraints.get("captureTarget").add(new ConstraintTerm(constr, 1));
+                contVariableToConstraints.put("captureTarget[" + t + "]", new HashSet<ConstraintTerm>());
+                contVariableToConstraints.get("captureTarget[" + t + "]").add(new ConstraintTerm(constr, 1));
             } else if (modelVersion.equals("p")) {
                 contVariableToConstraints.put("taxCreditValue", new HashSet<ConstraintTerm>());
                 contVariableToConstraints.get("taxCreditValue").add(new ConstraintTerm(constr, 1));
             } else if (modelVersion.equals("t")) {
-                contVariableToConstraints.put("captureTarget", new HashSet<ConstraintTerm>());
-                contVariableToConstraints.get("captureTarget").add(new ConstraintTerm(constr, 1));
+                contVariableToConstraints.put("captureTarget["+t+"]", new HashSet<ConstraintTerm>());
+                contVariableToConstraints.get("captureTarget["+t+"]").add(new ConstraintTerm(constr, 1));
             }
             constraintToSign.put(constr, "E");
             constraintRHS.put(constr, intervals.getValue(t));
@@ -369,8 +367,8 @@ public class MPSWriterTime {
 
         for (int t = 0; t < num_intervals; t++) {
             String constr = "H[3][" + t + "]";
-            contVariableToConstraints.put("projectLength", new HashSet<ConstraintTerm>());
-            contVariableToConstraints.get("projectLength").add(new ConstraintTerm(constr, 1));
+            contVariableToConstraints.put("projectLength["+t+"]", new HashSet<ConstraintTerm>());
+            contVariableToConstraints.get("projectLength["+t+"]").add(new ConstraintTerm(constr, 1));
             constraintToSign.put(constr, "E");
             constraintRHS.put(constr, intervals.getYears(t));
         }

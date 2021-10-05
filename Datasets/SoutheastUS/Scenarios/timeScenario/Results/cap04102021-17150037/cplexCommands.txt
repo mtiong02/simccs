@@ -1,0 +1,5 @@
+set logfile *
+read /Users/livingston/IdeaProjects/simccs-lanl/Datasets/SoutheastUS/Scenarios/timeScenario/Results/cap04102021-17150037/cap.mps
+opt
+write /Users/livingston/IdeaProjects/simccs-lanl/Datasets/SoutheastUS/Scenarios/timeScenario/Results/cap04102021-17150037/solution.sol
+quit
