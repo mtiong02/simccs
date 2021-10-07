@@ -16,7 +16,10 @@ import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.Group;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
@@ -27,13 +30,15 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.TitledPane;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableColumn.CellEditEvent;
+import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
@@ -57,6 +62,7 @@ public class Gui extends Application {
     private ChoiceBox runChoice;
     private AnchorPane solutionPane;
     private TextArea messenger;
+    private TitledPane timeSettingsContainer;
 
     @Override
     public void start(Stage stage) {
@@ -437,10 +443,18 @@ public class Gui extends Application {
                                 Boolean oldVal,
                                 Boolean show) {
                 if (!oldVal) {
-                    priceVersion.setSelected(false);
-                    timeVersion.setSelected(false);
                     paramLabel.setText("Capture Target (MT/y)");
                     paramValue.setText("15");
+                    priceVersion.setSelected(false);
+                    timeVersion.setSelected(false);
+
+                    paramLabel.setDisable(false);
+                    paramValue.setDisable(false);
+                    yearLabel.setDisable(false);
+                    yearValue.setDisable(false);
+
+                    timeSettingsContainer.setDisable(true);
+                    timeSettingsContainer.setExpanded(false);
                 }
             }
         });
@@ -458,6 +472,14 @@ public class Gui extends Application {
                     timeVersion.setSelected(false);
                     paramLabel.setText("Tax/Credit ($/t)");
                     paramValue.setText("0");
+
+                    paramLabel.setDisable(false);
+                    paramValue.setDisable(false);
+                    yearLabel.setDisable(false);
+                    yearValue.setDisable(false);
+
+                    timeSettingsContainer.setDisable(true);
+                    timeSettingsContainer.setExpanded(false);
                 }
             }
         });
@@ -473,8 +495,14 @@ public class Gui extends Application {
                 if (!oldVal) {
                     capVersion.setSelected(false);
                     priceVersion.setSelected(false);
-                    paramLabel.setText("Time Intervals");
-                    paramValue.setText("0");
+
+                    paramLabel.setDisable(true);
+                    paramValue.setDisable(true);
+                    yearLabel.setDisable(true);
+                    yearValue.setDisable(true);
+
+                    timeSettingsContainer.setDisable(false);
+                    timeSettingsContainer.setExpanded(true);
                 }
             }
         });
@@ -487,40 +515,74 @@ public class Gui extends Application {
                 "1-2",
                 "20"), new TimeIntervalProto("3-5", "15"));
 
-        AnchorPane timeSettingsPane = new AnchorPane();
-        timeSettingsPane.setPrefSize(206, 600);
-        timeSettingsPane.setMinSize(0, 0);
+        TableView timeTable = new TableView();
+        timeTable.setEditable(true);
 
-        TableView timeIntervalsTable = new TableView();
-        timeIntervalsTable.setEditable(true);
-        timeIntervalsTable.setItems(data);
+        TableColumn intervalYearsCol = new TableColumn("Years");
+        intervalYearsCol.setMinWidth(50);
+        intervalYearsCol.setCellValueFactory(
+                new PropertyValueFactory<TimeIntervalProto, String>("timeInterval")
+        );
+        intervalYearsCol.setCellFactory(TextFieldTableCell.forTableColumn());
+        intervalYearsCol.setOnEditCommit(
+                new EventHandler<CellEditEvent<TimeIntervalProto, String>>() {
+                    @Override
+                    public void handle(CellEditEvent<TimeIntervalProto, String> t) {
+                        ((TimeIntervalProto) t.getTableView().getItems().get(
+                                t.getTablePosition().getRow())
+                        ).setTimeInterval(t.getNewValue());
+                    }
+                }
+        );
 
-        TableColumn timeIntervalsNumberCol = new TableColumn("#");
-        timeIntervalsNumberCol.setMinWidth(20);
-        timeIntervalsNumberCol.setSortable(false);
-        //timeIntervalsTICol.setCellValueFactory(new PropertyValueFactory<TimeIntervalProto, String>("id"));
+        TableColumn intervalValuesCol = new TableColumn("Values");
+        intervalValuesCol.setMinWidth(50);
+        intervalValuesCol.setCellValueFactory(
+                new PropertyValueFactory<TimeIntervalProto, String>("captureTarget")
+        );
+        intervalValuesCol.setCellFactory(TextFieldTableCell.forTableColumn());
+        intervalValuesCol.setOnEditCommit(
+                new EventHandler<CellEditEvent<TimeIntervalProto, String>>() {
+                    @Override
+                    public void handle(CellEditEvent<TimeIntervalProto, String> t) {
+                        ((TimeIntervalProto) t.getTableView().getItems().get(
+                                t.getTablePosition().getRow())
+                        ).setCaptureTarget(t.getNewValue());
+                    }
+                }
+        );
 
-        TableColumn timeIntervalsTICol = new TableColumn("Interval");
-        timeIntervalsTICol.setMinWidth(50);
-        timeIntervalsTICol.setSortable(false);
-        timeIntervalsTICol.setCellValueFactory(new PropertyValueFactory<TimeIntervalProto, String>(
-                "timeInterval"));
+        timeTable.setItems(data);
+        timeTable.getColumns().addAll(intervalYearsCol, intervalValuesCol);
 
-        TableColumn timeIntervalsCTCol = new TableColumn("Capture Target");
-        timeIntervalsCTCol.setMinWidth(50);
-        timeIntervalsCTCol.setSortable(false);
-        timeIntervalsCTCol.setCellValueFactory(new PropertyValueFactory<TimeIntervalProto, String>(
-                "captureTarget"));
+        final Button addIntervalButton = new Button("+");
+        addIntervalButton.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent e) {
+                // Add new interval to bottom of data stack (LIFO)
+                data.add(new TimeIntervalProto("-", "-"));
+            }
+        });
 
-        //timeIntervalsTable.getColumns().addAll(timeIntervalsTICol, timeIntervalsCTCol);
-        timeIntervalsTable.getColumns()
-                .addAll(timeIntervalsNumberCol, timeIntervalsTICol, timeIntervalsCTCol);
+        final Button subIntervalButton = new Button("–");
+        subIntervalButton.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent e) {
+                // Remove the last object added (LIFO)
+                if (data.size() > 0) {
+                    data.remove(data.size() - 1);
+                }
+            }
+        });
 
-        final VBox timeIntervalsVbox = new VBox();
-        //timeIntervalsVbox.setSpacing(5);
-        //timeIntervalsVbox.setPadding(new Insets(10, 0, 0, 10));
-        timeIntervalsVbox.getChildren().addAll(timeIntervalsTable);
-        timeSettingsPane.getChildren().addAll(timeIntervalsVbox);
+        final HBox timeIntervalBtnHBox = new HBox();
+        addIntervalButton.setMinWidth(50);
+        timeIntervalBtnHBox.getChildren().addAll(addIntervalButton, subIntervalButton);
+
+        final VBox timeTableVBox = new VBox();
+        timeTableVBox.setSpacing(5);
+        timeTableVBox.setPadding(new Insets(2, 2, 2, 2));
+        timeTableVBox.getChildren().addAll(timeTable, timeIntervalBtnHBox);
 
         //////////////////////////////////////////////////////////////////
 
@@ -532,13 +594,15 @@ public class Gui extends Application {
         modelContainer.setLayoutY(5);
         modelPane.getChildren().add(modelContainer);
 
-        TitledPane timeSettingsContainer = new TitledPane("Time Intervals", timeSettingsPane);
+        timeSettingsContainer = new TitledPane("Time Intervals", timeTableVBox);
         timeSettingsContainer.setCollapsible(true);
         timeSettingsContainer.setPrefSize(192, 282);
         timeSettingsContainer.setLayoutX(14);
         timeSettingsContainer.setLayoutY(259);
         modelPane.getChildren().add(timeSettingsContainer);
-        //TableView tableView = new TableView();
+
+        timeSettingsContainer.setDisable(true);
+        timeSettingsContainer.setExpanded(false);
 
         // Solution pane.
         AnchorPane mipSolutionPane = new AnchorPane();
@@ -569,6 +633,23 @@ public class Gui extends Application {
                     );
                 } else if (timeVersion.isSelected()) {
                     modelVersion = "t";
+                    for (TimeIntervalProto t : data) {
+                        String t_time = t.getTimeInterval();
+                        String t_value = t.getCaptureTarget();
+                        if (t_time.isEmpty() && t_value.isEmpty()) continue;
+
+                        try {
+                            intervals.addInterval(Double.parseDouble(t_time),
+                                                  Double.parseDouble(t_value));
+                        } catch (NumberFormatException | NullPointerException err) {
+                            System.err.println("Invalid interval: (" + t.getTimeInterval() + ", " + t.getCaptureTarget() + ")");
+                            Alert alert = new Alert(AlertType.ERROR,
+                                                    "Invalid interval: (" + t_time + ", " + t_value + ")",
+                                                    ButtonType.OK);
+                            alert.showAndWait();
+                            return;
+                        }
+                    }
                 }
 
                 controlActions.generateMPSFile(crfValue.getText(), intervals, modelVersion);
