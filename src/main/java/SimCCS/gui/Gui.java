@@ -511,9 +511,13 @@ public class Gui extends Application {
         // TIME SETTINGS PANE
         //////////////////////////////////////////////////////////////////
 
-        ObservableList<TimeIntervalProto> data = FXCollections.observableArrayList(new TimeIntervalProto(
-                "1-2",
-                "20"), new TimeIntervalProto("3-5", "15"));
+        /*
+        ObservableList<TimeIntervalProto> data = FXCollections.observableArrayList(
+                new TimeIntervalProto("1-2", "20"),
+                new TimeIntervalProto("3-5", "15")
+        );
+        */
+        ObservableList<TimeIntervalProto> data = FXCollections.observableArrayList();
 
         TableView timeTable = new TableView();
         timeTable.setEditable(true);
@@ -634,6 +638,7 @@ public class Gui extends Application {
                 } else if (timeVersion.isSelected()) {
                     modelVersion = "t";
                     for (TimeIntervalProto t : data) {
+                        System.out.println(t);
                         String t_time = t.getTimeInterval();
                         String t_value = t.getCaptureTarget();
                         if (t_time.isEmpty() && t_value.isEmpty()) continue;
@@ -652,7 +657,9 @@ public class Gui extends Application {
                     }
                 }
 
+                System.out.println("generating...");
                 controlActions.generateMPSFile(crfValue.getText(), intervals, modelVersion);
+                System.out.println("done generating");
             }
         });
 
@@ -705,6 +712,12 @@ public class Gui extends Application {
         solutionDisplayPane.setLayoutX(0);
         solutionDisplayPane.setLayoutY(110);
         resultsPane.getChildren().add(solutionDisplayPane);
+
+        // Time Interval selection
+        VBox timeIntervalVBox = new VBox();
+        Label timeIntervalLabel = new Label("Time Interval:");
+        ChoiceBox timeIntervalChoices = new ChoiceBox();
+        timeIntervalVBox.getChildren().addAll(timeIntervalLabel, timeIntervalChoices);
 
         // Solution labels.
         Label sources = new Label("Sources:");

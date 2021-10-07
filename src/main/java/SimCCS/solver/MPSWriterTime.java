@@ -21,7 +21,6 @@ public class MPSWriterTime extends MPSWriter {
                                         String dataset,
                                         String scenario,
                                         String modelVersion) {
-        //model version: c - cap, p - price
 
         // Collect data
         Source[] sources = data.getSources();

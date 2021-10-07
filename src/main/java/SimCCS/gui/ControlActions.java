@@ -293,7 +293,6 @@ public class ControlActions {
                                 TimeInterval intervals,
                                 String modelVersion) {
         if (scenario != "") {
-            System.out.println("Writing MPS File...");
             if (modelVersion.equals("c") || modelVersion.equals("p")) {
                 MPSWriter.writeCapPriceMPS(data,
                                            Double.parseDouble(crf),
