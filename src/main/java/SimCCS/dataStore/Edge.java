@@ -1,7 +1,6 @@
 package dataStore;
 
 /**
- *
  * @author yaw
  */
 public class Edge {
@@ -33,7 +32,7 @@ public class Edge {
         final Edge other = (Edge) obj;
         return (v1 == other.v1 && v2 == other.v2) || (v1 == other.v2 && v2 == other.v1);
     }
-    
+
     public String toString() {
         return v1 + " <-> " + v2;
     }

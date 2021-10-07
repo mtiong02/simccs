@@ -1,14 +1,6 @@
 package solver;
 
-/*
-- Interval 1:
-    - Range: 1 - 3
-    - Capture Target: 3 MT/yr
-- Interval 2:
-    - Range: 4 - 6
-    - Capture Target: 6 MT/yr
-*/
-
+import solver.MPSWriter;
 import dataStore.DataStorer;
 import dataStore.Edge;
 import dataStore.TimeInterval;
@@ -16,20 +8,19 @@ import dataStore.LinearComponent;
 import dataStore.Sink;
 import dataStore.Source;
 import dataStore.UnidirEdge;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import dataStore.TimeInterval;
+
 import java.util.HashMap;
 import java.util.HashSet;
 
-/**
- *
- * @author yaw
- */
-public class MPSWriterTime {
-
-    public static void writeCapPriceMPS(DataStorer data, double crf, double tmp1, double tmp2, String basePath, String dataset, String scenario, String modelVersion) {
+public class MPSWriterTime extends MPSWriter {
+    public static void writeCapPriceMPS(DataStorer data,
+                                        double crf,
+                                        TimeInterval intervals,
+                                        String basePath,
+                                        String dataset,
+                                        String scenario,
+                                        String modelVersion) {
         //model version: c - cap, p - price
 
         // Collect data
@@ -92,10 +83,9 @@ public class MPSWriterTime {
             index++;
         }
 
-        TimeInterval intervals = new TimeInterval();
-        //intervals.addInterval(6.0, 6.0);
-        intervals.addInterval(3.0, 6.0);
-        intervals.addInterval(3.0, 6.0);
+        //TimeInterval intervals = new TimeInterval();
+        //intervals.addInterval(3.0, 6.0);
+        //intervals.addInterval(3.0, 6.0);
 
         Integer num_intervals = intervals.numIntervals();
 
@@ -176,18 +166,22 @@ public class MPSWriterTime {
                     if (!contVariableToConstraints.containsKey(p[e][c][t])) {
                         contVariableToConstraints.put(p[e][c][t], new HashSet<ConstraintTerm>());
                     }
-                    contVariableToConstraints.get(p[e][c][t]).add(new ConstraintTerm(constraint, 1));
+                    contVariableToConstraints.get(p[e][c][t])
+                            .add(new ConstraintTerm(constraint, 1));
 
                     if (!intVariableToConstraints.containsKey(y[e][c][t])) {
                         intVariableToConstraints.put(y[e][c][t], new HashSet<ConstraintTerm>());
                     }
-                    intVariableToConstraints.get(y[e][c][t]).add(new ConstraintTerm(constraint, -linearComponents[c].getMaxCapacity()));
+                    intVariableToConstraints.get(y[e][c][t])
+                            .add(new ConstraintTerm(constraint,
+                                                    -linearComponents[c].getMaxCapacity()));
 
                     constraintToSign.put(constraint, "L");
                     constraintRHS.put(constraint, 0.0);
 
                     constraint = "A" + constraintCounter++;
-                    contVariableToConstraints.get(p[e][c][t]).add(new ConstraintTerm(constraint, 1));
+                    contVariableToConstraints.get(p[e][c][t])
+                            .add(new ConstraintTerm(constraint, 1));
                     constraintToSign.put(constraint, "G");
                 }
             }
@@ -218,9 +212,11 @@ public class MPSWriterTime {
                     UnidirEdge edge = new UnidirEdge(src, dest);
                     for (int c = 0; c < linearComponents.length; c++) {
                         if (!contVariableToConstraints.containsKey(p[edgeToIndex.get(edge)][c][t])) {
-                            contVariableToConstraints.put(p[edgeToIndex.get(edge)][c][t], new HashSet<ConstraintTerm>());
+                            contVariableToConstraints.put(p[edgeToIndex.get(edge)][c][t],
+                                                          new HashSet<ConstraintTerm>());
                         }
-                        contVariableToConstraints.get(p[edgeToIndex.get(edge)][c][t]).add(new ConstraintTerm(constraint, 1));
+                        contVariableToConstraints.get(p[edgeToIndex.get(edge)][c][t])
+                                .add(new ConstraintTerm(constraint, 1));
                     }
                 }
 
@@ -228,9 +224,11 @@ public class MPSWriterTime {
                     UnidirEdge edge = new UnidirEdge(dest, src);
                     for (int c = 0; c < linearComponents.length; c++) {
                         if (!contVariableToConstraints.containsKey(p[edgeToIndex.get(edge)][c][t])) {
-                            contVariableToConstraints.put(p[edgeToIndex.get(edge)][c][t], new HashSet<ConstraintTerm>());
+                            contVariableToConstraints.put(p[edgeToIndex.get(edge)][c][t],
+                                                          new HashSet<ConstraintTerm>());
                         }
-                        contVariableToConstraints.get(p[edgeToIndex.get(edge)][c][t]).add(new ConstraintTerm(constraint, -1));
+                        contVariableToConstraints.get(p[edgeToIndex.get(edge)][c][t])
+                                .add(new ConstraintTerm(constraint, -1));
                     }
                 }
 
@@ -238,10 +236,13 @@ public class MPSWriterTime {
                 if (sourceCells.contains(src)) {
                     for (Source source : sources) {
                         if (source.getCellNum() == src) {
-                            if (!contVariableToConstraints.containsKey(a[sourceCellToIndex.get(source)][t])) {
-                                contVariableToConstraints.put(a[sourceCellToIndex.get(source)][t], new HashSet<ConstraintTerm>());
+                            if (!contVariableToConstraints.containsKey(a[sourceCellToIndex.get(
+                                    source)][t])) {
+                                contVariableToConstraints.put(a[sourceCellToIndex.get(source)][t],
+                                                              new HashSet<ConstraintTerm>());
                             }
-                            contVariableToConstraints.get(a[sourceCellToIndex.get(source)][t]).add(new ConstraintTerm(constraint, -1));
+                            contVariableToConstraints.get(a[sourceCellToIndex.get(source)][t])
+                                    .add(new ConstraintTerm(constraint, -1));
                         }
                     }
                 }
@@ -249,9 +250,11 @@ public class MPSWriterTime {
                     for (Sink sink : sinks) {
                         if (sink.getCellNum() == src) {
                             if (!contVariableToConstraints.containsKey(b[sinkCellToIndex.get(sink)][t])) {
-                                contVariableToConstraints.put(b[sinkCellToIndex.get(sink)][t], new HashSet<ConstraintTerm>());
+                                contVariableToConstraints.put(b[sinkCellToIndex.get(sink)][t],
+                                                              new HashSet<ConstraintTerm>());
                             }
-                            contVariableToConstraints.get(b[sinkCellToIndex.get(sink)][t]).add(new ConstraintTerm(constraint, 1));
+                            contVariableToConstraints.get(b[sinkCellToIndex.get(sink)][t])
+                                    .add(new ConstraintTerm(constraint, 1));
                         }
                     }
                 }
@@ -266,14 +269,18 @@ public class MPSWriterTime {
                 String constraint = "D" + constraintCounter++;
 
                 if (!intVariableToConstraints.containsKey(s[sourceCellToIndex.get(src)][t])) {
-                    intVariableToConstraints.put(s[sourceCellToIndex.get(src)][t], new HashSet<ConstraintTerm>());
+                    intVariableToConstraints.put(s[sourceCellToIndex.get(src)][t],
+                                                 new HashSet<ConstraintTerm>());
                 }
-                intVariableToConstraints.get(s[sourceCellToIndex.get(src)][t]).add(new ConstraintTerm(constraint, src.getProductionRate()));
+                intVariableToConstraints.get(s[sourceCellToIndex.get(src)][t])
+                        .add(new ConstraintTerm(constraint, src.getProductionRate()));
 
                 if (!contVariableToConstraints.containsKey(a[sourceCellToIndex.get(src)][t])) {
-                    contVariableToConstraints.put(a[sourceCellToIndex.get(src)][t], new HashSet<ConstraintTerm>());
+                    contVariableToConstraints.put(a[sourceCellToIndex.get(src)][t],
+                                                  new HashSet<ConstraintTerm>());
                 }
-                contVariableToConstraints.get(a[sourceCellToIndex.get(src)][t]).add(new ConstraintTerm(constraint, -1));
+                contVariableToConstraints.get(a[sourceCellToIndex.get(src)][t])
+                        .add(new ConstraintTerm(constraint, -1));
                 constraintToSign.put(constraint, "G");
             }
         }
@@ -285,14 +292,18 @@ public class MPSWriterTime {
                 String constraint = "E" + constraintCounter++;
 
                 if (!intVariableToConstraints.containsKey(w[sinkCellToIndex.get(snk)][t])) {
-                    intVariableToConstraints.put(w[sinkCellToIndex.get(snk)][t], new HashSet<ConstraintTerm>());
+                    intVariableToConstraints.put(w[sinkCellToIndex.get(snk)][t],
+                                                 new HashSet<ConstraintTerm>());
                 }
-                intVariableToConstraints.get(w[sinkCellToIndex.get(snk)][t]).add(new ConstraintTerm(constraint, snk.getWellCapacity()));
+                intVariableToConstraints.get(w[sinkCellToIndex.get(snk)][t])
+                        .add(new ConstraintTerm(constraint, snk.getWellCapacity()));
 
                 if (!contVariableToConstraints.containsKey(b[sinkCellToIndex.get(snk)][t])) {
-                    contVariableToConstraints.put(b[sinkCellToIndex.get(snk)][t], new HashSet<ConstraintTerm>());
+                    contVariableToConstraints.put(b[sinkCellToIndex.get(snk)][t],
+                                                  new HashSet<ConstraintTerm>());
                 }
-                contVariableToConstraints.get(b[sinkCellToIndex.get(snk)][t]).add(new ConstraintTerm(constraint, -1));
+                contVariableToConstraints.get(b[sinkCellToIndex.get(snk)][t])
+                        .add(new ConstraintTerm(constraint, -1));
                 constraintToSign.put(constraint, "G");
             }
         }
@@ -303,22 +314,21 @@ public class MPSWriterTime {
             for (Sink snk : sinks) {
                 String constraint = "F" + constraintCounter++;
                 if (!intVariableToConstraints.containsKey(r[sinkCellToIndex.get(snk)][t])) {
-                    intVariableToConstraints.put(r[sinkCellToIndex.get(snk)][t], new HashSet<ConstraintTerm>());
+                    intVariableToConstraints.put(r[sinkCellToIndex.get(snk)][t],
+                                                 new HashSet<ConstraintTerm>());
                 }
 
-                intVariableToConstraints.get(
-                        r[sinkCellToIndex.get(snk)][t]).add(
-                                new ConstraintTerm(
-                                        constraint,
-                                        snk.getCapacity() / intervals.getYears(t)
-                                )
-                );
+                intVariableToConstraints.get(r[sinkCellToIndex.get(snk)][t])
+                        .add(new ConstraintTerm(constraint,
+                                                snk.getCapacity() / intervals.getYears(t)));
 
                 if (!contVariableToConstraints.containsKey(b[sinkCellToIndex.get(snk)][t])) {
-                    contVariableToConstraints.put(b[sinkCellToIndex.get(snk)][t], new HashSet<ConstraintTerm>());
+                    contVariableToConstraints.put(b[sinkCellToIndex.get(snk)][t],
+                                                  new HashSet<ConstraintTerm>());
                 }
 
-                contVariableToConstraints.get(b[sinkCellToIndex.get(snk)][t]).add(new ConstraintTerm(constraint, -1));
+                contVariableToConstraints.get(b[sinkCellToIndex.get(snk)][t])
+                        .add(new ConstraintTerm(constraint, -1));
                 constraintToSign.put(constraint, "G");
             }
         }
@@ -333,9 +343,11 @@ public class MPSWriterTime {
 
                 for (Source src : sources) {
                     if (!contVariableToConstraints.containsKey(a[sourceCellToIndex.get(src)][t])) {
-                        contVariableToConstraints.put(a[sourceCellToIndex.get(src)][t], new HashSet<ConstraintTerm>());
+                        contVariableToConstraints.put(a[sourceCellToIndex.get(src)][t],
+                                                      new HashSet<ConstraintTerm>());
                     }
-                    contVariableToConstraints.get(a[sourceCellToIndex.get(src)][t]).add(new ConstraintTerm(constraint, 1));
+                    contVariableToConstraints.get(a[sourceCellToIndex.get(src)][t])
+                            .add(new ConstraintTerm(constraint, 1));
                 }
 
                 constraintToSign.put(constraint, "E");
@@ -347,14 +359,18 @@ public class MPSWriterTime {
         for (int t = 0; t < num_intervals; t++) {
             String constr = "H[1][" + t + "]";
             if (modelVersion.equals("c")) {
-                contVariableToConstraints.put("captureTarget[" + t + "]", new HashSet<ConstraintTerm>());
-                contVariableToConstraints.get("captureTarget[" + t + "]").add(new ConstraintTerm(constr, 1));
+                contVariableToConstraints.put("captureTarget[" + t + "]",
+                                              new HashSet<ConstraintTerm>());
+                contVariableToConstraints.get("captureTarget[" + t + "]")
+                        .add(new ConstraintTerm(constr, 1));
             } else if (modelVersion.equals("p")) {
                 contVariableToConstraints.put("taxCreditValue", new HashSet<ConstraintTerm>());
                 contVariableToConstraints.get("taxCreditValue").add(new ConstraintTerm(constr, 1));
             } else if (modelVersion.equals("t")) {
-                contVariableToConstraints.put("captureTarget["+t+"]", new HashSet<ConstraintTerm>());
-                contVariableToConstraints.get("captureTarget["+t+"]").add(new ConstraintTerm(constr, 1));
+                contVariableToConstraints.put("captureTarget[" + t + "]",
+                                              new HashSet<ConstraintTerm>());
+                contVariableToConstraints.get("captureTarget[" + t + "]")
+                        .add(new ConstraintTerm(constr, 1));
             }
             constraintToSign.put(constr, "E");
             constraintRHS.put(constr, intervals.getValue(t));
@@ -367,8 +383,10 @@ public class MPSWriterTime {
 
         for (int t = 0; t < num_intervals; t++) {
             String constr = "H[3][" + t + "]";
-            contVariableToConstraints.put("projectLength["+t+"]", new HashSet<ConstraintTerm>());
-            contVariableToConstraints.get("projectLength["+t+"]").add(new ConstraintTerm(constr, 1));
+            contVariableToConstraints.put("projectLength[" + t + "]",
+                                          new HashSet<ConstraintTerm>());
+            contVariableToConstraints.get("projectLength[" + t + "]")
+                    .add(new ConstraintTerm(constr, 1));
             constraintToSign.put(constr, "E");
             constraintRHS.put(constr, intervals.getYears(t));
         }
@@ -378,17 +396,23 @@ public class MPSWriterTime {
         for (int t = 0; t < num_intervals; t++) {
             for (Source src : sources) {
                 if (!intVariableToConstraints.containsKey(s[sourceCellToIndex.get(src)][t])) {
-                    intVariableToConstraints.put(s[sourceCellToIndex.get(src)][t], new HashSet<ConstraintTerm>());
+                    intVariableToConstraints.put(s[sourceCellToIndex.get(src)][t],
+                                                 new HashSet<ConstraintTerm>());
                 }
-                intVariableToConstraints.get(s[sourceCellToIndex.get(src)][t]).add(new ConstraintTerm(constraint, src.getOpeningCost(crf)));
+                intVariableToConstraints.get(s[sourceCellToIndex.get(src)][t])
+                        .add(new ConstraintTerm(constraint, src.getOpeningCost(crf)));
 
                 if (!contVariableToConstraints.containsKey(a[sourceCellToIndex.get(src)][t])) {
-                    contVariableToConstraints.put(a[sourceCellToIndex.get(src)][t], new HashSet<ConstraintTerm>());
+                    contVariableToConstraints.put(a[sourceCellToIndex.get(src)][t],
+                                                  new HashSet<ConstraintTerm>());
                 }
                 if (modelVersion.equals("p")) {
-                    contVariableToConstraints.get(a[sourceCellToIndex.get(src)][t]).add(new ConstraintTerm(constraint, (src.getCaptureCost() + intervals.getValue(t))));
+                    contVariableToConstraints.get(a[sourceCellToIndex.get(src)][t])
+                            .add(new ConstraintTerm(constraint,
+                                                    (src.getCaptureCost() + intervals.getValue(t))));
                 } else {
-                    contVariableToConstraints.get(a[sourceCellToIndex.get(src)][t]).add(new ConstraintTerm(constraint, src.getCaptureCost()));
+                    contVariableToConstraints.get(a[sourceCellToIndex.get(src)][t])
+                            .add(new ConstraintTerm(constraint, src.getCaptureCost()));
                 }
             }
         }
@@ -402,14 +426,20 @@ public class MPSWriterTime {
                     if (!intVariableToConstraints.containsKey(y[e][c][t])) {
                         intVariableToConstraints.put(y[e][c][t], new HashSet<ConstraintTerm>());
                     }
-                    double coefficient = (linearComponents[c].getConIntercept() * edgeConstructionCosts.get(bidirEdge) + linearComponents[c].getRowIntercept() * edgeRightOfWayCosts.get(bidirEdge)) * crf;
-                    intVariableToConstraints.get(y[e][c][t]).add(new ConstraintTerm(constraint, coefficient));
+                    double coefficient = (linearComponents[c].getConIntercept() * edgeConstructionCosts.get(
+                            bidirEdge) + linearComponents[c].getRowIntercept() * edgeRightOfWayCosts.get(
+                            bidirEdge)) * crf;
+                    intVariableToConstraints.get(y[e][c][t])
+                            .add(new ConstraintTerm(constraint, coefficient));
 
                     if (!contVariableToConstraints.containsKey(p[e][c][t])) {
                         contVariableToConstraints.put(p[e][c][t], new HashSet<ConstraintTerm>());
                     }
-                    coefficient = (linearComponents[c].getConSlope() * edgeConstructionCosts.get(bidirEdge) + linearComponents[c].getRowSlope() * edgeRightOfWayCosts.get(bidirEdge)) * crf / pipeUtilization;
-                    contVariableToConstraints.get(p[e][c][t]).add(new ConstraintTerm(constraint, coefficient));
+                    coefficient = (linearComponents[c].getConSlope() * edgeConstructionCosts.get(
+                            bidirEdge) + linearComponents[c].getRowSlope() * edgeRightOfWayCosts.get(
+                            bidirEdge)) * crf / pipeUtilization;
+                    contVariableToConstraints.get(p[e][c][t])
+                            .add(new ConstraintTerm(constraint, coefficient));
                 }
             }
         }
@@ -417,19 +447,25 @@ public class MPSWriterTime {
         for (int t = 0; t < num_intervals; t++) {
             for (Sink snk : sinks) {
                 if (!intVariableToConstraints.containsKey(r[sinkCellToIndex.get(snk)][t])) {
-                    intVariableToConstraints.put(r[sinkCellToIndex.get(snk)][t], new HashSet<ConstraintTerm>());
+                    intVariableToConstraints.put(r[sinkCellToIndex.get(snk)][t],
+                                                 new HashSet<ConstraintTerm>());
                 }
-                intVariableToConstraints.get(r[sinkCellToIndex.get(snk)][t]).add(new ConstraintTerm(constraint, snk.getOpeningCost(crf)));
+                intVariableToConstraints.get(r[sinkCellToIndex.get(snk)][t])
+                        .add(new ConstraintTerm(constraint, snk.getOpeningCost(crf)));
 
                 if (!intVariableToConstraints.containsKey(w[sinkCellToIndex.get(snk)][t])) {
-                    intVariableToConstraints.put(w[sinkCellToIndex.get(snk)][t], new HashSet<ConstraintTerm>());
+                    intVariableToConstraints.put(w[sinkCellToIndex.get(snk)][t],
+                                                 new HashSet<ConstraintTerm>());
                 }
-                intVariableToConstraints.get(w[sinkCellToIndex.get(snk)][t]).add(new ConstraintTerm(constraint, snk.getWellOpeningCost(crf)));
+                intVariableToConstraints.get(w[sinkCellToIndex.get(snk)][t])
+                        .add(new ConstraintTerm(constraint, snk.getWellOpeningCost(crf)));
 
                 if (!contVariableToConstraints.containsKey(b[sinkCellToIndex.get(snk)][t])) {
-                    contVariableToConstraints.put(b[sinkCellToIndex.get(snk)][t], new HashSet<ConstraintTerm>());
+                    contVariableToConstraints.put(b[sinkCellToIndex.get(snk)][t],
+                                                  new HashSet<ConstraintTerm>());
                 }
-                contVariableToConstraints.get(b[sinkCellToIndex.get(snk)][t]).add(new ConstraintTerm(constraint, snk.getInjectionCost()));
+                contVariableToConstraints.get(b[sinkCellToIndex.get(snk)][t])
+                        .add(new ConstraintTerm(constraint, snk.getInjectionCost()));
             }
         }
 
@@ -444,89 +480,15 @@ public class MPSWriterTime {
             fileName = "time.mps";
         }
 
-        makeFile(fileName, basePath, dataset, scenario, intVariableToConstraints, contVariableToConstraints, constraintToSign, constraintRHS, variableBounds);
+        makeFile(fileName,
+                 basePath,
+                 dataset,
+                 scenario,
+                 intVariableToConstraints,
+                 contVariableToConstraints,
+                 constraintToSign,
+                 constraintRHS,
+                 variableBounds);
     }
 
-    private static void makeFile(String fileName, String basePath, String dataset, String scenario, HashMap<String, HashSet<ConstraintTerm>> intVariableToConstraints, HashMap<String, HashSet<ConstraintTerm>> contVariableToConstraints, HashMap<String, String> constraintToSign, HashMap<String, Double> constraintRHS, HashMap<String, VariableBound> variableBounds) {
-        StringBuilder problemFormulation = new StringBuilder("NAME\tSimCCS\n");
-
-        // Identify constraints.
-        problemFormulation.append("ROWS\n");
-        for (String constraint : constraintToSign.keySet()) {
-            problemFormulation.append("\t" + constraintToSign.get(constraint) + "\t" + constraint + "\n");
-        }
-
-        // Identify columns.
-        problemFormulation.append("COLUMNS\n");
-        problemFormulation.append("\tMARK0000\t'MARKER'\t'INTORG'\n");
-        for (String intVar : intVariableToConstraints.keySet()) {
-            for (ConstraintTerm term : intVariableToConstraints.get(intVar)) {
-                problemFormulation.append("\t" + intVar + "\t" + term.constraint + "\t" + term.coefficient + "\n");
-            }
-        }
-        problemFormulation.append("\tMARK0001\t'MARKER'\t'INTEND'\n");
-        for (String contVar : contVariableToConstraints.keySet()) {
-            for (ConstraintTerm term : contVariableToConstraints.get(contVar)) {
-                problemFormulation.append("\t" + contVar + "\t" + term.constraint + "\t" + term.coefficient + "\n");
-            }
-        }
-
-        // Identify RHSs.
-        problemFormulation.append("RHS\n");
-        for (String constraint : constraintRHS.keySet()) {
-            problemFormulation.append("\trhs\t" + constraint + "\t" + constraintRHS.get(constraint) + "\n");
-        }
-
-        // Identify bounds.
-        problemFormulation.append("BOUNDS\n");
-        for (String variable : variableBounds.keySet()) {
-            problemFormulation.append("\t" + variableBounds.get(variable).type + " bnd\t" + variable + "\t" + variableBounds.get(variable).bound + "\n");
-        }
-
-        // End file.
-        problemFormulation.append("ENDATA");
-
-        // Clear mip directory.
-        String mipDirectory = basePath + "/" + dataset + "/Scenarios/" + scenario + "/MIP/";
-        File mipFolder = new File(mipDirectory);
-        File[] mips = mipFolder.listFiles();
-        if (mips != null) {
-            for (File mip : mips) {
-                mip.delete();
-            }
-        }
-
-        System.out.println("WROTE MPS TIME");
-
-        // Save to file.
-        String mipPath = mipDirectory + fileName;
-        System.out.println("Writing file to: " + mipPath);
-        try (BufferedWriter bw = new BufferedWriter(new FileWriter(mipPath))) {
-            bw.write(problemFormulation.toString());
-        } catch (IOException e) {
-            System.out.println(e.getMessage());
-        }
-    }
-
-    private static class ConstraintTerm {
-
-        String constraint;
-        double coefficient;
-
-        public ConstraintTerm(String constraint, double coefficient) {
-            this.constraint = constraint;
-            this.coefficient = Math.round(coefficient * 100000.0) / 100000.0;
-        }
-    }
-
-    private static class VariableBound {
-
-        String type;
-        double bound;
-
-        public VariableBound(String type, double bound) {
-            this.type = type;
-            this.bound = bound;
-        }
-    }
 }

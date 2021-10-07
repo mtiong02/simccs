@@ -2,8 +2,11 @@ package gui;
 
 import java.io.File;
 
+import dataStore.TimeInterval;
 import javafx.application.Application;
+
 import static javafx.application.Application.launch;
+
 import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
 import javafx.beans.value.ObservableValue;
@@ -38,7 +41,6 @@ import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
 
 /**
- *
  * @author yaw
  */
 public class Gui extends Application {
@@ -74,8 +76,10 @@ public class Gui extends Application {
         displayPane.setTranslateX(220);
         // Associate scroll/navigation actions.
         SceneGestures sceneGestures = new SceneGestures(displayPane);
-        displayPane.addEventFilter(MouseEvent.MOUSE_PRESSED, sceneGestures.getOnMousePressedEventHandler());
-        displayPane.addEventFilter(MouseEvent.MOUSE_DRAGGED, sceneGestures.getOnMouseDraggedEventHandler());
+        displayPane.addEventFilter(MouseEvent.MOUSE_PRESSED,
+                                   sceneGestures.getOnMousePressedEventHandler());
+        displayPane.addEventFilter(MouseEvent.MOUSE_DRAGGED,
+                                   sceneGestures.getOnMouseDraggedEventHandler());
         displayPane.addEventFilter(ScrollEvent.ANY, sceneGestures.getOnScrollEventHandler());
 
         // Make background.
@@ -125,8 +129,7 @@ public class Gui extends Application {
         tabPane.getTabs().add(resultsTab);
 
         // Clear messenger when clicking in control area.
-        tabPane.addEventFilter(MouseEvent.MOUSE_CLICKED,
-                new EventHandler<MouseEvent>() {
+        tabPane.addEventFilter(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>() {
             public void handle(MouseEvent event) {
                 //messenger.clear();
             }
@@ -162,12 +165,16 @@ public class Gui extends Application {
         dataPane.getChildren().add(scenarioContainer);
         runChoice = new ChoiceBox();
 
-        scenarioChoice.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<String>() {
-            @Override
-            public void changed(ObservableValue<? extends String> selected, String oldScenario, String newScenario) {
-                controlActions.selectScenario(newScenario, background, runChoice);
-            }
-        });
+        scenarioChoice.getSelectionModel()
+                .selectedItemProperty()
+                .addListener(new ChangeListener<String>() {
+                    @Override
+                    public void changed(ObservableValue<? extends String> selected,
+                                        String oldScenario,
+                                        String newScenario) {
+                        controlActions.selectScenario(newScenario, background, runChoice);
+                    }
+                });
 
         // Build dataset selection control and add to control pane.
         Button openDataset = new Button("[Open Dataset]");
@@ -231,7 +238,9 @@ public class Gui extends Application {
         controlActions.addRawDelaunayLayer(rawDelaunayLayer);
         dispDelaunayEdges.selectedProperty().addListener(new ChangeListener<Boolean>() {
             @Override
-            public void changed(ObservableValue<? extends Boolean> selected, Boolean oldVal, Boolean show) {
+            public void changed(ObservableValue<? extends Boolean> selected,
+                                Boolean oldVal,
+                                Boolean show) {
                 controlActions.toggleRawDelaunayDisplay(show);
             }
         });
@@ -246,7 +255,9 @@ public class Gui extends Application {
         controlActions.addCandidateNetworkLayer(candidateNetworkLayer);
         dispCandidateNetwork.selectedProperty().addListener(new ChangeListener<Boolean>() {
             @Override
-            public void changed(ObservableValue<? extends Boolean> selected, Boolean oldVal, Boolean show) {
+            public void changed(ObservableValue<? extends Boolean> selected,
+                                Boolean oldVal,
+                                Boolean show) {
                 controlActions.toggleCandidateNetworkDisplay(show);
             }
         });
@@ -269,7 +280,9 @@ public class Gui extends Application {
         sceneGestures.addEntityToResize(sourcesLayer);
         sourceVisible.selectedProperty().addListener(new ChangeListener<Boolean>() {
             @Override
-            public void changed(ObservableValue<? extends Boolean> selected, Boolean oldVal, Boolean show) {
+            public void changed(ObservableValue<? extends Boolean> selected,
+                                Boolean oldVal,
+                                Boolean show) {
                 if (!show) {
                     sourceLabeled.setSelected(false);
                 }
@@ -288,7 +301,9 @@ public class Gui extends Application {
         sceneGestures.addEntityToResize(sourceLabelsLayer);
         sourceLabeled.selectedProperty().addListener(new ChangeListener<Boolean>() {
             @Override
-            public void changed(ObservableValue<? extends Boolean> selected, Boolean oldVal, Boolean show) {
+            public void changed(ObservableValue<? extends Boolean> selected,
+                                Boolean oldVal,
+                                Boolean show) {
                 if (!sourceVisible.isSelected()) {
                     show = false;
                     sourceLabeled.setSelected(false);
@@ -314,7 +329,9 @@ public class Gui extends Application {
         sceneGestures.addEntityToResize(sinksLayer);
         sinkVisible.selectedProperty().addListener(new ChangeListener<Boolean>() {
             @Override
-            public void changed(ObservableValue<? extends Boolean> selected, Boolean oldVal, Boolean show) {
+            public void changed(ObservableValue<? extends Boolean> selected,
+                                Boolean oldVal,
+                                Boolean show) {
                 if (!show) {
                     sinkLabeled.setSelected(false);
                 }
@@ -332,7 +349,9 @@ public class Gui extends Application {
         sceneGestures.addEntityToResize(sinkLabelsLayer);
         sinkLabeled.selectedProperty().addListener(new ChangeListener<Boolean>() {
             @Override
-            public void changed(ObservableValue<? extends Boolean> selected, Boolean oldVal, Boolean show) {
+            public void changed(ObservableValue<? extends Boolean> selected,
+                                Boolean oldVal,
+                                Boolean show) {
                 if (!sinkVisible.isSelected()) {
                     show = false;
                     sinkLabeled.setSelected(false);
@@ -348,7 +367,9 @@ public class Gui extends Application {
         selectionPane.getChildren().add(dispCostSurface);
         dispCostSurface.selectedProperty().addListener(new ChangeListener<Boolean>() {
             @Override
-            public void changed(ObservableValue<? extends Boolean> selected, Boolean oldVal, Boolean show) {
+            public void changed(ObservableValue<? extends Boolean> selected,
+                                Boolean oldVal,
+                                Boolean show) {
                 controlActions.toggleCostSurface(show, background);
             }
         });
@@ -412,7 +433,9 @@ public class Gui extends Application {
         capVersion.setSelected(true);
         capVersion.selectedProperty().addListener(new ChangeListener<Boolean>() {
             @Override
-            public void changed(ObservableValue<? extends Boolean> selected, Boolean oldVal, Boolean show) {
+            public void changed(ObservableValue<? extends Boolean> selected,
+                                Boolean oldVal,
+                                Boolean show) {
                 if (!oldVal) {
                     priceVersion.setSelected(false);
                     timeVersion.setSelected(false);
@@ -427,7 +450,9 @@ public class Gui extends Application {
         formulationPane.getChildren().add(priceVersion);
         priceVersion.selectedProperty().addListener(new ChangeListener<Boolean>() {
             @Override
-            public void changed(ObservableValue<? extends Boolean> selected, Boolean oldVal, Boolean show) {
+            public void changed(ObservableValue<? extends Boolean> selected,
+                                Boolean oldVal,
+                                Boolean show) {
                 if (!oldVal) {
                     capVersion.setSelected(false);
                     timeVersion.setSelected(false);
@@ -442,7 +467,9 @@ public class Gui extends Application {
         formulationPane.getChildren().add(timeVersion);
         timeVersion.selectedProperty().addListener(new ChangeListener<Boolean>() {
             @Override
-            public void changed(ObservableValue<? extends Boolean> selected, Boolean oldVal, Boolean show) {
+            public void changed(ObservableValue<? extends Boolean> selected,
+                                Boolean oldVal,
+                                Boolean show) {
                 if (!oldVal) {
                     capVersion.setSelected(false);
                     priceVersion.setSelected(false);
@@ -456,10 +483,9 @@ public class Gui extends Application {
         // TIME SETTINGS PANE
         //////////////////////////////////////////////////////////////////
 
-        ObservableList<TimeIntervalProto> data = FXCollections.observableArrayList(
-            new TimeIntervalProto("1-2", "20"),
-            new TimeIntervalProto("3-5", "15")
-        );
+        ObservableList<TimeIntervalProto> data = FXCollections.observableArrayList(new TimeIntervalProto(
+                "1-2",
+                "20"), new TimeIntervalProto("3-5", "15"));
 
         AnchorPane timeSettingsPane = new AnchorPane();
         timeSettingsPane.setPrefSize(206, 600);
@@ -477,15 +503,18 @@ public class Gui extends Application {
         TableColumn timeIntervalsTICol = new TableColumn("Interval");
         timeIntervalsTICol.setMinWidth(50);
         timeIntervalsTICol.setSortable(false);
-        timeIntervalsTICol.setCellValueFactory(new PropertyValueFactory<TimeIntervalProto, String>("timeInterval"));
+        timeIntervalsTICol.setCellValueFactory(new PropertyValueFactory<TimeIntervalProto, String>(
+                "timeInterval"));
 
         TableColumn timeIntervalsCTCol = new TableColumn("Capture Target");
         timeIntervalsCTCol.setMinWidth(50);
         timeIntervalsCTCol.setSortable(false);
-        timeIntervalsCTCol.setCellValueFactory(new PropertyValueFactory<TimeIntervalProto, String>("captureTarget"));
+        timeIntervalsCTCol.setCellValueFactory(new PropertyValueFactory<TimeIntervalProto, String>(
+                "captureTarget"));
 
         //timeIntervalsTable.getColumns().addAll(timeIntervalsTICol, timeIntervalsCTCol);
-        timeIntervalsTable.getColumns().addAll(timeIntervalsNumberCol, timeIntervalsTICol, timeIntervalsCTCol);
+        timeIntervalsTable.getColumns()
+                .addAll(timeIntervalsNumberCol, timeIntervalsTICol, timeIntervalsCTCol);
 
         final VBox timeIntervalsVbox = new VBox();
         //timeIntervalsVbox.setSpacing(5);
@@ -523,24 +552,26 @@ public class Gui extends Application {
         generateSolutionFile.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent e) {
+                TimeInterval intervals = new TimeInterval();
                 String modelVersion = "";
 
                 if (capVersion.isSelected()) {
                     modelVersion = "c";
+                    intervals.addInterval(
+                            Double.parseDouble(yearValue.getText()),
+                            Double.parseDouble(paramValue.getText())
+                    );
                 } else if (priceVersion.isSelected()) {
                     modelVersion = "p";
+                    intervals.addInterval(
+                            Double.parseDouble(yearValue.getText()),
+                            Double.parseDouble(paramValue.getText())
+                    );
                 } else if (timeVersion.isSelected()) {
                     modelVersion = "t";
                 }
 
-
-                controlActions.generateMPSFile(
-                    crfValue.getText(),
-                    yearValue.getText(),
-                    paramValue.getText(),
-                    // add time params here
-                    modelVersion
-                );
+                controlActions.generateMPSFile(crfValue.getText(), intervals, modelVersion);
             }
         });
 
@@ -690,12 +721,16 @@ public class Gui extends Application {
         Label[] solutionValues = new Label[]{sourcesValue, sinksValue, storedValue, edgesValue, lengthValue, capT, capU, transT, transU, storT, storU, totT, totU};
 
         // Run selection action.
-        runChoice.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<String>() {
-            @Override
-            public void changed(ObservableValue<? extends String> selected, String oldSolution, String newSolution) {
-                controlActions.selectSolution(newSolution, solutionValues);
-            }
-        });
+        runChoice.getSelectionModel()
+                .selectedItemProperty()
+                .addListener(new ChangeListener<String>() {
+                    @Override
+                    public void changed(ObservableValue<? extends String> selected,
+                                        String oldSolution,
+                                        String newSolution) {
+                        controlActions.selectSolution(newSolution, solutionValues);
+                    }
+                });
         runChoice.showingProperty().addListener((obs, wasShowing, isShowing) -> {
             if (isShowing) {
                 controlActions.initializeSolutionSelection(runChoice);
@@ -744,6 +779,7 @@ public class Gui extends Application {
         public void setTimeInterval(String time_interval) {
             this.timeInterval = time_interval;
         }
+
         public String getCaptureTarget() {
             return this.captureTarget;
         }

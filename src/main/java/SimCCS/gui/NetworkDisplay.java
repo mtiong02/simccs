@@ -1,6 +1,7 @@
 package gui;
 
 import java.util.ArrayList;
+
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.event.EventHandler;
@@ -15,7 +16,6 @@ import javafx.scene.shape.Line;
 import javafx.scene.text.Font;
 
 /**
- *
  * @author yaw
  */
 class NetworkDisplay extends Pane {
@@ -45,7 +45,7 @@ class NetworkDisplay extends Pane {
     public void setControlActions(ControlActions controlActions) {
         this.controlActions = controlActions;
     }
-    
+
     public ControlActions getControlActions() {
         return controlActions;
     }
@@ -109,7 +109,10 @@ class SceneGestures {
                 sceneDragContext.translateAnchorY = canvas.getTranslateY();
             } else if (event.isSecondaryButtonDown()) {
                 // Up for grabs.
-                canvas.getControlActions().getMessenger().setText("Cell number: " + canvas.getControlActions().displayXYToVectorized(event.getX(), event.getY()));
+                canvas.getControlActions()
+                        .getMessenger()
+                        .setText("Cell number: " + canvas.getControlActions()
+                                .displayXYToVectorized(event.getX(), event.getY()));
                 /*int cellNum = canvas.controlActions.displayXYToVectorized(event.getX(), event.getY());
                 HashMap<Integer, HashSet<Integer>> neighbors = canvas.controlActions.getData().getGraphNeighbors();
                 String n = "";
@@ -164,8 +167,10 @@ class SceneGestures {
 
             double f = (scale / oldScale) - 1;
 
-            double dx = (event.getSceneX() - (canvas.getBoundsInParent().getWidth() / 2 + canvas.getBoundsInParent().getMinX()));
-            double dy = (event.getSceneY() - (canvas.getBoundsInParent().getHeight() / 2 + canvas.getBoundsInParent().getMinY()));
+            double dx = (event.getSceneX() - (canvas.getBoundsInParent()
+                    .getWidth() / 2 + canvas.getBoundsInParent().getMinX()));
+            double dy = (event.getSceneY() - (canvas.getBoundsInParent()
+                    .getHeight() / 2 + canvas.getBoundsInParent().getMinY()));
 
             canvas.setScale(scale);
 
