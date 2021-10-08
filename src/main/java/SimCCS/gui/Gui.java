@@ -14,8 +14,11 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Group;
 import javafx.scene.Scene;
+import javafx.scene.control.Separator;
+import javafx.geometry.Orientation;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
@@ -511,18 +514,13 @@ public class Gui extends Application {
         // TIME SETTINGS PANE
         //////////////////////////////////////////////////////////////////
 
-        /*
-        ObservableList<TimeIntervalProto> data = FXCollections.observableArrayList(
-                new TimeIntervalProto("1-2", "20"),
-                new TimeIntervalProto("3-5", "15")
-        );
-        */
         ObservableList<TimeIntervalProto> data = FXCollections.observableArrayList();
 
         TableView timeTable = new TableView();
         timeTable.setEditable(true);
 
         TableColumn intervalYearsCol = new TableColumn("Years");
+        intervalYearsCol.setSortable(false);
         intervalYearsCol.setMinWidth(50);
         intervalYearsCol.setCellValueFactory(
                 new PropertyValueFactory<TimeIntervalProto, String>("timeInterval")
@@ -540,6 +538,7 @@ public class Gui extends Application {
         );
 
         TableColumn intervalValuesCol = new TableColumn("Values");
+        intervalValuesCol.setSortable(false);
         intervalValuesCol.setMinWidth(50);
         intervalValuesCol.setCellValueFactory(
                 new PropertyValueFactory<TimeIntervalProto, String>("captureTarget")
@@ -637,6 +636,16 @@ public class Gui extends Application {
                     );
                 } else if (timeVersion.isSelected()) {
                     modelVersion = "t";
+
+                    if (data.size() == 0) {
+                        System.err.println("No intervals have been set");
+                        Alert alert = new Alert(AlertType.ERROR,
+                                                "No intervals have been set",
+                                                ButtonType.OK);
+                        alert.showAndWait();
+                        return;
+                    }
+
                     for (TimeIntervalProto t : data) {
                         System.out.println(t);
                         String t_time = t.getTimeInterval();
@@ -657,9 +666,7 @@ public class Gui extends Application {
                     }
                 }
 
-                System.out.println("generating...");
                 controlActions.generateMPSFile(crfValue.getText(), intervals, modelVersion);
-                System.out.println("done generating");
             }
         });
 
@@ -693,6 +700,10 @@ public class Gui extends Application {
         runChoice.setLayoutX(20);
         runChoice.setLayoutY(4);
 
+        ////////////////////////////////////////////
+        // SOLUTIONS PANE
+        ////////////////////////////////////////////
+
         solutionPane = new AnchorPane();
         solutionPane.setPrefSize(190, 30);
         solutionPane.setMinSize(0, 0);
@@ -714,10 +725,25 @@ public class Gui extends Application {
         resultsPane.getChildren().add(solutionDisplayPane);
 
         // Time Interval selection
-        VBox timeIntervalVBox = new VBox();
+        ////////////////////////////////////////////////////
+        HBox timeIntervalHBox = new HBox();
         Label timeIntervalLabel = new Label("Time Interval:");
+        timeIntervalLabel.setPrefHeight(27);
+        timeIntervalLabel.setAlignment(Pos.CENTER);
         ChoiceBox timeIntervalChoices = new ChoiceBox();
-        timeIntervalVBox.getChildren().addAll(timeIntervalLabel, timeIntervalChoices);
+        timeIntervalChoices.setPrefWidth(50);
+        timeIntervalChoices.setPrefHeight(27);
+        Separator separator = new Separator(Orientation.VERTICAL);
+        separator.setPrefWidth(25);
+        separator.setVisible(false);
+        timeIntervalHBox.getChildren().addAll(timeIntervalLabel, separator, timeIntervalChoices);
+
+        timeIntervalHBox.setPrefWidth(150);
+        timeIntervalHBox.setLayoutX(35);
+        timeIntervalHBox.setLayoutY(67);
+
+        resultsPane.getChildren().add(timeIntervalHBox);
+        ////////////////////////////////////////////////////
 
         // Solution labels.
         Label sources = new Label("Sources:");
