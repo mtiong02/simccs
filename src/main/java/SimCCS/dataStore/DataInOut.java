@@ -6,10 +6,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
+import java.util.*;
 
 import static utilities.Utilities.*;
 
@@ -34,8 +31,6 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.TreeMap;
 
 /**
  * @author yaw
@@ -720,9 +715,10 @@ public class DataInOut {
         }
     }
 
-    public Solution loadSolution(String solutionPath) {
+    public Solution[] loadSolution(String solutionPath) {
+        Boolean isTimeScenario = this.scenario.startsWith("time");
+        Integer offset = isTimeScenario ? 1 : 0;
         double threshold = .000001;
-        Solution soln = new Solution();
 
         // Make file paths.
         File solFile = null;
@@ -779,6 +775,15 @@ public class DataInOut {
 
         HashMap<String, Double> variableValues = new HashMap<>();
 
+        Integer numIntervals = 2;
+        Solution[] allSolutions = new Solution[numIntervals];
+
+        for (int i = 0; i < numIntervals; i++) {
+            allSolutions[i] = new Solution();
+        }
+
+        Solution soln = allSolutions[0];
+
         try (BufferedReader br = new BufferedReader(new FileReader(solFile))) {
             String line = br.readLine();
             while (!line.equals(" <variables>")) {
@@ -793,6 +798,12 @@ public class DataInOut {
                 if (Double.parseDouble(variable[2]) > threshold) {
                     variableValues.put(variable[0], Double.parseDouble(variable[2]));
                     String[] components = variable[0].split("\\]\\[|\\[|\\]");
+
+                    if (isTimeScenario && components.length > 1) {
+                        Integer interval = Integer.parseInt(components[components.length - 1]);
+                        soln = allSolutions[interval];
+                    }
+
                     if (components[0].equals("a")) {
                         soln.addSourceCaptureAmount(sources[Integer.parseInt(components[1])],
                                                     Double.parseDouble(variable[2]));
@@ -800,7 +811,7 @@ public class DataInOut {
                         soln.addSinkStorageAmount(sinks[Integer.parseInt(components[1])],
                                                   Double.parseDouble(variable[2]));
                     } else if (components[0].equals("p")) {
-                        if (components.length == 4) {
+                        if (components.length == 4 + offset) {
                             soln.addEdgeTransportAmount(new Edge(vertexIndexToCell.get(Integer.parseInt(
                                                                 components[1])),
                                                                  vertexIndexToCell.get(Integer.parseInt(
@@ -824,7 +835,9 @@ public class DataInOut {
                     }
 
                     if (variable[0].equals("crf")) {
-                        soln.setCRF(Double.parseDouble(variable[2]));
+                        for (Solution s_i : allSolutions) {
+                            s_i.setCRF(Double.parseDouble(variable[2]));
+                        }
                     } else if (variable[0].equals("taxCreditValue")) {
                         soln.setTaxCredit(Double.parseDouble(variable[2]));
                     } else if (variable[0].equals("projectLength")) {
@@ -850,6 +863,12 @@ public class DataInOut {
                 String[] column = line.replaceFirst("\\s+", "").split("\\s+");
                 if (column[1].equals("OBJ") && variableValues.keySet().contains(column[0])) {
                     String[] components = column[0].split("\\]\\[|\\[|\\]");
+
+                    if (isTimeScenario && components.length > 1) {
+                        Integer interval = Integer.parseInt(components[components.length - 1]);
+                        soln = allSolutions[interval];
+                    }
+
                     if (column[0].charAt(0) == 's' || column[0].charAt(0) == 'a') {
                         double cost = variableValues.get(column[0]) * Double.parseDouble(column[2]);
                         soln.addSourceCostComponent(sources[Integer.parseInt(components[1])], cost);
@@ -859,7 +878,7 @@ public class DataInOut {
                         soln.addSinkCostComponent(sinks[Integer.parseInt(components[1])], cost);
                     } else if (column[0].charAt(0) == 'p' || column[0].charAt(0) == 'y') {
                         double cost = variableValues.get(column[0]) * Double.parseDouble(column[2]);
-                        if (components.length == 4) {
+                        if (components.length == 4 + offset) {
                             soln.addEdgeCostComponent(new Edge(vertexIndexToCell.get(Integer.parseInt(
                                     components[1])),
                                                                vertexIndexToCell.get(Integer.parseInt(
@@ -876,7 +895,8 @@ public class DataInOut {
             System.out.println(e.getMessage());
         }
 
-        return soln;
+        //return soln;
+        return allSolutions;
     }
 
     public void makeShapeFiles(String path, Solution soln) {
@@ -1218,8 +1238,7 @@ public class DataInOut {
 
     public void makeSolutionFile(String path, Solution soln) {
         HashMap<Edge, Double> graphEdgeLengths = data.getGraphEdgeLengths();
-        try (BufferedWriter bw = new BufferedWriter(new FileWriter(new File(path,
-                                                                            "solution.csv")))) {
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter(new File(path, "solution.csv")))) {
             bw.write("Project Length," + soln.getProjectLength() + "\n");
             bw.write("CRF," + soln.getCRF() + "\n");
             if (soln.getTaxCredit() != 0) {

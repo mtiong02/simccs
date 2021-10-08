@@ -336,8 +336,8 @@ public class MPSWriterTime extends MPSWriter {
 
         // Set amount of CO2 to capture
         if (modelVersion.equals("c") || modelVersion.equals("t")) {
+            constraintCounter = 1;
             for (int t = 0; t < num_intervals; t++) {
-                constraintCounter = 1;
                 constraint = "G" + constraintCounter++;
 
                 for (Source src : sources) {

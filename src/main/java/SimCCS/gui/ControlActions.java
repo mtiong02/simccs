@@ -490,7 +490,7 @@ public class ControlActions {
         }
     }
 
-    public void selectSolution(String file, Label[] solutionValues) {
+    public void selectSolution(String file, Label[] solutionValues, Integer slnIndex) {
         solutionLayer.getChildren().clear();
         for (Label l : solutionValues) {
             l.setText("-");
@@ -498,8 +498,8 @@ public class ControlActions {
 
         if (file != null && !file.equals("None")) {
             String solutionPath = basePath + "/" + dataset + "/Scenarios/" + scenario + "/Results/" + file;
-            Solution soln = data.loadSolution(solutionPath);
-            displaySolution(file, soln, solutionValues);
+            Solution[] soln = data.loadSolution(solutionPath);
+            displaySolution(file, soln[slnIndex], solutionValues);
         }
     }
 

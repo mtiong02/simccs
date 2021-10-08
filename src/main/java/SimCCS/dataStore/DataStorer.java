@@ -620,7 +620,7 @@ public class DataStorer {
         dataInOut.downloadFile(urlPath);
     }
 
-    public Solution loadSolution(String solutionPath) {
+    public Solution[] loadSolution(String solutionPath) {
         return dataInOut.loadSolution(solutionPath);
     }
 }

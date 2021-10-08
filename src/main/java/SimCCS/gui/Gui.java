@@ -67,6 +67,9 @@ public class Gui extends Application {
     private TextArea messenger;
     private TitledPane timeSettingsContainer;
 
+    private String loadedSolutionFile;
+    protected Integer selectedSolutionFileInterval;
+
     @Override
     public void start(Stage stage) {
         Scene scene = buildGUI(stage);
@@ -451,10 +454,10 @@ public class Gui extends Application {
                     priceVersion.setSelected(false);
                     timeVersion.setSelected(false);
 
-                    paramLabel.setDisable(false);
-                    paramValue.setDisable(false);
-                    yearLabel.setDisable(false);
-                    yearValue.setDisable(false);
+                    paramLabel.setVisible(true);
+                    paramValue.setVisible(true);
+                    yearLabel.setVisible(true);
+                    yearValue.setVisible(true);
 
                     timeSettingsContainer.setDisable(true);
                     timeSettingsContainer.setExpanded(false);
@@ -476,10 +479,10 @@ public class Gui extends Application {
                     paramLabel.setText("Tax/Credit ($/t)");
                     paramValue.setText("0");
 
-                    paramLabel.setDisable(false);
-                    paramValue.setDisable(false);
-                    yearLabel.setDisable(false);
-                    yearValue.setDisable(false);
+                    paramLabel.setVisible(true);
+                    paramValue.setVisible(true);
+                    yearLabel.setVisible(true);
+                    yearValue.setVisible(true);
 
                     timeSettingsContainer.setDisable(true);
                     timeSettingsContainer.setExpanded(false);
@@ -499,10 +502,10 @@ public class Gui extends Application {
                     capVersion.setSelected(false);
                     priceVersion.setSelected(false);
 
-                    paramLabel.setDisable(true);
-                    paramValue.setDisable(true);
-                    yearLabel.setDisable(true);
-                    yearValue.setDisable(true);
+                    paramLabel.setVisible(false);
+                    paramValue.setVisible(false);
+                    yearLabel.setVisible(false);
+                    yearValue.setVisible(false);
 
                     timeSettingsContainer.setDisable(false);
                     timeSettingsContainer.setExpanded(true);
@@ -537,9 +540,9 @@ public class Gui extends Application {
                 }
         );
 
-        TableColumn intervalValuesCol = new TableColumn("Values");
+        TableColumn intervalValuesCol = new TableColumn("Values (MT/y)");
         intervalValuesCol.setSortable(false);
-        intervalValuesCol.setMinWidth(50);
+        intervalValuesCol.setMinWidth(100);
         intervalValuesCol.setCellValueFactory(
                 new PropertyValueFactory<TimeIntervalProto, String>("captureTarget")
         );
@@ -744,6 +747,11 @@ public class Gui extends Application {
 
         resultsPane.getChildren().add(timeIntervalHBox);
         ////////////////////////////////////////////////////
+        // TODO
+        timeIntervalChoices.getItems().add("1");
+        timeIntervalChoices.getItems().add("2");
+        timeIntervalChoices.getSelectionModel().selectFirst();
+        ////////////////////////////////////////////////////
 
         // Solution labels.
         Label sources = new Label("Sources:");
@@ -840,6 +848,22 @@ public class Gui extends Application {
 
         Label[] solutionValues = new Label[]{sourcesValue, sinksValue, storedValue, edgesValue, lengthValue, capT, capU, transT, transU, storT, storU, totT, totU};
 
+        timeIntervalChoices.getSelectionModel()
+                .selectedItemProperty()
+                .addListener(new ChangeListener<String>() {
+                                 @Override
+                                 public void changed(ObservableValue<? extends String> selected,
+                                                     String oldValue,
+                                                     String newValue) {
+                                                selectedSolutionFileInterval =
+                                                        Integer.parseInt(newValue) - 1;
+                                                controlActions.selectSolution(loadedSolutionFile,
+                                                                              solutionValues,
+                                                                              selectedSolutionFileInterval);
+                                            }
+                                        }
+                           );
+
         // Run selection action.
         runChoice.getSelectionModel()
                 .selectedItemProperty()
@@ -848,7 +872,9 @@ public class Gui extends Application {
                     public void changed(ObservableValue<? extends String> selected,
                                         String oldSolution,
                                         String newSolution) {
-                        controlActions.selectSolution(newSolution, solutionValues);
+                        loadedSolutionFile = newSolution;
+                        selectedSolutionFileInterval = 0;
+                        controlActions.selectSolution(newSolution, solutionValues, 0);
                     }
                 });
         runChoice.showingProperty().addListener((obs, wasShowing, isShowing) -> {
