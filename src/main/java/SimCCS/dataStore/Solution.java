@@ -25,6 +25,7 @@ public class Solution {
     // Other.
     private double captureAmountPerYear;
     private int projectLength;
+    private int interval;
     private double crf;
     private double taxCredit;
 
@@ -279,6 +280,18 @@ public class Solution {
 
     public double getTotalCost() {
         return getTotalAnnualCaptureCost() + getTotalAnnualStorageCost() + getTotalAnnualTransportCost();
+    }
+
+    public String getFilePrefix() {
+        return "solution_T" + String.valueOf(this.getInterval() + 1);
+    }
+
+    public void setInterval(int interval) {
+        this.interval = interval;
+    }
+
+    public int getInterval() {
+        return this.interval;
     }
 
     public double getUnitTotalCost() {

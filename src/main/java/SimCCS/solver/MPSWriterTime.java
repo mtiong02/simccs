@@ -82,10 +82,6 @@ public class MPSWriterTime extends MPSWriter {
             index++;
         }
 
-        //TimeInterval intervals = new TimeInterval();
-        //intervals.addInterval(3.0, 6.0);
-        //intervals.addInterval(3.0, 6.0);
-
         Integer num_intervals = intervals.numIntervals();
 
         // Build model

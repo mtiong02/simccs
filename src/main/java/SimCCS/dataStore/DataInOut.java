@@ -715,6 +715,42 @@ public class DataInOut {
         }
     }
 
+    public Integer parseNumberOfIntervals(String solutionPath) {
+        int num_intervals = -1;
+        File solFile = null;
+
+        for (File f : new File(solutionPath).listFiles()) {
+            if (f.getName().endsWith(".sol")) {
+                solFile = f;
+            }
+        }
+
+        try (BufferedReader br = new BufferedReader(new FileReader(solFile))) {
+            String line = br.readLine();
+            while (!line.equals(" <variables>")) {
+                line = br.readLine();
+            }
+            line = br.readLine();
+
+            while (!line.equals(" </variables>")) {
+                String[] partition = line.split("\"");
+                String[] variable = new String[]{partition[1], partition[3], partition[5]};
+                String[] components = variable[0].split("\\]\\[|\\[|\\]");
+
+                if (components.length == 4) {
+                    // p[18][1][1] --> parse the last '1' to get variable interval
+                    int parsed_interval = Integer.parseInt(components[3]) + 1;
+                    num_intervals = parsed_interval > num_intervals ? parsed_interval :
+                            num_intervals;
+                }
+            }
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+        }
+
+        return num_intervals;
+    }
+
     public Solution[] loadSolution(String solutionPath) {
         Boolean isTimeScenario = this.scenario.startsWith("time");
         Integer offset = isTimeScenario ? 1 : 0;
@@ -775,11 +811,12 @@ public class DataInOut {
 
         HashMap<String, Double> variableValues = new HashMap<>();
 
-        Integer numIntervals = 2;
+        Integer numIntervals = this.parseNumberOfIntervals(solutionPath);
         Solution[] allSolutions = new Solution[numIntervals];
 
         for (int i = 0; i < numIntervals; i++) {
             allSolutions[i] = new Solution();
+            allSolutions[i].setInterval(i);
         }
 
         Solution soln = allSolutions[0];
@@ -840,14 +877,27 @@ public class DataInOut {
                         }
                     } else if (variable[0].equals("taxCreditValue")) {
                         soln.setTaxCredit(Double.parseDouble(variable[2]));
-                    } else if (variable[0].equals("projectLength")) {
-                        soln.setProjectLength(Integer.parseInt(variable[2]));
+                    } else if (variable[0].contains("projectLength")) {
+                        String[] tmpInterval = variable[0].split("\\]\\[|\\[|\\]");
+
+                        if (tmpInterval.length > 1) {
+                            Integer idx = Integer.parseInt(tmpInterval[1]);
+                            allSolutions[idx].setProjectLength(Integer.parseInt(variable[2]));
+                        } else {
+                            soln.setProjectLength(Integer.parseInt(variable[2]));
+                        }
                     }
                 }
                 line = br.readLine();
             }
         } catch (IOException e) {
             System.out.println(e.getMessage());
+        }
+
+        Integer totalProjectLength = 0;
+        for (int i = 0; i < numIntervals; i++) {
+            totalProjectLength += allSolutions[i].getProjectLength();
+            allSolutions[i].setProjectLength(totalProjectLength);
         }
 
         // load costs into solution.
@@ -1238,7 +1288,10 @@ public class DataInOut {
 
     public void makeSolutionFile(String path, Solution soln) {
         HashMap<Edge, Double> graphEdgeLengths = data.getGraphEdgeLengths();
-        try (BufferedWriter bw = new BufferedWriter(new FileWriter(new File(path, "solution.csv")))) {
+
+        try (BufferedWriter bw =
+                     new BufferedWriter(new FileWriter(new File(path,
+                                                                soln.getFilePrefix() + ".csv")))) {
             bw.write("Project Length," + soln.getProjectLength() + "\n");
             bw.write("CRF," + soln.getCRF() + "\n");
             if (soln.getTaxCredit() != 0) {

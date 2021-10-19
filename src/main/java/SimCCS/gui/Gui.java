@@ -750,6 +750,7 @@ public class Gui extends Application {
         // TODO
         timeIntervalChoices.getItems().add("1");
         timeIntervalChoices.getItems().add("2");
+        timeIntervalChoices.getItems().add("3");
         timeIntervalChoices.getSelectionModel().selectFirst();
         ////////////////////////////////////////////////////
 
@@ -875,6 +876,7 @@ public class Gui extends Application {
                         loadedSolutionFile = newSolution;
                         selectedSolutionFileInterval = 0;
                         controlActions.selectSolution(newSolution, solutionValues, 0);
+                        controlActions.assignNumberOfIntervals(newSolution, timeIntervalChoices);
                     }
                 });
         runChoice.showingProperty().addListener((obs, wasShowing, isShowing) -> {

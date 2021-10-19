@@ -490,6 +490,10 @@ public class ControlActions {
         }
     }
 
+    public void assignNumberOfIntervals() {
+
+    }
+
     public void selectSolution(String file, Label[] solutionValues, Integer slnIndex) {
         solutionLayer.getChildren().clear();
         for (Label l : solutionValues) {
