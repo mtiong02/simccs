@@ -4,17 +4,19 @@ import dataStore.DataStorer;
 import dataStore.Edge;
 import dataStore.Source;
 import dataStore.Sink;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.PriorityQueue;
+
 import javafx.scene.control.TextArea;
+
 import static utilities.Utilities.*;
 
 /**
- *
  * @author yaw
  */
 public class Solver {
@@ -83,8 +85,14 @@ public class Solver {
         } else {
             for (int nodeNum = 0; nodeNum < sourcesAndSinks.length - 1; nodeNum++) {
                 int[] destinations = new int[sourcesAndSinks.length - nodeNum - 1];
-                System.arraycopy(sourcesAndSinks, nodeNum + 1, destinations, 0, destinations.length);
-                Object[] sourcePathsAndCosts = dijkstra(sourcesAndSinks[nodeNum], destinations, .9999999);
+                System.arraycopy(sourcesAndSinks,
+                                 nodeNum + 1,
+                                 destinations,
+                                 0,
+                                 destinations.length);
+                Object[] sourcePathsAndCosts = dijkstra(sourcesAndSinks[nodeNum],
+                                                        destinations,
+                                                        .9999999);
                 allPathsList.addAll((ArrayList<int[]>) sourcePathsAndCosts[0]);
                 allPathCostsList.addAll((ArrayList<Double>) sourcePathsAndCosts[1]);
             }
@@ -149,9 +157,10 @@ public class Solver {
         boolean degree2Removed = true;
         while (degree2Removed) {
             degree2Removed = false;
-            for (Iterator<Integer> iter = degree2Vertices.iterator(); iter.hasNext();) {
+            for (Iterator<Integer> iter = degree2Vertices.iterator(); iter.hasNext(); ) {
                 int vertex = iter.next();
-                int[] neighbors = convertIntegerArray(vertexNeighbors.get(vertex).toArray(new Integer[0]));
+                int[] neighbors = convertIntegerArray(vertexNeighbors.get(vertex)
+                                                              .toArray(new Integer[0]));
                 // Only remove if it won't create multi-edges.
                 Edge newEdge = new Edge(neighbors[0], neighbors[1]);
                 if (!graphEdgeCosts.containsKey(newEdge)) {
@@ -239,12 +248,12 @@ public class Solver {
         }
         return new Object[]{rightOfWayCosts, constructionCosts};
     }
-    
+
     public HashMap<Edge, Double> calculateGraphEdgeLengths() {
         HashMap<Edge, Double> graphEdgeLengths = new HashMap<>();
-        
+
         HashMap<Edge, int[]> graphEdgeRoutes = data.getGraphEdgeRoutes();
-        
+
         for (Edge edge : graphEdgeRoutes.keySet()) {
             double distance = 0;
             int[] route = graphEdgeRoutes.get(edge);
@@ -252,20 +261,21 @@ public class Solver {
             int cell2 = route[1];
             for (int i = 1; i < route.length; i++) {
                 cell2 = route[i];
-                
+
                 double[] latLon1 = data.cellToLatLon(cell1);
                 double[] latLon2 = data.cellToLatLon(cell2);
-                
+
                 // Calculate distance
                 double p = 0.017453292519943295;
-                double a = 0.5 - Math.cos((latLon2[0] - latLon1[0]) * p)/2 + Math.cos(latLon1[0] * p) * Math.cos(latLon2[0] * p) * (1 - Math.cos((latLon2[1] - latLon1[1]) * p))/2;
+                double a = 0.5 - Math.cos((latLon2[0] - latLon1[0]) * p) / 2 + Math.cos(latLon1[0] * p) * Math.cos(
+                        latLon2[0] * p) * (1 - Math.cos((latLon2[1] - latLon1[1]) * p)) / 2;
                 distance += 12742 * Math.asin(Math.sqrt(a));
-                
+
                 cell1 = cell2;
             }
             graphEdgeLengths.put(edge, distance);
         }
-        
+
         return graphEdgeLengths;
     }
 
@@ -299,7 +309,9 @@ public class Solver {
                 if (!connectedDests.isEmpty()) {
                     for (int neighborCell : data.getNeighborCells(u.cellNum)) {
                         if (neighborCell != 0) {
-                            double altDistance = costs[u.cellNum] + data.getModifiedEdgeRoutingCost(u.cellNum, neighborCell);
+                            double altDistance = costs[u.cellNum] + data.getModifiedEdgeRoutingCost(
+                                    u.cellNum,
+                                    neighborCell);
                             if (altDistance < costs[neighborCell] && !map[neighborCell].connected) {
                                 costs[neighborCell] = altDistance;
                                 previous[neighborCell] = u.cellNum;
@@ -331,8 +343,12 @@ public class Solver {
             double cost = 0;
             for (int i = 0; i < pathList.size() - 1; i++) {
                 cost += data.getEdgeWeight(pathList.get(i), pathList.get(i + 1), "c");
-                data.updateModifiedEdgeRoutingCost(pathList.get(i), pathList.get(i + 1), edgeCostModification);
-                data.updateModifiedEdgeRoutingCost(pathList.get(i + 1), pathList.get(i), edgeCostModification);
+                data.updateModifiedEdgeRoutingCost(pathList.get(i),
+                                                   pathList.get(i + 1),
+                                                   edgeCostModification);
+                data.updateModifiedEdgeRoutingCost(pathList.get(i + 1),
+                                                   pathList.get(i),
+                                                   edgeCostModification);
             }
             pathCosts.add(cost);
             paths.add(convertIntegerArray(pathList.toArray(new Integer[0])));

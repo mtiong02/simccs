@@ -10,7 +10,6 @@ import com.sun.prism.Image;
 import javafx.scene.image.ImageView;
 
 /**
- *
  * @author yaw
  */
 public class PixelatedImageView extends ImageView {
@@ -18,12 +17,14 @@ public class PixelatedImageView extends ImageView {
         return new NGImageView() {
             private Image image;
 
-            @Override public void setImage(Object img) {
+            @Override
+            public void setImage(Object img) {
                 super.setImage(img);
                 image = (Image) img;
             }
 
-            @Override protected void renderContent(Graphics g) {
+            @Override
+            protected void renderContent(Graphics g) {
                 BaseResourceFactory factory = (BaseResourceFactory) g.getResourceFactory();
                 Texture tex = factory.getCachedTexture(image, Texture.WrapMode.CLAMP_TO_EDGE);
                 tex.setLinearFiltering(false);

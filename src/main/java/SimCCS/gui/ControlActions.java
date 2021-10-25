@@ -10,6 +10,8 @@ import dataStore.Edge;
 import dataStore.Sink;
 import dataStore.Solution;
 import dataStore.Source;
+import dataStore.TimeInterval;
+
 import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.File;
@@ -29,8 +31,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
 import javafx.collections.FXCollections;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.control.ChoiceBox;
@@ -46,14 +47,16 @@ import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.StrokeLineCap;
+
 import javax.imageio.ImageIO;
+
 import solver.MPSWriter;
+import solver.MPSWriterTime;
 import solver.Solver;
 
 import static utilities.Utilities.*;
 
 /**
- *
  * @author yaw
  */
 public class ControlActions {
@@ -203,7 +206,9 @@ public class ControlActions {
 
             for (Source source : data.getSources()) {
                 double[] rawXYLocation = data.cellLocationToRawXY(source.getCellNum());
-                Circle c = new Circle(rawXtoDisplayX(rawXYLocation[0]), rawYtoDisplayY(rawXYLocation[1]), 5 / gui.getScale());
+                Circle c = new Circle(rawXtoDisplayX(rawXYLocation[0]),
+                                      rawYtoDisplayY(rawXYLocation[1]),
+                                      5 / gui.getScale());
                 c.setStroke(Color.SALMON);
                 c.setFill(Color.SALMON);
                 //c.setStroke(Color.RED);
@@ -239,7 +244,7 @@ public class ControlActions {
             //    c.setStroke(Color.ORANGE);
             //    c.setFill(Color.ORANGE);
             //    sinkLocationsLayer.getChildren().add(c);
-            //    
+            //
             //    rawXYLocation = dataStorer.cellLocationToRawXY(e.v2);
             //    Circle c2 = new Circle(rawXtoDisplayX(rawXYLocation[0]), rawYtoDisplayY(rawXYLocation[1]), 1);
             //    c2.setStroke(Color.ORANGE);
@@ -249,7 +254,9 @@ public class ControlActions {
 
             for (Sink sink : data.getSinks()) {
                 double[] rawXYLocation = data.cellLocationToRawXY(sink.getCellNum());
-                Circle c = new Circle(rawXtoDisplayX(rawXYLocation[0]), rawYtoDisplayY(rawXYLocation[1]), 5 / gui.getScale());
+                Circle c = new Circle(rawXtoDisplayX(rawXYLocation[0]),
+                                      rawYtoDisplayY(rawXYLocation[1]),
+                                      5 / gui.getScale());
                 c.setStroke(Color.CORNFLOWERBLUE);
                 c.setFill(Color.CORNFLOWERBLUE);
                 //c.setStroke(Color.BLUE);
@@ -282,11 +289,27 @@ public class ControlActions {
         }
     }
 
-    public void generateMPSFile(String crf, String numYears, String modelParamValue, String modelVersion) {
+    public void generateMPSFile(String crf,
+                                TimeInterval intervals,
+                                String modelVersion) {
         if (scenario != "") {
-            System.out.println("Writing MPS File...");
             if (modelVersion.equals("c") || modelVersion.equals("p")) {
-                MPSWriter.writeCapPriceMPS(data, Double.parseDouble(crf), Double.parseDouble(numYears), Double.parseDouble(modelParamValue), basePath, dataset, scenario, modelVersion);
+                MPSWriter.writeCapPriceMPS(data,
+                                           Double.parseDouble(crf),
+                                           intervals.getYears(0),
+                                           intervals.getValue(0),
+                                           basePath,
+                                           dataset,
+                                           scenario,
+                                           modelVersion);
+            } else if (modelVersion.equals("t")) {
+                MPSWriterTime.writeCapPriceMPS(data,
+                                               Double.parseDouble(crf),
+                                               intervals,
+                                               basePath,
+                                               dataset,
+                                               scenario,
+                                               modelVersion);
             }
         }
     }
@@ -312,6 +335,10 @@ public class ControlActions {
                         modelVersion = "p";
                         run = "price";
                         mpsFileName = "price.mps";
+                    } else if (f.getName().startsWith("time")) {
+                        modelVersion = "t";
+                        run = "time";
+                        mpsFileName = "time.mps";
                     }
                 }
             }
@@ -463,7 +490,7 @@ public class ControlActions {
         }
     }
 
-    public void selectSolution(String file, Label[] solutionValues) {
+    public void selectSolution(String file, Label[] solutionValues, Integer slnIndex) {
         solutionLayer.getChildren().clear();
         for (Label l : solutionValues) {
             l.setText("-");
@@ -471,8 +498,9 @@ public class ControlActions {
 
         if (file != null && !file.equals("None")) {
             String solutionPath = basePath + "/" + dataset + "/Scenarios/" + scenario + "/Results/" + file;
-            Solution soln = data.loadSolution(solutionPath);
-            displaySolution(file, soln, solutionValues);
+            Solution[] soln = data.loadSolution(solutionPath);
+            Integer numIntervals = data.parseNumberOfIntervals(solutionPath);
+            displaySolution(file, soln[slnIndex], solutionValues);
         }
     }
 
@@ -500,7 +528,9 @@ public class ControlActions {
 
         for (Source source : soln.getOpenedSources()) {
             double[] rawXYLocation = data.cellLocationToRawXY(source.getCellNum());
-            Circle c = new Circle(rawXtoDisplayX(rawXYLocation[0]), rawYtoDisplayY(rawXYLocation[1]), 20 / gui.getScale());
+            Circle c = new Circle(rawXtoDisplayX(rawXYLocation[0]),
+                                  rawYtoDisplayY(rawXYLocation[1]),
+                                  20 / gui.getScale());
             c.setStrokeWidth(0);
             c.setStroke(Color.SALMON);
             c.setFill(Color.SALMON);
@@ -523,7 +553,9 @@ public class ControlActions {
 
         for (Sink sink : soln.getOpenedSinks()) {
             double[] rawXYLocation = data.cellLocationToRawXY(sink.getCellNum());
-            Circle c = new Circle(rawXtoDisplayX(rawXYLocation[0]), rawYtoDisplayY(rawXYLocation[1]), 20 / gui.getScale());
+            Circle c = new Circle(rawXtoDisplayX(rawXYLocation[0]),
+                                  rawYtoDisplayY(rawXYLocation[1]),
+                                  20 / gui.getScale());
             c.setStrokeWidth(0);
             c.setStroke(Color.CORNFLOWERBLUE);
             c.setFill(Color.CORNFLOWERBLUE);
@@ -558,11 +590,14 @@ public class ControlActions {
         solutionValues[10].setText(Double.toString(round(soln.getUnitStorageCost(), 2)));
         solutionValues[11].setText(Double.toString(round(soln.getTotalCost(), 2)));
         solutionValues[12].setText(Double.toString(round(soln.getUnitTotalCost(), 2)));
+        solutionValues[13].setText(Integer.toString(soln.getTotalIntervals()));
 
         // Write to shapefiles.
-        data.makeShapeFiles(basePath + "/" + dataset + "/Scenarios/" + scenario + "/Results/" + file, soln);
+        data.makeShapeFiles(basePath + "/" + dataset + "/Scenarios/" + scenario + "/Results/" + file,
+                            soln);
         data.makeCandidateShapeFiles(basePath + "/" + dataset + "/Scenarios/" + scenario);
-        data.makeSolutionFile(basePath + "/" + dataset + "/Scenarios/" + scenario + "/Results/" + file, soln);
+        data.makeSolutionFile(basePath + "/" + dataset + "/Scenarios/" + scenario + "/Results/" + file,
+                              soln);
 
         //determineROW(soln, basePath + "/" + dataset + "/Scenarios/" + scenario + "/Results/" + file);
     }
@@ -681,7 +716,9 @@ public class ControlActions {
                 routeLatLon[i * 2 + 1] = data.cellToLatLon(cell)[1];
             }
 
-            EsriPolyline edge = new EsriPolyline(routeLatLon, OMGraphic.DECIMAL_DEGREES, OMGraphic.LINETYPE_STRAIGHT);
+            EsriPolyline edge = new EsriPolyline(routeLatLon,
+                                                 OMGraphic.DECIMAL_DEGREES,
+                                                 OMGraphic.LINETYPE_STRAIGHT);
             edgeList.add(edge);
 
             // Add attributes.
@@ -697,7 +734,9 @@ public class ControlActions {
             edgeAttributeTable.addRecord(row);
         }
 
-        EsriShapeExport writeEdgeShapefiles = new EsriShapeExport(edgeList, edgeAttributeTable, path + "/" + name);
+        EsriShapeExport writeEdgeShapefiles = new EsriShapeExport(edgeList,
+                                                                  edgeAttributeTable,
+                                                                  path + "/" + name);
         writeEdgeShapefiles.export();
     }
 

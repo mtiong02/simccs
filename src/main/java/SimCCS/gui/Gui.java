@@ -1,16 +1,28 @@
 package gui;
 
 import java.io.File;
+
+import dataStore.TimeInterval;
 import javafx.application.Application;
+
 import static javafx.application.Application.launch;
+
 import javafx.beans.value.ChangeListener;
+import javafx.collections.FXCollections;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Group;
 import javafx.scene.Scene;
+import javafx.scene.control.Separator;
+import javafx.geometry.Orientation;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
@@ -20,18 +32,23 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TitledPane;
 import javafx.scene.control.ToggleGroup;
-import javafx.scene.input.KeyEvent;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableColumn.CellEditEvent;
+import javafx.scene.control.cell.TextFieldTableCell;
+import javafx.scene.control.TableView;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
 
 /**
- *
  * @author yaw
  */
 public class Gui extends Application {
@@ -48,10 +65,15 @@ public class Gui extends Application {
     private ChoiceBox runChoice;
     private AnchorPane solutionPane;
     private TextArea messenger;
+    private TitledPane timeSettingsContainer;
+
+    private String loadedSolutionFile;
+    protected Integer selectedSolutionFileInterval;
 
     @Override
     public void start(Stage stage) {
         Scene scene = buildGUI(stage);
+        scene.getRoot().setStyle("-fx-font-family: 'serif'");
         stage.setScene(scene);
         stage.setTitle("SimCCS");
         stage.show();
@@ -66,8 +88,10 @@ public class Gui extends Application {
         displayPane.setTranslateX(220);
         // Associate scroll/navigation actions.
         SceneGestures sceneGestures = new SceneGestures(displayPane);
-        displayPane.addEventFilter(MouseEvent.MOUSE_PRESSED, sceneGestures.getOnMousePressedEventHandler());
-        displayPane.addEventFilter(MouseEvent.MOUSE_DRAGGED, sceneGestures.getOnMouseDraggedEventHandler());
+        displayPane.addEventFilter(MouseEvent.MOUSE_PRESSED,
+                                   sceneGestures.getOnMousePressedEventHandler());
+        displayPane.addEventFilter(MouseEvent.MOUSE_DRAGGED,
+                                   sceneGestures.getOnMouseDraggedEventHandler());
         displayPane.addEventFilter(ScrollEvent.ANY, sceneGestures.getOnScrollEventHandler());
 
         // Make background.
@@ -117,8 +141,7 @@ public class Gui extends Application {
         tabPane.getTabs().add(resultsTab);
 
         // Clear messenger when clicking in control area.
-        tabPane.addEventFilter(MouseEvent.MOUSE_CLICKED,
-                new EventHandler<MouseEvent>() {
+        tabPane.addEventFilter(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>() {
             public void handle(MouseEvent event) {
                 //messenger.clear();
             }
@@ -153,12 +176,17 @@ public class Gui extends Application {
         scenarioContainer.setLayoutY(73);
         dataPane.getChildren().add(scenarioContainer);
         runChoice = new ChoiceBox();
-        scenarioChoice.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<String>() {
-            @Override
-            public void changed(ObservableValue<? extends String> selected, String oldScenario, String newScenario) {
-                controlActions.selectScenario(newScenario, background, runChoice);
-            }
-        });
+
+        scenarioChoice.getSelectionModel()
+                .selectedItemProperty()
+                .addListener(new ChangeListener<String>() {
+                    @Override
+                    public void changed(ObservableValue<? extends String> selected,
+                                        String oldScenario,
+                                        String newScenario) {
+                        controlActions.selectScenario(newScenario, background, runChoice);
+                    }
+                });
 
         // Build dataset selection control and add to control pane.
         Button openDataset = new Button("[Open Dataset]");
@@ -198,6 +226,7 @@ public class Gui extends Application {
         buttonPane.setPrefSize(190, 30);
         buttonPane.setMinSize(0, 0);
         buttonPane.getChildren().addAll(candidateNetwork);
+
         TitledPane networkContainer = new TitledPane("Network Generation", buttonPane);
         networkContainer.setCollapsible(false);
         networkContainer.setPrefSize(192, 63);
@@ -214,13 +243,16 @@ public class Gui extends Application {
         dispDelaunayEdges.setLayoutX(4);
         dispDelaunayEdges.setLayoutY(83);
         selectionPane.getChildren().add(dispDelaunayEdges);
+
         Pane rawDelaunayLayer = new Pane();
         sceneGestures.addEntityToResize(rawDelaunayLayer);
         displayPane.getChildren().add(rawDelaunayLayer);
         controlActions.addRawDelaunayLayer(rawDelaunayLayer);
         dispDelaunayEdges.selectedProperty().addListener(new ChangeListener<Boolean>() {
             @Override
-            public void changed(ObservableValue<? extends Boolean> selected, Boolean oldVal, Boolean show) {
+            public void changed(ObservableValue<? extends Boolean> selected,
+                                Boolean oldVal,
+                                Boolean show) {
                 controlActions.toggleRawDelaunayDisplay(show);
             }
         });
@@ -235,7 +267,9 @@ public class Gui extends Application {
         controlActions.addCandidateNetworkLayer(candidateNetworkLayer);
         dispCandidateNetwork.selectedProperty().addListener(new ChangeListener<Boolean>() {
             @Override
-            public void changed(ObservableValue<? extends Boolean> selected, Boolean oldVal, Boolean show) {
+            public void changed(ObservableValue<? extends Boolean> selected,
+                                Boolean oldVal,
+                                Boolean show) {
                 controlActions.toggleCandidateNetworkDisplay(show);
             }
         });
@@ -251,13 +285,16 @@ public class Gui extends Application {
         sourceVisible.setLayoutX(62);
         sourceVisible.setLayoutY(4);
         selectionPane.getChildren().add(sourceVisible);
+
         Pane sourcesLayer = new Pane();
         displayPane.getChildren().add(sourcesLayer);
         controlActions.addSourceLocationsLayer(sourcesLayer);
         sceneGestures.addEntityToResize(sourcesLayer);
         sourceVisible.selectedProperty().addListener(new ChangeListener<Boolean>() {
             @Override
-            public void changed(ObservableValue<? extends Boolean> selected, Boolean oldVal, Boolean show) {
+            public void changed(ObservableValue<? extends Boolean> selected,
+                                Boolean oldVal,
+                                Boolean show) {
                 if (!show) {
                     sourceLabeled.setSelected(false);
                 }
@@ -269,13 +306,16 @@ public class Gui extends Application {
         sourceLabeled.setLayoutX(131);
         sourceLabeled.setLayoutY(4);
         selectionPane.getChildren().add(sourceLabeled);
+
         Pane sourceLabelsLayer = new Pane();
         displayPane.getChildren().add(sourceLabelsLayer);
         controlActions.addSourceLabelsLayer(sourceLabelsLayer);
         sceneGestures.addEntityToResize(sourceLabelsLayer);
         sourceLabeled.selectedProperty().addListener(new ChangeListener<Boolean>() {
             @Override
-            public void changed(ObservableValue<? extends Boolean> selected, Boolean oldVal, Boolean show) {
+            public void changed(ObservableValue<? extends Boolean> selected,
+                                Boolean oldVal,
+                                Boolean show) {
                 if (!sourceVisible.isSelected()) {
                     show = false;
                     sourceLabeled.setSelected(false);
@@ -301,7 +341,9 @@ public class Gui extends Application {
         sceneGestures.addEntityToResize(sinksLayer);
         sinkVisible.selectedProperty().addListener(new ChangeListener<Boolean>() {
             @Override
-            public void changed(ObservableValue<? extends Boolean> selected, Boolean oldVal, Boolean show) {
+            public void changed(ObservableValue<? extends Boolean> selected,
+                                Boolean oldVal,
+                                Boolean show) {
                 if (!show) {
                     sinkLabeled.setSelected(false);
                 }
@@ -319,7 +361,9 @@ public class Gui extends Application {
         sceneGestures.addEntityToResize(sinkLabelsLayer);
         sinkLabeled.selectedProperty().addListener(new ChangeListener<Boolean>() {
             @Override
-            public void changed(ObservableValue<? extends Boolean> selected, Boolean oldVal, Boolean show) {
+            public void changed(ObservableValue<? extends Boolean> selected,
+                                Boolean oldVal,
+                                Boolean show) {
                 if (!sinkVisible.isSelected()) {
                     show = false;
                     sinkLabeled.setSelected(false);
@@ -335,7 +379,9 @@ public class Gui extends Application {
         selectionPane.getChildren().add(dispCostSurface);
         dispCostSurface.selectedProperty().addListener(new ChangeListener<Boolean>() {
             @Override
-            public void changed(ObservableValue<? extends Boolean> selected, Boolean oldVal, Boolean show) {
+            public void changed(ObservableValue<? extends Boolean> selected,
+                                Boolean oldVal,
+                                Boolean show) {
                 controlActions.toggleCostSurface(show, background);
             }
         });
@@ -387,9 +433,11 @@ public class Gui extends Application {
 
         RadioButton capVersion = new RadioButton("Cap");
         RadioButton priceVersion = new RadioButton("Price");
+        RadioButton timeVersion = new RadioButton("Time");
         ToggleGroup capVsPrice = new ToggleGroup();
         capVersion.setToggleGroup(capVsPrice);
         priceVersion.setToggleGroup(capVsPrice);
+        timeVersion.setToggleGroup(capVsPrice);
 
         capVersion.setLayoutX(5);
         capVersion.setLayoutY(94);
@@ -397,28 +445,152 @@ public class Gui extends Application {
         capVersion.setSelected(true);
         capVersion.selectedProperty().addListener(new ChangeListener<Boolean>() {
             @Override
-            public void changed(ObservableValue<? extends Boolean> selected, Boolean oldVal, Boolean show) {
+            public void changed(ObservableValue<? extends Boolean> selected,
+                                Boolean oldVal,
+                                Boolean show) {
                 if (!oldVal) {
-                    priceVersion.setSelected(false);
                     paramLabel.setText("Capture Target (MT/y)");
                     paramValue.setText("15");
+                    priceVersion.setSelected(false);
+                    timeVersion.setSelected(false);
+
+                    paramLabel.setVisible(true);
+                    paramValue.setVisible(true);
+                    yearLabel.setVisible(true);
+                    yearValue.setVisible(true);
+
+                    timeSettingsContainer.setDisable(true);
+                    timeSettingsContainer.setExpanded(false);
                 }
             }
         });
 
-        priceVersion.setLayoutX(60);
+        priceVersion.setLayoutX(65);
         priceVersion.setLayoutY(94);
         formulationPane.getChildren().add(priceVersion);
         priceVersion.selectedProperty().addListener(new ChangeListener<Boolean>() {
             @Override
-            public void changed(ObservableValue<? extends Boolean> selected, Boolean oldVal, Boolean show) {
+            public void changed(ObservableValue<? extends Boolean> selected,
+                                Boolean oldVal,
+                                Boolean show) {
                 if (!oldVal) {
                     capVersion.setSelected(false);
+                    timeVersion.setSelected(false);
                     paramLabel.setText("Tax/Credit ($/t)");
                     paramValue.setText("0");
+
+                    paramLabel.setVisible(true);
+                    paramValue.setVisible(true);
+                    yearLabel.setVisible(true);
+                    yearValue.setVisible(true);
+
+                    timeSettingsContainer.setDisable(true);
+                    timeSettingsContainer.setExpanded(false);
                 }
             }
         });
+
+        timeVersion.setLayoutX(125);
+        timeVersion.setLayoutY(94);
+        formulationPane.getChildren().add(timeVersion);
+        timeVersion.selectedProperty().addListener(new ChangeListener<Boolean>() {
+            @Override
+            public void changed(ObservableValue<? extends Boolean> selected,
+                                Boolean oldVal,
+                                Boolean show) {
+                if (!oldVal) {
+                    capVersion.setSelected(false);
+                    priceVersion.setSelected(false);
+
+                    paramLabel.setVisible(false);
+                    paramValue.setVisible(false);
+                    yearLabel.setVisible(false);
+                    yearValue.setVisible(false);
+
+                    timeSettingsContainer.setDisable(false);
+                    timeSettingsContainer.setExpanded(true);
+                }
+            }
+        });
+
+        //////////////////////////////////////////////////////////////////
+        // TIME SETTINGS PANE
+        //////////////////////////////////////////////////////////////////
+
+        ObservableList<TimeIntervalProto> data = FXCollections.observableArrayList();
+
+        TableView timeTable = new TableView();
+        timeTable.setEditable(true);
+
+        TableColumn intervalYearsCol = new TableColumn("Years");
+        intervalYearsCol.setSortable(false);
+        intervalYearsCol.setMinWidth(50);
+        intervalYearsCol.setCellValueFactory(
+                new PropertyValueFactory<TimeIntervalProto, String>("timeInterval")
+        );
+        intervalYearsCol.setCellFactory(TextFieldTableCell.forTableColumn());
+        intervalYearsCol.setOnEditCommit(
+                new EventHandler<CellEditEvent<TimeIntervalProto, String>>() {
+                    @Override
+                    public void handle(CellEditEvent<TimeIntervalProto, String> t) {
+                        ((TimeIntervalProto) t.getTableView().getItems().get(
+                                t.getTablePosition().getRow())
+                        ).setTimeInterval(t.getNewValue());
+                    }
+                }
+        );
+
+        TableColumn intervalValuesCol = new TableColumn("Values (MT/y)");
+        intervalValuesCol.setSortable(false);
+        intervalValuesCol.setMinWidth(100);
+        intervalValuesCol.setCellValueFactory(
+                new PropertyValueFactory<TimeIntervalProto, String>("captureTarget")
+        );
+        intervalValuesCol.setCellFactory(TextFieldTableCell.forTableColumn());
+        intervalValuesCol.setOnEditCommit(
+                new EventHandler<CellEditEvent<TimeIntervalProto, String>>() {
+                    @Override
+                    public void handle(CellEditEvent<TimeIntervalProto, String> t) {
+                        ((TimeIntervalProto) t.getTableView().getItems().get(
+                                t.getTablePosition().getRow())
+                        ).setCaptureTarget(t.getNewValue());
+                    }
+                }
+        );
+
+        timeTable.setItems(data);
+        timeTable.getColumns().addAll(intervalYearsCol, intervalValuesCol);
+
+        final Button addIntervalButton = new Button("+");
+        addIntervalButton.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent e) {
+                // Add new interval to bottom of data stack (LIFO)
+                data.add(new TimeIntervalProto("-", "-"));
+            }
+        });
+
+        final Button subIntervalButton = new Button("–");
+        subIntervalButton.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent e) {
+                // Remove the last object added (LIFO)
+                if (data.size() > 0) {
+                    data.remove(data.size() - 1);
+                }
+            }
+        });
+
+        final HBox timeIntervalBtnHBox = new HBox();
+        addIntervalButton.setMinWidth(50);
+        timeIntervalBtnHBox.getChildren().addAll(addIntervalButton, subIntervalButton);
+
+        final VBox timeTableVBox = new VBox();
+        timeTableVBox.setSpacing(5);
+        timeTableVBox.setPadding(new Insets(2, 2, 2, 2));
+        timeTableVBox.getChildren().addAll(timeTable, timeIntervalBtnHBox);
+
+        //////////////////////////////////////////////////////////////////
 
         // Populate model pane.
         TitledPane modelContainer = new TitledPane("Problem Formulation", formulationPane);
@@ -427,6 +599,16 @@ public class Gui extends Application {
         modelContainer.setLayoutX(14);
         modelContainer.setLayoutY(5);
         modelPane.getChildren().add(modelContainer);
+
+        timeSettingsContainer = new TitledPane("Time Intervals", timeTableVBox);
+        timeSettingsContainer.setCollapsible(true);
+        timeSettingsContainer.setPrefSize(192, 282);
+        timeSettingsContainer.setLayoutX(14);
+        timeSettingsContainer.setLayoutY(259);
+        modelPane.getChildren().add(timeSettingsContainer);
+
+        timeSettingsContainer.setDisable(true);
+        timeSettingsContainer.setExpanded(false);
 
         // Solution pane.
         AnchorPane mipSolutionPane = new AnchorPane();
@@ -440,14 +622,54 @@ public class Gui extends Application {
         generateSolutionFile.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent e) {
+                TimeInterval intervals = new TimeInterval();
                 String modelVersion = "";
+
                 if (capVersion.isSelected()) {
                     modelVersion = "c";
+                    intervals.addInterval(
+                            Double.parseDouble(yearValue.getText()),
+                            Double.parseDouble(paramValue.getText())
+                    );
                 } else if (priceVersion.isSelected()) {
                     modelVersion = "p";
+                    intervals.addInterval(
+                            Double.parseDouble(yearValue.getText()),
+                            Double.parseDouble(paramValue.getText())
+                    );
+                } else if (timeVersion.isSelected()) {
+                    modelVersion = "t";
+
+                    if (data.size() == 0) {
+                        System.err.println("No intervals have been set");
+                        Alert alert = new Alert(AlertType.ERROR,
+                                                "No intervals have been set",
+                                                ButtonType.OK);
+                        alert.showAndWait();
+                        return;
+                    }
+
+                    for (TimeIntervalProto t : data) {
+                        System.out.println(t);
+                        String t_time = t.getTimeInterval();
+                        String t_value = t.getCaptureTarget();
+                        if (t_time.isEmpty() && t_value.isEmpty()) continue;
+
+                        try {
+                            intervals.addInterval(Double.parseDouble(t_time),
+                                                  Double.parseDouble(t_value));
+                        } catch (NumberFormatException | NullPointerException err) {
+                            System.err.println("Invalid interval: (" + t.getTimeInterval() + ", " + t.getCaptureTarget() + ")");
+                            Alert alert = new Alert(AlertType.ERROR,
+                                                    "Invalid interval: (" + t_time + ", " + t_value + ")",
+                                                    ButtonType.OK);
+                            alert.showAndWait();
+                            return;
+                        }
+                    }
                 }
 
-                controlActions.generateMPSFile(crfValue.getText(), yearValue.getText(), paramValue.getText(), modelVersion);
+                controlActions.generateMPSFile(crfValue.getText(), intervals, modelVersion);
             }
         });
 
@@ -481,6 +703,10 @@ public class Gui extends Application {
         runChoice.setLayoutX(20);
         runChoice.setLayoutY(4);
 
+        ////////////////////////////////////////////
+        // SOLUTIONS PANE
+        ////////////////////////////////////////////
+
         solutionPane = new AnchorPane();
         solutionPane.setPrefSize(190, 30);
         solutionPane.setMinSize(0, 0);
@@ -500,6 +726,26 @@ public class Gui extends Application {
         solutionDisplayPane.setLayoutX(0);
         solutionDisplayPane.setLayoutY(110);
         resultsPane.getChildren().add(solutionDisplayPane);
+
+        // Time Interval selection
+        ////////////////////////////////////////////////////
+        HBox timeIntervalHBox = new HBox();
+        Label timeIntervalLabel = new Label("Time Interval:");
+        timeIntervalLabel.setPrefHeight(27);
+        timeIntervalLabel.setAlignment(Pos.CENTER);
+        ChoiceBox timeIntervalChoices = new ChoiceBox();
+        timeIntervalChoices.setPrefWidth(50);
+        timeIntervalChoices.setPrefHeight(27);
+        Separator separator = new Separator(Orientation.VERTICAL);
+        separator.setPrefWidth(25);
+        separator.setVisible(false);
+        timeIntervalHBox.getChildren().addAll(timeIntervalLabel, separator, timeIntervalChoices);
+
+        timeIntervalHBox.setPrefWidth(150);
+        timeIntervalHBox.setLayoutX(35);
+        timeIntervalHBox.setLayoutY(67);
+
+        resultsPane.getChildren().add(timeIntervalHBox);
 
         // Solution labels.
         Label sources = new Label("Sources:");
@@ -594,15 +840,49 @@ public class Gui extends Application {
         totU.setLayoutY(220);
         solutionDisplayPane.getChildren().addAll(tot, totT, totU);
 
-        Label[] solutionValues = new Label[]{sourcesValue, sinksValue, storedValue, edgesValue, lengthValue, capT, capU, transT, transU, storT, storU, totT, totU};
+        Label solnIntervals = new Label("Solution Intervals:");
+        solnIntervals.setLayoutX(30);
+        solnIntervals.setLayoutY(260);
+        Label solnIntervalsValue = new Label("-");
+        solnIntervalsValue.setLayoutX(135);
+        solnIntervalsValue.setLayoutY(260);
+        solutionDisplayPane.getChildren().addAll(solnIntervals, solnIntervalsValue);
+
+        Label[] solutionValues = new Label[]{
+                sourcesValue, sinksValue, storedValue, edgesValue,
+                lengthValue, capT, capU, transT, transU, storT, storU,
+                totT, totU, solnIntervalsValue};
+
+        timeIntervalChoices.getSelectionModel()
+                .selectedItemProperty()
+                .addListener(new ChangeListener<String>() {
+                                 @Override
+                                 public void changed(ObservableValue<? extends String> selected,
+                                                     String oldValue,
+                                                     String newValue) {
+                                                selectedSolutionFileInterval =
+                                                        Integer.parseInt(newValue) - 1;
+                                                controlActions.selectSolution(loadedSolutionFile,
+                                                                              solutionValues,
+                                                                              selectedSolutionFileInterval);
+                                            }
+                                        }
+                           );
 
         // Run selection action.
-        runChoice.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<String>() {
-            @Override
-            public void changed(ObservableValue<? extends String> selected, String oldSolution, String newSolution) {
-                controlActions.selectSolution(newSolution, solutionValues);
-            }
-        });
+        runChoice.getSelectionModel()
+                .selectedItemProperty()
+                .addListener(new ChangeListener<String>() {
+                    @Override
+                    public void changed(ObservableValue<? extends String> selected,
+                                        String oldSolution,
+                                        String newSolution) {
+                        loadedSolutionFile = newSolution;
+                        selectedSolutionFileInterval = 0;
+                        controlActions.selectSolution(newSolution, solutionValues, 0);
+                        setNumIntervalChoices(timeIntervalChoices, solutionValues[13].getText());
+                    }
+                });
         runChoice.showingProperty().addListener((obs, wasShowing, isShowing) -> {
             if (isShowing) {
                 controlActions.initializeSolutionSelection(runChoice);
@@ -633,6 +913,35 @@ public class Gui extends Application {
         return new Scene(group, 1050, 660);
     }
 
+    public static class TimeIntervalProto {
+        private String timeInterval;
+        private String captureTarget;
+        private static String id = "0";
+
+        private TimeIntervalProto(String time_interval, String capture_target) {
+            TimeIntervalProto.id = String.valueOf(Integer.parseInt(id) + 1);
+            this.timeInterval = time_interval;
+            this.captureTarget = capture_target;
+        }
+
+        public String getTimeInterval() {
+            return this.timeInterval;
+        }
+
+        public void setTimeInterval(String time_interval) {
+            this.timeInterval = time_interval;
+        }
+
+        public String getCaptureTarget() {
+            return this.captureTarget;
+        }
+
+        public void setCaptureTarget(String capture_target) {
+            this.captureTarget = capture_target;
+        }
+
+    }
+
     public void displayCostSurface() {
         dispCostSurface.setSelected(true);
     }
@@ -647,6 +956,29 @@ public class Gui extends Application {
         sinkVisible.setSelected(false);
         dispCostSurface.setSelected(false);
         messenger.setText("");
+    }
+
+    public void setNumIntervalChoices(ChoiceBox timeIntervalChoices, String numIntervalsLabel) {
+
+        Integer numIntervals = null;
+
+        try {
+             numIntervals = Integer.parseInt(numIntervalsLabel);
+        } catch (NumberFormatException err) {
+            return;
+        } finally {
+            if (numIntervals == null) return;
+        }
+
+        if (!timeIntervalChoices.getSelectionModel().isEmpty()) {
+            timeIntervalChoices.setItems(null);
+        }
+
+        for (int i = 0; i < numIntervals; i++) {
+            timeIntervalChoices.getItems().add(String.valueOf(i + 1));
+        }
+
+        //timeIntervalChoices.getSelectionModel().selectFirst();
     }
 
     public void softReset() {

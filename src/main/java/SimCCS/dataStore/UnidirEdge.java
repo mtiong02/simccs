@@ -6,7 +6,6 @@
 package dataStore;
 
 /**
- *
  * @author yaw
  */
 public class UnidirEdge {
@@ -17,7 +16,7 @@ public class UnidirEdge {
         this.v1 = v1;
         this.v2 = v2;
     }
-    
+
     @Override
     public int hashCode() {
         if (v1 > v2) {
@@ -40,7 +39,7 @@ public class UnidirEdge {
         final UnidirEdge other = (UnidirEdge) obj;
         return (v1 == other.v1 && v2 == other.v2);
     }
-    
+
     public String toString() {
         return v1 + " -> " + v2;
     }

@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 
 /**
- *
  * @author yaw
  */
 public class Solution {
@@ -26,6 +25,8 @@ public class Solution {
     // Other.
     private double captureAmountPerYear;
     private int projectLength;
+    private int interval;
+    private int totalIntervals;
     private double crf;
     private double taxCredit;
 
@@ -120,7 +121,8 @@ public class Solution {
 
     public void setSolutionCosts(DataStorer data) {
         for (Source src : sourceCaptureAmounts.keySet()) {
-            double cost = src.getOpeningCost(crf) + src.getCaptureCost() * sourceCaptureAmounts.get(src);
+            double cost = src.getOpeningCost(crf) + src.getCaptureCost() * sourceCaptureAmounts.get(
+                    src);
             sourceCosts.put(src, cost);
         }
 
@@ -138,8 +140,11 @@ public class Solution {
             HashMap<Edge, Double> edgeConstructionCosts = data.getGraphEdgeConstructionCosts();
             HashMap<Edge, Double> edgeRightOfWayCosts = data.getGraphEdgeRightOfWayCosts();
             int edgeTrend = edgeTrends.get(edg);
-            double fixed = (linearComponents[edgeTrend].getConIntercept() * edgeConstructionCosts.get(edg) + linearComponents[edgeTrend].getRowIntercept() * edgeRightOfWayCosts.get(edg)) * crf;
-            double variable = (linearComponents[edgeTrend].getConSlope() * edgeConstructionCosts.get(edg) + linearComponents[edgeTrend].getRowSlope() * edgeRightOfWayCosts.get(edg)) * crf / 1.0;
+            double fixed = (linearComponents[edgeTrend].getConIntercept() * edgeConstructionCosts.get(
+                    edg) + linearComponents[edgeTrend].getRowIntercept() * edgeRightOfWayCosts.get(
+                    edg)) * crf;
+            double variable = (linearComponents[edgeTrend].getConSlope() * edgeConstructionCosts.get(
+                    edg) + linearComponents[edgeTrend].getRowSlope() * edgeRightOfWayCosts.get(edg)) * crf / 1.0;
             double cost = fixed + variable * edgeTransportAmounts.get(edg);
             edgeCosts.put(edg, cost);
         }
@@ -152,7 +157,7 @@ public class Solution {
     public void setCRF(double crf) {
         this.crf = crf;
     }
-    
+
     public void setTaxCredit(double taxCredit) {
         this.taxCredit = taxCredit;
     }
@@ -224,7 +229,7 @@ public class Solution {
     public double getCRF() {
         return crf;
     }
-    
+
     public double getTaxCredit() {
         return taxCredit;
     }
@@ -277,6 +282,20 @@ public class Solution {
     public double getTotalCost() {
         return getTotalAnnualCaptureCost() + getTotalAnnualStorageCost() + getTotalAnnualTransportCost();
     }
+
+    public String getFilePrefix() {
+        return "solution_T" + String.valueOf(this.getInterval() + 1);
+    }
+
+    public void setInterval(int interval) {
+        this.interval = interval;
+    }
+    public void setTotalIntervals(int totalIntervals) { this.totalIntervals = totalIntervals; }
+
+    public int getInterval() {
+        return this.interval;
+    }
+    public int getTotalIntervals() { return this.totalIntervals; }
 
     public double getUnitTotalCost() {
         return getUnitCaptureCost() + getUnitStorageCost() + getUnitTransportCost();

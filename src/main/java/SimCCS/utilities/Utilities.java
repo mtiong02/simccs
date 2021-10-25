@@ -1,7 +1,6 @@
 package utilities;
 
 /**
- *
  * @author yaw
  */
 public class Utilities {
@@ -20,18 +19,18 @@ public class Utilities {
         }
         return returnA;
     }
-    
+
     public static double round(double val, int numAfterDecimal) {
         double div = Math.pow(10, numAfterDecimal);
         return Math.round(val * div) / div;
     }
-    
-    public static boolean isDouble(String value) {  
-     try {  
-         Double.parseDouble(value);  
-         return true;  
-      } catch (NumberFormatException e) {  
-         return false;  
-      }  
-}
+
+    public static boolean isDouble(String value) {
+        try {
+            Double.parseDouble(value);
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
+        }
+    }
 }

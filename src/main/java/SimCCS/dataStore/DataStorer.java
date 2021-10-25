@@ -5,10 +5,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
+
 import solver.Solver;
 
 /**
- *
  * @author yaw
  */
 public class DataStorer {
@@ -215,7 +215,7 @@ public class DataStorer {
         }
         return graphEdgeRoutes;
     }
-    
+
     public HashMap<Edge, Double> getGraphEdgeLengths() {
         if (graphEdgeLengths == null) {
             graphEdgeLengths = solver.calculateGraphEdgeLengths();
@@ -239,7 +239,10 @@ public class DataStorer {
                 return routingCosts[cell1][getNeighborNum(cell1, cell2)];
             } else if (type.equals("c")) {
                 if (rightOfWayCosts != null) {
-                    return constructionCosts[cell1][getNeighborNum(cell1, cell2)] + rightOfWayCosts[cell1][getNeighborNum(cell1, cell2)];
+                    return constructionCosts[cell1][getNeighborNum(cell1,
+                                                                   cell2)] + rightOfWayCosts[cell1][getNeighborNum(
+                            cell1,
+                            cell2)];
                 } else {
                     return constructionCosts[cell1][getNeighborNum(cell1, cell2)];
                 }
@@ -369,7 +372,10 @@ public class DataStorer {
         if (cell1 == cell2) {
 
         } else if (getNeighborNum(cell1, cell2) >= 0 && getNeighborNum(cell1, cell2) < 8) {
-            modifiedRoutingCosts[cell1][getNeighborNum(cell1, cell2)] = edgeCostModification * routingCosts[cell1][getNeighborNum(cell1, cell2)];
+            modifiedRoutingCosts[cell1][getNeighborNum(cell1,
+                                                       cell2)] = edgeCostModification * routingCosts[cell1][getNeighborNum(
+                    cell1,
+                    cell2)];
         }
     }
 
@@ -614,7 +620,11 @@ public class DataStorer {
         dataInOut.downloadFile(urlPath);
     }
 
-    public Solution loadSolution(String solutionPath) {
+    public Solution[] loadSolution(String solutionPath) {
         return dataInOut.loadSolution(solutionPath);
+    }
+
+    public Integer parseNumberOfIntervals(String solutionPath) {
+        return dataInOut.parseNumberOfIntervals(solutionPath);
     }
 }

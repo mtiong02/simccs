@@ -1,7 +1,6 @@
 package dataStore;
 
 /**
- *
  * @author yaw
  */
 public class Source {
@@ -11,39 +10,39 @@ public class Source {
     private double captureCost;
     private double productionRate;
     private String label;
-    
+
     private DataStorer data;
-    
+
     private double remainingCapacity;    //Heuristic
-    
+
     public Source(DataStorer data) {
         this.data = data;
     }
-    
+
     public void setCellNum(int cellNum) {
         this.cellNum = cellNum;
     }
-    
+
     public void setLabel(String label) {
         this.label = label;
     }
-    
+
     public void setOpeningCost(double openingCost) {
         this.openingCost = openingCost;
     }
-    
+
     public void setOMCost(double omCost) {
         this.omCost = omCost;
     }
-    
+
     public void setCaptureCost(double captureCost) {
         this.captureCost = captureCost;
     }
-    
+
     public void setProductionRate(double productionRates) {
         this.productionRate = productionRates;
     }
-    
+
     // Heuristic
     public void setRemainingCapacity(double remaingCapacity) {
         this.remainingCapacity = remaingCapacity;
@@ -53,27 +52,27 @@ public class Source {
     public double getRemainingCapacity() {
         return remainingCapacity;
     }
-    
+
     public int getCellNum() {
         return cellNum;
     }
-    
+
     public String getLabel() {
         return label;
     }
-    
+
     public double getOpeningCost(double crf) {
         return crf * openingCost + omCost;
     }
-    
+
     public double getCaptureCost() {
         return captureCost;
     }
-    
+
     public double getProductionRate() {
         return productionRate;
     }
-    
+
     public boolean isSimplified() {
         if (openingCost == 0 && omCost == 0) {
             return true;

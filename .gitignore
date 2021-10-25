@@ -1,4 +1,15 @@
 *.DS_Store
+Datasets/
+*.mps
+*.sol
+*.dbf
+*.prj
+*.shp
+*.shx
+*.csv
+cplexCommands.txt
+osCommands.sh
+
 # Ignore Gradle project-specific cache directory
 .gradle
 
