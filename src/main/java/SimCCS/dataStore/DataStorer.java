@@ -623,4 +623,8 @@ public class DataStorer {
     public Solution[] loadSolution(String solutionPath) {
         return dataInOut.loadSolution(solutionPath);
     }
+
+    public Integer parseNumberOfIntervals(String solutionPath) {
+        return dataInOut.parseNumberOfIntervals(solutionPath);
+    }
 }

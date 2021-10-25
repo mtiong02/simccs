@@ -490,10 +490,6 @@ public class ControlActions {
         }
     }
 
-    public void assignNumberOfIntervals() {
-
-    }
-
     public void selectSolution(String file, Label[] solutionValues, Integer slnIndex) {
         solutionLayer.getChildren().clear();
         for (Label l : solutionValues) {
@@ -503,6 +499,7 @@ public class ControlActions {
         if (file != null && !file.equals("None")) {
             String solutionPath = basePath + "/" + dataset + "/Scenarios/" + scenario + "/Results/" + file;
             Solution[] soln = data.loadSolution(solutionPath);
+            Integer numIntervals = data.parseNumberOfIntervals(solutionPath);
             displaySolution(file, soln[slnIndex], solutionValues);
         }
     }
@@ -593,6 +590,7 @@ public class ControlActions {
         solutionValues[10].setText(Double.toString(round(soln.getUnitStorageCost(), 2)));
         solutionValues[11].setText(Double.toString(round(soln.getTotalCost(), 2)));
         solutionValues[12].setText(Double.toString(round(soln.getUnitTotalCost(), 2)));
+        solutionValues[13].setText(Integer.toString(soln.getTotalIntervals()));
 
         // Write to shapefiles.
         data.makeShapeFiles(basePath + "/" + dataset + "/Scenarios/" + scenario + "/Results/" + file,

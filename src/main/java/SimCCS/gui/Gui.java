@@ -746,13 +746,6 @@ public class Gui extends Application {
         timeIntervalHBox.setLayoutY(67);
 
         resultsPane.getChildren().add(timeIntervalHBox);
-        ////////////////////////////////////////////////////
-        // TODO
-        timeIntervalChoices.getItems().add("1");
-        timeIntervalChoices.getItems().add("2");
-        timeIntervalChoices.getItems().add("3");
-        timeIntervalChoices.getSelectionModel().selectFirst();
-        ////////////////////////////////////////////////////
 
         // Solution labels.
         Label sources = new Label("Sources:");
@@ -847,7 +840,18 @@ public class Gui extends Application {
         totU.setLayoutY(220);
         solutionDisplayPane.getChildren().addAll(tot, totT, totU);
 
-        Label[] solutionValues = new Label[]{sourcesValue, sinksValue, storedValue, edgesValue, lengthValue, capT, capU, transT, transU, storT, storU, totT, totU};
+        Label solnIntervals = new Label("Solution Intervals:");
+        solnIntervals.setLayoutX(30);
+        solnIntervals.setLayoutY(260);
+        Label solnIntervalsValue = new Label("-");
+        solnIntervalsValue.setLayoutX(135);
+        solnIntervalsValue.setLayoutY(260);
+        solutionDisplayPane.getChildren().addAll(solnIntervals, solnIntervalsValue);
+
+        Label[] solutionValues = new Label[]{
+                sourcesValue, sinksValue, storedValue, edgesValue,
+                lengthValue, capT, capU, transT, transU, storT, storU,
+                totT, totU, solnIntervalsValue};
 
         timeIntervalChoices.getSelectionModel()
                 .selectedItemProperty()
@@ -876,7 +880,7 @@ public class Gui extends Application {
                         loadedSolutionFile = newSolution;
                         selectedSolutionFileInterval = 0;
                         controlActions.selectSolution(newSolution, solutionValues, 0);
-                        controlActions.assignNumberOfIntervals(newSolution, timeIntervalChoices);
+                        setNumIntervalChoices(timeIntervalChoices, solutionValues[13].getText());
                     }
                 });
         runChoice.showingProperty().addListener((obs, wasShowing, isShowing) -> {
@@ -952,6 +956,29 @@ public class Gui extends Application {
         sinkVisible.setSelected(false);
         dispCostSurface.setSelected(false);
         messenger.setText("");
+    }
+
+    public void setNumIntervalChoices(ChoiceBox timeIntervalChoices, String numIntervalsLabel) {
+
+        Integer numIntervals = null;
+
+        try {
+             numIntervals = Integer.parseInt(numIntervalsLabel);
+        } catch (NumberFormatException err) {
+            return;
+        } finally {
+            if (numIntervals == null) return;
+        }
+
+        if (!timeIntervalChoices.getSelectionModel().isEmpty()) {
+            timeIntervalChoices.setItems(null);
+        }
+
+        for (int i = 0; i < numIntervals; i++) {
+            timeIntervalChoices.getItems().add(String.valueOf(i + 1));
+        }
+
+        //timeIntervalChoices.getSelectionModel().selectFirst();
     }
 
     public void softReset() {

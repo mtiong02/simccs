@@ -734,8 +734,8 @@ public class DataInOut {
 
             while (!line.equals(" </variables>")) {
                 String[] partition = line.split("\"");
-                String[] variable = new String[]{partition[1], partition[3], partition[5]};
-                String[] components = variable[0].split("\\]\\[|\\[|\\]");
+                String variable = partition[1];
+                String[] components = variable.split("\\]\\[|\\[|\\]");
 
                 if (components.length == 4) {
                     // p[18][1][1] --> parse the last '1' to get variable interval
@@ -743,9 +743,14 @@ public class DataInOut {
                     num_intervals = parsed_interval > num_intervals ? parsed_interval :
                             num_intervals;
                 }
+                line = br.readLine();
             }
         } catch (IOException e) {
             System.out.println(e.getMessage());
+        }
+
+        if (num_intervals <= 0) {
+            num_intervals = 1;
         }
 
         return num_intervals;
@@ -817,6 +822,7 @@ public class DataInOut {
         for (int i = 0; i < numIntervals; i++) {
             allSolutions[i] = new Solution();
             allSolutions[i].setInterval(i);
+            allSolutions[i].setTotalIntervals(numIntervals);
         }
 
         Solution soln = allSolutions[0];
