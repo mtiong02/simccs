@@ -570,7 +570,7 @@ public class Gui extends Application {
             }
         });
 
-        final Button subIntervalButton = new Button("–");
+        final Button subIntervalButton = new Button("-");
         subIntervalButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent e) {
