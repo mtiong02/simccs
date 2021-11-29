@@ -6,50 +6,54 @@
  * User Manual available at https://docs.gradle.org/6.8.3/userguide/building_java_projects.html
  */
 
+plugins {
+    id("application")
+    id("org.openjfx.javafxplugin") version "0.0.9"
+    //id("com.github.johnrengelman.shadow") version "6.1.0"
+}
 
 application {
     // Define the main class for the application.
-    //mainClassName = "gui.Gui"
-    //val javafxLibPath: String by project
-    //applicationDefaultJvmArgs = listOf(
-    //    "--module-path", "$javafxLibPath",
-    //    "--add-modules=ALL-MODULE-PATH",
-    //    "--add-exports", "javafx.graphics/com.sun.javafx.sg.prism=ALL-UNNAMED"
-    //)
+    mainClass.set("gui.Gui")
+    applicationDefaultJvmArgs = listOf(
+        "--add-modules=ALL-MODULE-PATH",
+        "--add-exports", "javafx.graphics/com.sun.javafx.sg.prism=ALL-UNNAMED",
+        "--add-exports", "jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED"
+    )
 }
 
-plugins {
-    // Apply the application plugin to add support for building a CLI application in Java.
-    application
-    id("org.openjfx.javafxplugin") version "0.0.9"
-    id("com.github.johnrengelman.shadow") version "6.1.0"
-}
+//tasks {
+//    run {
+//        debugOptions.enabled = true
+//        debugOptions.port = 5050
+//        debugOptions.server = true
+//        debugOptions.suspend = false
+//    }
+//}
+
+//task runApp(type: JavaExec) {
+//   debugOptions {
+//       enabled = true
+//       port = 5566
+//       server = true
+//       suspend = false
+//   }
+//}
 
 javafx {
-    version = "16"
     modules("javafx.controls", "javafx.fxml", "javafx.swing", "javafx.base", "javafx.graphics", "javafx.web")
 }
 
 repositories {
-    // Use JCenter for resolving dependencies.
-    jcenter()
-    mavenCentral()
     maven {
         url = uri("https://jitpack.io")
     }
+    mavenCentral()
 }
 
 dependencies {
-    implementation("org.jetbrains:annotations:20.1.0")
-    // Use JUnit test framework.
-    testImplementation("junit:junit:4.13.2")
-
-    // This dependency is used by the application.
-    implementation("com.google.guava:guava:30.1.1-jre")
-
+    testImplementation("junit:junit:4.13")
+    implementation("com.google.guava:guava:29.0-jre")
     implementation("com.github.OpenMap-java:openmap:v5.1.15")
 }
 
-java {
-    modularity.inferModulePath.set(true)
-}
