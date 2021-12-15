@@ -2,26 +2,21 @@ package solver;
 
 import dataStore.DataStorer;
 import dataStore.Edge;
-import dataStore.Source;
 import dataStore.Sink;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.PriorityQueue;
-
+import dataStore.Source;
 import javafx.scene.control.TextArea;
 
-import static utilities.Utilities.*;
+import java.util.*;
+
+import static utilities.Utilities.convertDoubleArray;
+import static utilities.Utilities.convertIntegerArray;
 
 /**
  * @author yaw
  */
 public class Solver {
 
-    private DataStorer data;
+    private final DataStorer data;
     private TextArea messenger;
 
     public Solver(DataStorer data) {
@@ -86,13 +81,13 @@ public class Solver {
             for (int nodeNum = 0; nodeNum < sourcesAndSinks.length - 1; nodeNum++) {
                 int[] destinations = new int[sourcesAndSinks.length - nodeNum - 1];
                 System.arraycopy(sourcesAndSinks,
-                                 nodeNum + 1,
-                                 destinations,
-                                 0,
-                                 destinations.length);
+                        nodeNum + 1,
+                        destinations,
+                        0,
+                        destinations.length);
                 Object[] sourcePathsAndCosts = dijkstra(sourcesAndSinks[nodeNum],
-                                                        destinations,
-                                                        .9999999);
+                        destinations,
+                        .9999999);
                 allPathsList.addAll((ArrayList<int[]>) sourcePathsAndCosts[0]);
                 allPathCostsList.addAll((ArrayList<Double>) sourcePathsAndCosts[1]);
             }
@@ -121,7 +116,7 @@ public class Solver {
 
         // Populate initial costs, routes, and neighbors
         for (Edge pair : delaunayPairs) {
-            int pair2List[] = {pair.v2};
+            int[] pair2List = {pair.v2};
             int[] path = ((ArrayList<int[]>) (dijkstra(pair.v1, pair2List, .9999999)[0])).get(0);
 
             for (int i = 0; i < path.length - 1; i++) {
@@ -160,7 +155,7 @@ public class Solver {
             for (Iterator<Integer> iter = degree2Vertices.iterator(); iter.hasNext(); ) {
                 int vertex = iter.next();
                 int[] neighbors = convertIntegerArray(vertexNeighbors.get(vertex)
-                                                              .toArray(new Integer[0]));
+                        .toArray(new Integer[0]));
                 // Only remove if it won't create multi-edges.
                 Edge newEdge = new Edge(neighbors[0], neighbors[1]);
                 if (!graphEdgeCosts.containsKey(newEdge)) {
@@ -344,11 +339,11 @@ public class Solver {
             for (int i = 0; i < pathList.size() - 1; i++) {
                 cost += data.getEdgeWeight(pathList.get(i), pathList.get(i + 1), "c");
                 data.updateModifiedEdgeRoutingCost(pathList.get(i),
-                                                   pathList.get(i + 1),
-                                                   edgeCostModification);
+                        pathList.get(i + 1),
+                        edgeCostModification);
                 data.updateModifiedEdgeRoutingCost(pathList.get(i + 1),
-                                                   pathList.get(i),
-                                                   edgeCostModification);
+                        pathList.get(i),
+                        edgeCostModification);
             }
             pathCosts.add(cost);
             paths.add(convertIntegerArray(pathList.toArray(new Integer[0])));
@@ -356,12 +351,12 @@ public class Solver {
         return new Object[]{paths, pathCosts};
     }
 
-    public void setMessenger(TextArea messenger) {
-        this.messenger = messenger;
-    }
-
     public TextArea getMessenger() {
         return messenger;
+    }
+
+    public void setMessenger(TextArea messenger) {
+        this.messenger = messenger;
     }
 
     private class Data implements Comparable<Data> {

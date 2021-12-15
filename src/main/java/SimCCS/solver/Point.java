@@ -4,8 +4,8 @@ package solver;
  * @author yaw
  */
 public class Point {
-    private double x;
-    private double y;
+    private final double x;
+    private final double y;
 
     // create and initialize a random point in unit square
     public Point() {
@@ -17,22 +17,6 @@ public class Point {
     public Point(double x, double y) {
         this.x = x;
         this.y = y;
-    }
-
-    // accessor methods
-    public double x() {
-        return x;
-    }
-
-    public double y() {
-        return y;
-    }
-
-    // return Euclidean distance between this and p
-    public double distanceTo(Point p) {
-        double dx = this.x - p.x;
-        double dy = this.y - p.y;
-        return Math.sqrt(dx * dx + dy * dy);
     }
 
     // return signed area of triangle a->b->c
@@ -50,6 +34,22 @@ public class Point {
             return -1;
         else
             return 0;
+    }
+
+    // accessor methods
+    public double x() {
+        return x;
+    }
+
+    public double y() {
+        return y;
+    }
+
+    // return Euclidean distance between this and p
+    public double distanceTo(Point p) {
+        double dx = this.x - p.x;
+        double dy = this.y - p.y;
+        return Math.sqrt(dx * dx + dy * dy);
     }
 
     // is invoking point inside circle defined by a-b-c

@@ -11,20 +11,12 @@ public class Source {
     private double productionRate;
     private String label;
 
-    private DataStorer data;
+    private final DataStorer data;
 
     private double remainingCapacity;    //Heuristic
 
     public Source(DataStorer data) {
         this.data = data;
-    }
-
-    public void setCellNum(int cellNum) {
-        this.cellNum = cellNum;
-    }
-
-    public void setLabel(String label) {
-        this.label = label;
     }
 
     public void setOpeningCost(double openingCost) {
@@ -35,12 +27,9 @@ public class Source {
         this.omCost = omCost;
     }
 
-    public void setCaptureCost(double captureCost) {
-        this.captureCost = captureCost;
-    }
-
-    public void setProductionRate(double productionRates) {
-        this.productionRate = productionRates;
+    // Heuristic
+    public double getRemainingCapacity() {
+        return remainingCapacity;
     }
 
     // Heuristic
@@ -48,17 +37,20 @@ public class Source {
         this.remainingCapacity = remaingCapacity;
     }
 
-    // Heuristic
-    public double getRemainingCapacity() {
-        return remainingCapacity;
-    }
-
     public int getCellNum() {
         return cellNum;
     }
 
+    public void setCellNum(int cellNum) {
+        this.cellNum = cellNum;
+    }
+
     public String getLabel() {
         return label;
+    }
+
+    public void setLabel(String label) {
+        this.label = label;
     }
 
     public double getOpeningCost(double crf) {
@@ -69,14 +61,19 @@ public class Source {
         return captureCost;
     }
 
+    public void setCaptureCost(double captureCost) {
+        this.captureCost = captureCost;
+    }
+
     public double getProductionRate() {
         return productionRate;
     }
 
+    public void setProductionRate(double productionRates) {
+        this.productionRate = productionRates;
+    }
+
     public boolean isSimplified() {
-        if (openingCost == 0 && omCost == 0) {
-            return true;
-        }
-        return false;
+        return openingCost == 0 && omCost == 0;
     }
 }

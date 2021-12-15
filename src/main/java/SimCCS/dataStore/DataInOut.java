@@ -1,27 +1,9 @@
 package dataStore;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.*;
-
-import static utilities.Utilities.*;
-
+import com.bbn.openmap.dataAccess.shape.*;
 import com.bbn.openmap.omGraphics.OMGraphic;
-import com.bbn.openmap.dataAccess.shape.EsriPolyline;
-import com.bbn.openmap.dataAccess.shape.EsriPolylineList;
-import com.bbn.openmap.dataAccess.shape.EsriShapeExport;
-import com.bbn.openmap.dataAccess.shape.DbfTableModel;
-import com.bbn.openmap.dataAccess.shape.EsriPoint;
-import com.bbn.openmap.dataAccess.shape.EsriPointList;
 
-import java.io.DataOutputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.InputStream;
+import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -31,6 +13,9 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.*;
+
+import static utilities.Utilities.*;
 
 /**
  * @author yaw
@@ -162,7 +147,7 @@ public class DataInOut {
                         nextCellIndex = line.length();
                     }
                     int neighborCell = Integer.parseInt(line.substring(currentCellIndex,
-                                                                       nextCellIndex));
+                            nextCellIndex));
                     currentCellIndex = nextCellIndex + 1;
 
                     nextCostIndex = costLine.indexOf(",", currentCostIndex);
@@ -170,11 +155,11 @@ public class DataInOut {
                         nextCostIndex = costLine.length();
                     }
                     double cost = Double.parseDouble(costLine.substring(currentCostIndex,
-                                                                        nextCostIndex));
+                            nextCostIndex));
                     currentCostIndex = nextCostIndex + 1;
 
                     constructionCosts[centerCell][data.getNeighborNum(centerCell,
-                                                                      neighborCell)] = cost;
+                            neighborCell)] = cost;
                 }
 
                 line = br.readLine();
@@ -205,7 +190,7 @@ public class DataInOut {
                     int centerCell = Integer.parseInt(cells[0]);
                     for (int i = 1; i < costs.length; i++) {
                         constructionCosts[centerCell][data.getNeighborNum(centerCell,
-                                                                          Integer.parseInt(cells[i]))] = Double.parseDouble(
+                                Integer.parseInt(cells[i]))] = Double.parseDouble(
                                 costs[i]);
                     }
                     line = br.readLine();
@@ -238,7 +223,7 @@ public class DataInOut {
                 int centerCell = Integer.parseInt(cells[0]);
                 for (int i = 1; i < costs.length; i++) {
                     rightOfWayCosts[centerCell][data.getNeighborNum(centerCell,
-                                                                    Integer.parseInt(cells[i]))] = Double.parseDouble(
+                            Integer.parseInt(cells[i]))] = Double.parseDouble(
                             costs[i]);
                 }
                 line = br.readLine();
@@ -280,7 +265,7 @@ public class DataInOut {
                         nextCellIndex = line.length();
                     }
                     int neighborCell = Integer.parseInt(line.substring(currentCellIndex,
-                                                                       nextCellIndex));
+                            nextCellIndex));
                     currentCellIndex = nextCellIndex + 1;
 
                     nextCostIndex = costLine.indexOf(",", currentCostIndex);
@@ -288,7 +273,7 @@ public class DataInOut {
                         nextCostIndex = costLine.length();
                     }
                     double cost = Double.parseDouble(costLine.substring(currentCostIndex,
-                                                                        nextCostIndex));
+                            nextCostIndex));
                     currentCostIndex = nextCostIndex + 1;
 
                     routingCosts[centerCell][data.getNeighborNum(centerCell, neighborCell)] = cost;
@@ -326,7 +311,7 @@ public class DataInOut {
                 Source source = new Source(data);
                 source.setLabel(elements[1]);
                 source.setCellNum(data.latLonToCell(Double.parseDouble(elements[8]),
-                                                    Double.parseDouble(elements[7])));
+                        Double.parseDouble(elements[7])));
 
                 if (elements[3].equals("") || (isDouble(elements[3]) && Double.parseDouble(elements[3]) == 0)) {
                     if (elements[4].equals("")) {
@@ -368,7 +353,7 @@ public class DataInOut {
                     Source source = new Source(data);
                     source.setLabel(elements[0]);
                     source.setCellNum(data.latLonToCell(Double.parseDouble(elements[7]),
-                                                        Double.parseDouble(elements[6])));
+                            Double.parseDouble(elements[6])));
                     source.setOpeningCost(Double.parseDouble(elements[1]));
                     source.setOMCost(Double.parseDouble(elements[2]));
                     source.setCaptureCost(Double.parseDouble(elements[3]));
@@ -396,7 +381,7 @@ public class DataInOut {
                 Sink sink = new Sink(data);
                 sink.setLabel(elements[1]);
                 sink.setCellNum(data.latLonToCell(Double.parseDouble(elements[11]),
-                                                  Double.parseDouble(elements[10])));
+                        Double.parseDouble(elements[10])));
 
                 if (elements[3].equals("") || (isDouble(elements[3]) && Double.parseDouble(elements[3]) == 0)) {
                     if (elements[4].equals("")) {
@@ -458,7 +443,7 @@ public class DataInOut {
                     Sink sink = new Sink(data);
                     sink.setLabel(elements[0]);
                     sink.setCellNum(data.latLonToCell(Double.parseDouble(elements[11]),
-                                                      Double.parseDouble(elements[10])));
+                            Double.parseDouble(elements[10])));
                     sink.setOpeningCost(Double.parseDouble(elements[3]));
                     sink.setOMCost(Double.parseDouble(elements[4]));
                     sink.setWellOpeningCost(Double.parseDouble(elements[6]));
@@ -849,32 +834,32 @@ public class DataInOut {
 
                     if (components[0].equals("a")) {
                         soln.addSourceCaptureAmount(sources[Integer.parseInt(components[1])],
-                                                    Double.parseDouble(variable[2]));
+                                Double.parseDouble(variable[2]));
                     } else if (components[0].equals("b")) {
                         soln.addSinkStorageAmount(sinks[Integer.parseInt(components[1])],
-                                                  Double.parseDouble(variable[2]));
+                                Double.parseDouble(variable[2]));
                     } else if (components[0].equals("p")) {
                         if (components.length == 4 + offset) {
                             soln.addEdgeTransportAmount(new Edge(vertexIndexToCell.get(Integer.parseInt(
-                                                                components[1])),
-                                                                 vertexIndexToCell.get(Integer.parseInt(
-                                                                         components[2]))),
-                                                        Double.parseDouble(variable[2]));
+                                            components[1])),
+                                            vertexIndexToCell.get(Integer.parseInt(
+                                                    components[2]))),
+                                    Double.parseDouble(variable[2]));
                             soln.setEdgeTrend(new Edge(vertexIndexToCell.get(Integer.parseInt(
-                                                      components[1])),
-                                                       vertexIndexToCell.get(Integer.parseInt(
-                                                               components[2]))),
-                                              Integer.parseInt(components[3]));
+                                            components[1])),
+                                            vertexIndexToCell.get(Integer.parseInt(
+                                                    components[2]))),
+                                    Integer.parseInt(components[3]));
                         } else {
                             UnidirEdge unidirEdge = edgeIndexToEdge.get(Integer.parseInt(components[1]));
                             soln.addEdgeTransportAmount(new Edge(unidirEdge.v1, unidirEdge.v2),
-                                                        Double.parseDouble(variable[2]));
+                                    Double.parseDouble(variable[2]));
                             soln.setEdgeTrend(new Edge(unidirEdge.v1, unidirEdge.v2),
-                                              Integer.parseInt(components[2]));
+                                    Integer.parseInt(components[2]));
                         }
                     } else if (components[0].equals("w")) {
                         soln.addSinkNumWells(sinks[Integer.parseInt(components[1])],
-                                             (int) Math.round(Double.parseDouble(variable[2])));
+                                (int) Math.round(Double.parseDouble(variable[2])));
                     }
 
                     if (variable[0].equals("crf")) {
@@ -917,7 +902,7 @@ public class DataInOut {
 
             while (!line.equals("RHS")) {
                 String[] column = line.replaceFirst("\\s+", "").split("\\s+");
-                if (column[1].equals("OBJ") && variableValues.keySet().contains(column[0])) {
+                if (column[1].equals("OBJ") && variableValues.containsKey(column[0])) {
                     String[] components = column[0].split("\\]\\[|\\[|\\]");
 
                     if (isTimeScenario && components.length > 1) {
@@ -937,8 +922,8 @@ public class DataInOut {
                         if (components.length == 4 + offset) {
                             soln.addEdgeCostComponent(new Edge(vertexIndexToCell.get(Integer.parseInt(
                                     components[1])),
-                                                               vertexIndexToCell.get(Integer.parseInt(
-                                                                       components[2]))), cost);
+                                    vertexIndexToCell.get(Integer.parseInt(
+                                            components[2]))), cost);
                         } else {
                             UnidirEdge unidirEdge = edgeIndexToEdge.get(Integer.parseInt(components[1]));
                             soln.addEdgeCostComponent(new Edge(unidirEdge.v1, unidirEdge.v2), cost);
@@ -998,7 +983,7 @@ public class DataInOut {
             for (Source src : sameCapSources) {
                 if (sourceCaptureAmounts.containsKey(src)) {
                     EsriPoint source = new EsriPoint(data.cellToLatLon(src.getCellNum())[0],
-                                                     data.cellToLatLon(src.getCellNum())[1]);
+                            data.cellToLatLon(src.getCellNum())[1]);
                     sourceList.add(source);
 
                     // Add attributes.
@@ -1019,8 +1004,8 @@ public class DataInOut {
         }
 
         EsriShapeExport writeSourceShapefiles = new EsriShapeExport(sourceList,
-                                                                    sourceAttributeTable,
-                                                                    newDir.toString() + "/Sources");
+                sourceAttributeTable,
+                newDir + "/Sources");
         writeSourceShapefiles.export();
         makeProjectionFile("Sources", newDir.toString());
 
@@ -1053,7 +1038,7 @@ public class DataInOut {
             for (Sink snk : sameCapSinks) {
                 if (sinkStorageAmounts.containsKey(snk)) {
                     EsriPoint source = new EsriPoint(data.cellToLatLon(snk.getCellNum())[0],
-                                                     data.cellToLatLon(snk.getCellNum())[1]);
+                            data.cellToLatLon(snk.getCellNum())[1]);
                     sinkList.add(source);
 
                     // Add attributes.
@@ -1075,8 +1060,8 @@ public class DataInOut {
         }
 
         EsriShapeExport writeSinkShapefiles = new EsriShapeExport(sinkList,
-                                                                  sinkAttributeTable,
-                                                                  newDir.toString() + "/Sinks");
+                sinkAttributeTable,
+                newDir + "/Sinks");
         writeSinkShapefiles.export();
         makeProjectionFile("Sinks", newDir.toString());
 
@@ -1106,8 +1091,8 @@ public class DataInOut {
             }
 
             EsriPolyline edge = new EsriPolyline(routeLatLon,
-                                                 OMGraphic.DECIMAL_DEGREES,
-                                                 OMGraphic.LINETYPE_STRAIGHT);
+                    OMGraphic.DECIMAL_DEGREES,
+                    OMGraphic.LINETYPE_STRAIGHT);
             edgeList.add(edge);
 
             // Add attributes.
@@ -1126,8 +1111,8 @@ public class DataInOut {
         }
 
         EsriShapeExport writeEdgeShapefiles = new EsriShapeExport(edgeList,
-                                                                  edgeAttributeTable,
-                                                                  newDir.toString() + "/Network");
+                edgeAttributeTable,
+                newDir + "/Network");
         writeEdgeShapefiles.export();
         makeProjectionFile("Network", newDir.toString());
     }
@@ -1170,7 +1155,7 @@ public class DataInOut {
         for (ArrayList<Source> sameCapSources : orderedSources.values()) {
             for (Source src : sameCapSources) {
                 EsriPoint source = new EsriPoint(data.cellToLatLon(src.getCellNum())[0],
-                                                 data.cellToLatLon(src.getCellNum())[1]);
+                        data.cellToLatLon(src.getCellNum())[1]);
                 sourceList.add(source);
 
                 // Add attributes.
@@ -1184,8 +1169,8 @@ public class DataInOut {
         }
 
         EsriShapeExport writeSourceShapefiles = new EsriShapeExport(sourceList,
-                                                                    sourceAttributeTable,
-                                                                    newDir.toString() + "/Sources");
+                sourceAttributeTable,
+                newDir + "/Sources");
         writeSourceShapefiles.export();
         makeProjectionFile("Sources", newDir.toString());
 
@@ -1217,7 +1202,7 @@ public class DataInOut {
         for (ArrayList<Sink> sameCapSinks : orderedSinks.values()) {
             for (Sink snk : sameCapSinks) {
                 EsriPoint source = new EsriPoint(data.cellToLatLon(snk.getCellNum())[0],
-                                                 data.cellToLatLon(snk.getCellNum())[1]);
+                        data.cellToLatLon(snk.getCellNum())[1]);
                 sinkList.add(source);
 
                 // Add attributes.
@@ -1231,8 +1216,8 @@ public class DataInOut {
         }
 
         EsriShapeExport writeSinkShapefiles = new EsriShapeExport(sinkList,
-                                                                  sinkAttributeTable,
-                                                                  newDir.toString() + "/Sinks");
+                sinkAttributeTable,
+                newDir + "/Sinks");
         writeSinkShapefiles.export();
         makeProjectionFile("Sinks", newDir.toString());
 
@@ -1262,8 +1247,8 @@ public class DataInOut {
             }
 
             EsriPolyline edge = new EsriPolyline(routeLatLon,
-                                                 OMGraphic.DECIMAL_DEGREES,
-                                                 OMGraphic.LINETYPE_STRAIGHT);
+                    OMGraphic.DECIMAL_DEGREES,
+                    OMGraphic.LINETYPE_STRAIGHT);
             edgeList.add(edge);
 
             // Add attributes.
@@ -1275,15 +1260,15 @@ public class DataInOut {
         }
 
         EsriShapeExport writeEdgeShapefiles = new EsriShapeExport(edgeList,
-                                                                  edgeAttributeTable,
-                                                                  newDir.toString() + "/Network");
+                edgeAttributeTable,
+                newDir + "/Network");
         writeEdgeShapefiles.export();
         makeProjectionFile("Network", newDir.toString());
     }
 
     public void makeProjectionFile(String name, String path) {
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(new File(path,
-                                                                            name + ".prj")))) {
+                name + ".prj")))) {
             bw.write(
                     "GEOGCS[\"GCS_North_American_1983\",DATUM[\"D_North_American_1983\",SPHEROID[\"GRS_1980\",6378137.0,298.257222101]],PRIMEM[\"Greenwich\",0.0],UNIT[\"Degree\",0.0174532925199433]]");
         } catch (IOException e) {
@@ -1297,7 +1282,7 @@ public class DataInOut {
 
         try (BufferedWriter bw =
                      new BufferedWriter(new FileWriter(new File(path,
-                                                                soln.getFilePrefix() + ".csv")))) {
+                             soln.getFilePrefix() + ".csv")))) {
             bw.write("Project Length," + soln.getProjectLength() + "\n");
             bw.write("CRF," + soln.getCRF() + "\n");
             if (soln.getTaxCredit() != 0) {
@@ -1356,7 +1341,7 @@ public class DataInOut {
 
             // Make Sources.
             try (BufferedWriter bw = new BufferedWriter(new FileWriter(new File(newDir,
-                                                                                "Sources.txt")))) {
+                    "Sources.txt")))) {
                 bw.write(
                         "ID,X,Y,CO2Cptrd,MxSpply,PieWdge,GensUsed,MaxGens,ActlCst,TtlCst,Name,Cell#\n");
                 for (Source src : sources) {
@@ -1377,7 +1362,7 @@ public class DataInOut {
 
             // Make Sinks.
             try (BufferedWriter bw = new BufferedWriter(new FileWriter(new File(newDir,
-                                                                                "Sinks.txt")))) {
+                    "Sinks.txt")))) {
                 bw.write("ID,X,Y,CO2Strd,MxStrg,PieWdge,WllsUsd,MxWlls,ActCst,TtlCst,Name,Cell#\n");
                 for (Sink snk : sinks) {
                     bw.write(snk.getLabel() + "," + data.cellToLatLon(snk.getCellNum())[1] + "," + data.cellToLatLon(
@@ -1397,14 +1382,14 @@ public class DataInOut {
 
             // Make PipeDiameters.
             try (BufferedWriter bw = new BufferedWriter(new FileWriter(new File(newDir,
-                                                                                "PipeDiameters.txt")))) {
+                    "PipeDiameters.txt")))) {
                 bw.write("ID,CapID,CapValue,Flow,Cost,LengKM,LengROW,LengCONS,Variable\n");
                 for (Edge e : soln.getOpenedEdges()) {
                     bw.write("0,0,0," + edgeTransportAmounts.get(e) + ",0,0,0,0,0\n");
                     int[] route = graphEdgeRoutes.get(e);
                     for (int vertex : route) {
                         bw.write(round(data.cellToLatLon(vertex)[1],
-                                       5) + "," + round(data.cellToLatLon(vertex)[0], 5) + "\n");
+                                5) + "," + round(data.cellToLatLon(vertex)[0], 5) + "\n");
                     }
                     bw.write("END\n");
                 }

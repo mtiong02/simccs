@@ -1,7 +1,5 @@
 package gui;
 
-import java.util.ArrayList;
-
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.event.EventHandler;
@@ -15,12 +13,14 @@ import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
 import javafx.scene.text.Font;
 
+import java.util.ArrayList;
+
 /**
  * @author yaw
  */
 class NetworkDisplay extends Pane {
 
-    private DoubleProperty scale = new SimpleDoubleProperty(1.0);
+    private final DoubleProperty scale = new SimpleDoubleProperty(1.0);
     private ControlActions controlActions;
 
     public NetworkDisplay() {
@@ -42,12 +42,12 @@ class NetworkDisplay extends Pane {
         setTranslateY(getTranslateY() - y);
     }
 
-    public void setControlActions(ControlActions controlActions) {
-        this.controlActions = controlActions;
-    }
-
     public ControlActions getControlActions() {
         return controlActions;
+    }
+
+    public void setControlActions(ControlActions controlActions) {
+        this.controlActions = controlActions;
     }
 }
 
@@ -64,41 +64,12 @@ class SceneGestures {
 
     private static final double MAX_SCALE = 100.0d;
     private static final double MIN_SCALE = 1d;
-
-    private DragContext sceneDragContext = new DragContext();
-
     NetworkDisplay canvas;
-
-    private ArrayList<Pane> entitiesToResize = new ArrayList<>();
-    private double radius = 5;
-    private double fontSize = 13;
-
-    public SceneGestures(NetworkDisplay canvas) {
-        this.canvas = canvas;
-    }
-
-    public void addEntityToResize(Pane p) {
-        entitiesToResize.add(p);
-    }
-
-    public EventHandler<MouseEvent> getOnMousePressedEventHandler() {
-        return onMousePressedEventHandler;
-    }
-
-    public EventHandler<MouseEvent> getOnMouseDraggedEventHandler() {
-        return onMouseDraggedEventHandler;
-    }
-
-    public EventHandler<ScrollEvent> getOnScrollEventHandler() {
-        return onScrollEventHandler;
-    }
-
-    // For testing.  Feel free to remove.
-    public EventHandler<MouseEvent> getOnMouseMovedEventHandler() {
-        return onMouseMovedEventHandler;
-    }
-
-    private EventHandler<MouseEvent> onMousePressedEventHandler = new EventHandler<MouseEvent>() {
+    private final DragContext sceneDragContext = new DragContext();
+    private final ArrayList<Pane> entitiesToResize = new ArrayList<>();
+    private final double radius = 5;
+    private final double fontSize = 13;
+    private final EventHandler<MouseEvent> onMousePressedEventHandler = new EventHandler<MouseEvent>() {
 
         public void handle(MouseEvent event) {
             if (event.isPrimaryButtonDown()) {
@@ -128,8 +99,7 @@ class SceneGestures {
             }
         }
     };
-
-    private EventHandler<MouseEvent> onMouseDraggedEventHandler = new EventHandler<MouseEvent>() {
+    private final EventHandler<MouseEvent> onMouseDraggedEventHandler = new EventHandler<MouseEvent>() {
         public void handle(MouseEvent event) {
             canvas.setTranslateX(sceneDragContext.translateAnchorX + event.getSceneX() - sceneDragContext.mouseAnchorX);
             canvas.setTranslateY(sceneDragContext.translateAnchorY + event.getSceneY() - sceneDragContext.mouseAnchorY);
@@ -137,17 +107,15 @@ class SceneGestures {
             event.consume();
         }
     };
-
     // For testing.  Feel free to remove.
-    private EventHandler<MouseEvent> onMouseMovedEventHandler = new EventHandler<MouseEvent>() {
+    private final EventHandler<MouseEvent> onMouseMovedEventHandler = new EventHandler<MouseEvent>() {
         public void handle(MouseEvent event) {
             System.out.println(event.getX() + ", " + event.getY() + ", " + event.getSceneX() + "," + event.getSceneY());
 
             event.consume();
         }
     };
-
-    private EventHandler<ScrollEvent> onScrollEventHandler = new EventHandler<ScrollEvent>() {
+    private final EventHandler<ScrollEvent> onScrollEventHandler = new EventHandler<ScrollEvent>() {
 
         @Override
         public void handle(ScrollEvent event) {
@@ -209,6 +177,10 @@ class SceneGestures {
         }
     };
 
+    public SceneGestures(NetworkDisplay canvas) {
+        this.canvas = canvas;
+    }
+
     public static double clamp(double value, double min, double max) {
         if (Double.compare(value, min) < 0) {
             return min;
@@ -219,5 +191,26 @@ class SceneGestures {
         }
 
         return value;
+    }
+
+    public void addEntityToResize(Pane p) {
+        entitiesToResize.add(p);
+    }
+
+    public EventHandler<MouseEvent> getOnMousePressedEventHandler() {
+        return onMousePressedEventHandler;
+    }
+
+    public EventHandler<MouseEvent> getOnMouseDraggedEventHandler() {
+        return onMouseDraggedEventHandler;
+    }
+
+    public EventHandler<ScrollEvent> getOnScrollEventHandler() {
+        return onScrollEventHandler;
+    }
+
+    // For testing.  Feel free to remove.
+    public EventHandler<MouseEvent> getOnMouseMovedEventHandler() {
+        return onMouseMovedEventHandler;
     }
 }

@@ -1,12 +1,11 @@
 package dataStore;
 
-import java.io.File;
+import solver.Solver;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
-
-import solver.Solver;
 
 /**
  * @author yaw
@@ -19,7 +18,7 @@ public class DataStorer {
 
     private Solver solver;
 
-    private DataInOut dataInOut = new DataInOut();
+    private final DataInOut dataInOut = new DataInOut();
 
     // Geospatial data.
     private int width;  // Number of columns
@@ -188,11 +187,19 @@ public class DataStorer {
         return graphVertices;
     }
 
+    public void setGraphVertices(int[] vertices) {
+        graphVertices = vertices;
+    }
+
     public HashMap<Edge, Double> getGraphEdgeCosts() {
         if (graphEdgeCosts == null) {
             generateCandidateGraph();
         }
         return graphEdgeCosts;
+    }
+
+    public void setGraphEdgeCosts(HashMap<Edge, Double> edgeCosts) {
+        graphEdgeCosts = edgeCosts;
     }
 
     public HashMap<Edge, Double> getGraphEdgeRightOfWayCosts() {
@@ -202,6 +209,10 @@ public class DataStorer {
         return graphEdgeRightOfWayCosts;
     }
 
+    public void setGraphEdgeRightOfWayCosts(HashMap<Edge, Double> rowCosts) {
+        graphEdgeRightOfWayCosts = rowCosts;
+    }
+
     public HashMap<Edge, Double> getGraphEdgeConstructionCosts() {
         if (graphEdgeConstructionCosts == null) {
             generateCandidateGraph();
@@ -209,11 +220,19 @@ public class DataStorer {
         return graphEdgeConstructionCosts;
     }
 
+    public void setGraphEdgeConstructionCosts(HashMap<Edge, Double> constructionCosts) {
+        graphEdgeConstructionCosts = constructionCosts;
+    }
+
     public HashMap<Edge, int[]> getGraphEdgeRoutes() {
         if (graphEdgeRoutes == null) {
             generateCandidateGraph();
         }
         return graphEdgeRoutes;
+    }
+
+    public void setGraphEdgeRoutes(HashMap<Edge, int[]> edgeRoutes) {
+        graphEdgeRoutes = edgeRoutes;
     }
 
     public HashMap<Edge, Double> getGraphEdgeLengths() {
@@ -230,6 +249,10 @@ public class DataStorer {
         return delaunayPairs;
     }
 
+    public void setDelaunayPairs(HashSet<Edge> pairs) {
+        delaunayPairs = pairs;
+    }
+
     // Get edge weight in one of the base cost surfaces.
     public double getEdgeWeight(int cell1, int cell2, String type) {
         if (cell1 == cell2) {
@@ -240,7 +263,7 @@ public class DataStorer {
             } else if (type.equals("c")) {
                 if (rightOfWayCosts != null) {
                     return constructionCosts[cell1][getNeighborNum(cell1,
-                                                                   cell2)] + rightOfWayCosts[cell1][getNeighborNum(
+                            cell2)] + rightOfWayCosts[cell1][getNeighborNum(
                             cell1,
                             cell2)];
                 } else {
@@ -373,7 +396,7 @@ public class DataStorer {
 
         } else if (getNeighborNum(cell1, cell2) >= 0 && getNeighborNum(cell1, cell2) < 8) {
             modifiedRoutingCosts[cell1][getNeighborNum(cell1,
-                                                       cell2)] = edgeCostModification * routingCosts[cell1][getNeighborNum(
+                    cell2)] = edgeCostModification * routingCosts[cell1][getNeighborNum(
                     cell1,
                     cell2)];
         }
@@ -465,20 +488,41 @@ public class DataStorer {
         return width;
     }
 
+    // Data element set methods
+    public void setWidth(int width) {
+        this.width = width;
+    }
+
     public int getHeight() {
         return height;
+    }
+
+    public void setHeight(int height) {
+        this.height = height;
     }
 
     public Source[] getSources() {
         return sources;
     }
 
+    public void setSources(Source[] sources) {
+        this.sources = sources;
+    }
+
     public Sink[] getSinks() {
         return sinks;
     }
 
+    public void setSinks(Sink[] sinks) {
+        this.sinks = sinks;
+    }
+
     public LinearComponent[] getLinearComponents() {
         return linearComponents;
+    }
+
+    public void setLinearComponents(LinearComponent[] linearComponents) {
+        this.linearComponents = linearComponents;
     }
 
     public String getCostSurfacePath() {
@@ -497,8 +541,16 @@ public class DataStorer {
         return priceConfiguration;
     }
 
+    public void setPriceConfiguration(double[] priceConfiguration) {
+        this.priceConfiguration = priceConfiguration;
+    }
+
     public double[][] getConstructionCosts() {
         return constructionCosts;
+    }
+
+    public void setConstructionCosts(double[][] constructionCosts) {
+        this.constructionCosts = constructionCosts;
     }
 
     public double[][] getRoutingCosts() {
@@ -508,13 +560,16 @@ public class DataStorer {
         return routingCosts;
     }
 
-    // Data element set methods
-    public void setWidth(int width) {
-        this.width = width;
-    }
+    public void setRoutingCosts(double[][] routingCosts) {
+        this.routingCosts = routingCosts;
 
-    public void setHeight(int height) {
-        this.height = height;
+        modifiedRoutingCosts = new double[routingCosts.length][];
+        for (int i = 0; i < routingCosts.length; i++) {
+            double[] temp = routingCosts[i];
+            int tempLength = temp.length;
+            modifiedRoutingCosts[i] = new double[tempLength];
+            System.arraycopy(temp, 0, modifiedRoutingCosts[i], 0, tempLength);
+        }
     }
 
     public void setLowerLeftX(double lowerLeftX) {
@@ -533,60 +588,8 @@ public class DataStorer {
         this.rightOfWayCosts = rightOfWayCosts;
     }
 
-    public void setConstructionCosts(double[][] constructionCosts) {
-        this.constructionCosts = constructionCosts;
-    }
-
-    public void setRoutingCosts(double[][] routingCosts) {
-        this.routingCosts = routingCosts;
-
-        modifiedRoutingCosts = new double[routingCosts.length][];
-        for (int i = 0; i < routingCosts.length; i++) {
-            double[] temp = routingCosts[i];
-            int tempLength = temp.length;
-            modifiedRoutingCosts[i] = new double[tempLength];
-            System.arraycopy(temp, 0, modifiedRoutingCosts[i], 0, tempLength);
-        }
-    }
-
-    public void setSources(Source[] sources) {
-        this.sources = sources;
-    }
-
-    public void setSinks(Sink[] sinks) {
-        this.sinks = sinks;
-    }
-
-    public void setLinearComponents(LinearComponent[] linearComponents) {
-        this.linearComponents = linearComponents;
-    }
-
-    public void setGraphVertices(int[] vertices) {
-        graphVertices = vertices;
-    }
-
-    public void setGraphEdgeCosts(HashMap<Edge, Double> edgeCosts) {
-        graphEdgeCosts = edgeCosts;
-    }
-
-    public void setGraphEdgeConstructionCosts(HashMap<Edge, Double> constructionCosts) {
-        graphEdgeConstructionCosts = constructionCosts;
-    }
-
-    public void setGraphEdgeRightOfWayCosts(HashMap<Edge, Double> rowCosts) {
-        graphEdgeRightOfWayCosts = rowCosts;
-    }
-
-    public void setGraphEdgeRoutes(HashMap<Edge, int[]> edgeRoutes) {
-        graphEdgeRoutes = edgeRoutes;
-    }
-
     public void setGraphSourceSinkPaths(HashMap<Edge, ArrayList<Edge>> routes) {
         sourceSinkRoutes = routes;
-    }
-
-    public void setDelaunayPairs(HashSet<Edge> pairs) {
-        delaunayPairs = pairs;
     }
 
     public void setSolver(Solver s) {
@@ -594,10 +597,6 @@ public class DataStorer {
 
         // Load data from files.
         dataInOut.loadData(basePath, dataset, scenario, this);
-    }
-
-    public void setPriceConfiguration(double[] priceConfiguration) {
-        this.priceConfiguration = priceConfiguration;
     }
 
     public void loadPriceConfiguration() {

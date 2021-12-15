@@ -4,7 +4,7 @@ import java.util.InputMismatchException;
 import java.util.Vector;
 
 public class TimeInterval {
-    private Vector<Vector<Double>> intervals;
+    private final Vector<Vector<Double>> intervals;
 
     public TimeInterval() {
         this.intervals = new Vector<Vector<Double>>(0);

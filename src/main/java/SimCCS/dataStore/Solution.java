@@ -14,13 +14,13 @@ public class Solution {
 
     // Opened sinks.
     private HashMap<Sink, Double> sinkStorageAmounts;
-    private HashMap<Sink, Integer> sinkNumWells;
+    private final HashMap<Sink, Integer> sinkNumWells;
     private HashMap<Sink, Double> sinkCosts;
 
     // Opened edges.
     private HashMap<Edge, Double> edgeTransportAmounts;
     private HashMap<Edge, Double> edgeCosts;
-    private HashMap<Edge, Integer> edgeTrends;
+    private final HashMap<Edge, Integer> edgeTrends;
 
     // Other.
     private double captureAmountPerYear;
@@ -95,30 +95,6 @@ public class Solution {
         edgeCosts.put(edg, edgeCosts.get(edg) + cost);
     }
 
-    public void setSourceCaptureAmounts(HashMap<Source, Double> sourceCaptureAmounts) {
-        this.sourceCaptureAmounts = sourceCaptureAmounts;
-    }
-
-    public void setSourceCosts(HashMap<Source, Double> sourceCosts) {
-        this.sourceCosts = sourceCosts;
-    }
-
-    public void setSinkStorageAmounts(HashMap<Sink, Double> sinkStorageAmounts) {
-        this.sinkStorageAmounts = sinkStorageAmounts;
-    }
-
-    public void setSinkCosts(HashMap<Sink, Double> sinkCosts) {
-        this.sinkCosts = sinkCosts;
-    }
-
-    public void setEdgeTransportAmounts(HashMap<Edge, Double> edgeTransportAmounts) {
-        this.edgeTransportAmounts = edgeTransportAmounts;
-    }
-
-    public void setEdgeCosts(HashMap<Edge, Double> edgeCosts) {
-        this.edgeCosts = edgeCosts;
-    }
-
     public void setSolutionCosts(DataStorer data) {
         for (Source src : sourceCaptureAmounts.keySet()) {
             double cost = src.getOpeningCost(crf) + src.getCaptureCost() * sourceCaptureAmounts.get(
@@ -150,18 +126,6 @@ public class Solution {
         }
     }
 
-    public void setProjectLength(int projectLength) {
-        this.projectLength = projectLength;
-    }
-
-    public void setCRF(double crf) {
-        this.crf = crf;
-    }
-
-    public void setTaxCredit(double taxCredit) {
-        this.taxCredit = taxCredit;
-    }
-
     public HashSet<Source> getOpenedSources() {
         return new HashSet<>(sourceCaptureAmounts.keySet());
     }
@@ -178,24 +142,48 @@ public class Solution {
         return sourceCaptureAmounts;
     }
 
+    public void setSourceCaptureAmounts(HashMap<Source, Double> sourceCaptureAmounts) {
+        this.sourceCaptureAmounts = sourceCaptureAmounts;
+    }
+
     public HashMap<Source, Double> getSourceCosts() {
         return sourceCosts;
+    }
+
+    public void setSourceCosts(HashMap<Source, Double> sourceCosts) {
+        this.sourceCosts = sourceCosts;
     }
 
     public HashMap<Sink, Double> getSinkStorageAmounts() {
         return sinkStorageAmounts;
     }
 
+    public void setSinkStorageAmounts(HashMap<Sink, Double> sinkStorageAmounts) {
+        this.sinkStorageAmounts = sinkStorageAmounts;
+    }
+
     public HashMap<Sink, Double> getSinkCosts() {
         return sinkCosts;
+    }
+
+    public void setSinkCosts(HashMap<Sink, Double> sinkCosts) {
+        this.sinkCosts = sinkCosts;
     }
 
     public HashMap<Edge, Double> getEdgeTransportAmounts() {
         return edgeTransportAmounts;
     }
 
+    public void setEdgeTransportAmounts(HashMap<Edge, Double> edgeTransportAmounts) {
+        this.edgeTransportAmounts = edgeTransportAmounts;
+    }
+
     public HashMap<Edge, Double> getEdgeCosts() {
         return edgeCosts;
+    }
+
+    public void setEdgeCosts(HashMap<Edge, Double> edgeCosts) {
+        this.edgeCosts = edgeCosts;
     }
 
     public int getNumOpenedSources() {
@@ -226,12 +214,24 @@ public class Solution {
         return projectLength;
     }
 
+    public void setProjectLength(int projectLength) {
+        this.projectLength = projectLength;
+    }
+
     public double getCRF() {
         return crf;
     }
 
+    public void setCRF(double crf) {
+        this.crf = crf;
+    }
+
     public double getTaxCredit() {
         return taxCredit;
+    }
+
+    public void setTaxCredit(double taxCredit) {
+        this.taxCredit = taxCredit;
     }
 
     public double getTotalAnnualCaptureCost() {
@@ -284,18 +284,24 @@ public class Solution {
     }
 
     public String getFilePrefix() {
-        return "solution_T" + String.valueOf(this.getInterval() + 1);
+        return "solution_T" + (this.getInterval() + 1);
+    }
+
+    public int getInterval() {
+        return this.interval;
     }
 
     public void setInterval(int interval) {
         this.interval = interval;
     }
-    public void setTotalIntervals(int totalIntervals) { this.totalIntervals = totalIntervals; }
 
-    public int getInterval() {
-        return this.interval;
+    public int getTotalIntervals() {
+        return this.totalIntervals;
     }
-    public int getTotalIntervals() { return this.totalIntervals; }
+
+    public void setTotalIntervals(int totalIntervals) {
+        this.totalIntervals = totalIntervals;
+    }
 
     public double getUnitTotalCost() {
         return getUnitCaptureCost() + getUnitStorageCost() + getUnitTransportCost();

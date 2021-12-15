@@ -10,9 +10,9 @@ import java.util.HashSet;
  * @author yaw
  */
 public class Delaunay {
-    private Point[] points;
     DataStorer data;
     HashSet<Neighbors> edges;
+    private Point[] points;
 
     public Delaunay(DataStorer data) {
         this.data = data;
@@ -59,11 +59,11 @@ public class Delaunay {
                     }
                     if (isTriangle) {
                         int point1Cell = data.xyToVectorized((int) points[i].x(),
-                                                             (int) points[i].y());
+                                (int) points[i].y());
                         int point2Cell = data.xyToVectorized((int) points[j].x(),
-                                                             (int) points[j].y());
+                                (int) points[j].y());
                         int point3Cell = data.xyToVectorized((int) points[k].x(),
-                                                             (int) points[k].y());
+                                (int) points[k].y());
                         Neighbors edge1 = new Neighbors(point1Cell, point2Cell);
                         Neighbors edge2 = new Neighbors(point1Cell, point3Cell);
                         Neighbors edge3 = new Neighbors(point2Cell, point3Cell);

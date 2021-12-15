@@ -5,33 +5,7 @@ import com.bbn.openmap.dataAccess.shape.EsriPolyline;
 import com.bbn.openmap.dataAccess.shape.EsriPolylineList;
 import com.bbn.openmap.dataAccess.shape.EsriShapeExport;
 import com.bbn.openmap.omGraphics.OMGraphic;
-import dataStore.DataStorer;
-import dataStore.Edge;
-import dataStore.Sink;
-import dataStore.Solution;
-import dataStore.Source;
-import dataStore.TimeInterval;
-
-import java.awt.image.BufferedImage;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-
+import dataStore.*;
 import javafx.collections.FXCollections;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.control.ChoiceBox;
@@ -41,20 +15,23 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Arc;
-import javafx.scene.shape.ArcType;
-import javafx.scene.shape.Circle;
-import javafx.scene.shape.Line;
-import javafx.scene.shape.Rectangle;
-import javafx.scene.shape.StrokeLineCap;
-
-import javax.imageio.ImageIO;
-
+import javafx.scene.shape.*;
 import solver.MPSWriter;
 import solver.MPSWriterTime;
 import solver.Solver;
 
-import static utilities.Utilities.*;
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.*;
+
+import static utilities.Utilities.round;
 
 /**
  * @author yaw
@@ -64,11 +41,11 @@ public class ControlActions {
     private String basePath = "";
     private String dataset = "";
     private String scenario = "";
-    private Integer arcRadius = 8;
+    private final Integer arcRadius = 8;
 
     private DataStorer data;
     private Solver solver;
-    private ImageView map;
+    private final ImageView map;
     private Pane sourceLocationsLayer;
     private Pane sinkLocationsLayer;
     private Pane sourceLabelsLayer;
@@ -78,7 +55,7 @@ public class ControlActions {
     private Pane rawDelaunayLayer;
     private Pane solutionLayer;
     private TextArea messenger;
-    private Gui gui;
+    private final Gui gui;
 
     public ControlActions(ImageView map, Gui gui) {
         this.map = map;
@@ -139,7 +116,7 @@ public class ControlActions {
         try {
             ImageIO.write(image, "PNG", new File(data.getCostSurfacePath()));
         } catch (IOException ex) {
-            System.out.println(ex.toString());
+            System.out.println(ex);
         }
         return SwingFXUtils.toFXImage(image, null);
     }
@@ -208,8 +185,8 @@ public class ControlActions {
             for (Source source : data.getSources()) {
                 double[] rawXYLocation = data.cellLocationToRawXY(source.getCellNum());
                 Circle c = new Circle(rawXtoDisplayX(rawXYLocation[0]),
-                                      rawYtoDisplayY(rawXYLocation[1]),
-                                      5 / gui.getScale());
+                        rawYtoDisplayY(rawXYLocation[1]),
+                        5 / gui.getScale());
                 c.setStroke(Color.SALMON);
                 c.setFill(Color.SALMON);
                 //c.setStroke(Color.RED);
@@ -256,8 +233,8 @@ public class ControlActions {
             for (Sink sink : data.getSinks()) {
                 double[] rawXYLocation = data.cellLocationToRawXY(sink.getCellNum());
                 Circle c = new Circle(rawXtoDisplayX(rawXYLocation[0]),
-                                      rawYtoDisplayY(rawXYLocation[1]),
-                                      5 / gui.getScale());
+                        rawYtoDisplayY(rawXYLocation[1]),
+                        5 / gui.getScale());
                 c.setStroke(Color.CORNFLOWERBLUE);
                 c.setFill(Color.CORNFLOWERBLUE);
                 //c.setStroke(Color.BLUE);
@@ -296,21 +273,21 @@ public class ControlActions {
         if (scenario != "") {
             if (modelVersion.equals("c") || modelVersion.equals("p")) {
                 MPSWriter.writeCapPriceMPS(data,
-                                           Double.parseDouble(crf),
-                                           intervals.getYears(0),
-                                           intervals.getValue(0),
-                                           basePath,
-                                           dataset,
-                                           scenario,
-                                           modelVersion);
+                        Double.parseDouble(crf),
+                        intervals.getYears(0),
+                        intervals.getValue(0),
+                        basePath,
+                        dataset,
+                        scenario,
+                        modelVersion);
             } else if (modelVersion.equals("t")) {
                 MPSWriterTime.writeCapPriceMPS(data,
-                                               Double.parseDouble(crf),
-                                               intervals,
-                                               basePath,
-                                               dataset,
-                                               scenario,
-                                               modelVersion);
+                        Double.parseDouble(crf),
+                        intervals,
+                        basePath,
+                        dataset,
+                        scenario,
+                        modelVersion);
             }
         }
     }
@@ -530,7 +507,7 @@ public class ControlActions {
         for (Source source : soln.getOpenedSources()) {
             double[] rawXYLocation = data.cellLocationToRawXY(source.getCellNum());
             Circle c = new Circle(rawXtoDisplayX(rawXYLocation[0]),
-                                  rawYtoDisplayY(rawXYLocation[1]),
+                    rawYtoDisplayY(rawXYLocation[1]),
                     arcRadius / gui.getScale());
             c.setStrokeWidth(0);
             c.setStroke(Color.SALMON);
@@ -555,7 +532,7 @@ public class ControlActions {
         for (Sink sink : soln.getOpenedSinks()) {
             double[] rawXYLocation = data.cellLocationToRawXY(sink.getCellNum());
             Circle c = new Circle(rawXtoDisplayX(rawXYLocation[0]),
-                                  rawYtoDisplayY(rawXYLocation[1]),
+                    rawYtoDisplayY(rawXYLocation[1]),
                     arcRadius / gui.getScale());
             c.setStrokeWidth(0);
             c.setStroke(Color.CORNFLOWERBLUE);
@@ -595,10 +572,10 @@ public class ControlActions {
 
         // Write to shapefiles.
         data.makeShapeFiles(basePath + "/" + dataset + "/Scenarios/" + scenario + "/Results/" + file,
-                            soln);
+                soln);
         data.makeCandidateShapeFiles(basePath + "/" + dataset + "/Scenarios/" + scenario);
         data.makeSolutionFile(basePath + "/" + dataset + "/Scenarios/" + scenario + "/Results/" + file,
-                              soln);
+                soln);
 
         //determineROW(soln, basePath + "/" + dataset + "/Scenarios/" + scenario + "/Results/" + file);
     }
@@ -718,8 +695,8 @@ public class ControlActions {
             }
 
             EsriPolyline edge = new EsriPolyline(routeLatLon,
-                                                 OMGraphic.DECIMAL_DEGREES,
-                                                 OMGraphic.LINETYPE_STRAIGHT);
+                    OMGraphic.DECIMAL_DEGREES,
+                    OMGraphic.LINETYPE_STRAIGHT);
             edgeList.add(edge);
 
             // Add attributes.
@@ -736,8 +713,8 @@ public class ControlActions {
         }
 
         EsriShapeExport writeEdgeShapefiles = new EsriShapeExport(edgeList,
-                                                                  edgeAttributeTable,
-                                                                  path + "/" + name);
+                edgeAttributeTable,
+                path + "/" + name);
         writeEdgeShapefiles.export();
     }
 

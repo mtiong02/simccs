@@ -1,58 +1,43 @@
 package gui;
 
-import java.io.File;
-
 import dataStore.TimeInterval;
+import dataStore.SolutionFileInfo;
 import javafx.application.Application;
-
-import static javafx.application.Application.launch;
-
 import javafx.beans.value.ChangeListener;
-import javafx.collections.FXCollections;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
+import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.Group;
 import javafx.scene.Scene;
-import javafx.scene.control.Separator;
-import javafx.geometry.Orientation;
-import javafx.scene.control.Alert;
+import javafx.scene.control.*;
 import javafx.scene.control.Alert.AlertType;
-import javafx.scene.control.Button;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.ChoiceBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.RadioButton;
-import javafx.scene.control.Tab;
-import javafx.scene.control.TabPane;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
-import javafx.scene.control.TitledPane;
-import javafx.scene.control.ToggleGroup;
-import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableColumn.CellEditEvent;
-import javafx.scene.control.cell.TextFieldTableCell;
-import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.Pane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
 
+import java.io.File;
+
 /**
  * @author yaw
  */
 public class Gui extends Application {
 
+    protected Integer selectedSolutionFileInterval;
     private NetworkDisplay displayPane;
     private ChoiceBox scenarioChoice;
     private RadioButton dispDelaunayEdges;
@@ -66,9 +51,12 @@ public class Gui extends Application {
     private AnchorPane solutionPane;
     private TextArea messenger;
     private TitledPane timeSettingsContainer;
-
     private String loadedSolutionFile;
-    protected Integer selectedSolutionFileInterval;
+    private SolutionFileInfo loaded_solution;
+
+    public static void main(String[] args) {
+        launch(args);
+    }
 
     @Override
     public void start(Stage stage) {
@@ -80,6 +68,7 @@ public class Gui extends Application {
     }
 
     public Scene buildGUI(Stage stage) {
+        loaded_solution = new SolutionFileInfo();
         Group group = new Group();
 
         // Build display pane.
@@ -89,9 +78,9 @@ public class Gui extends Application {
         // Associate scroll/navigation actions.
         SceneGestures sceneGestures = new SceneGestures(displayPane);
         displayPane.addEventFilter(MouseEvent.MOUSE_PRESSED,
-                                   sceneGestures.getOnMousePressedEventHandler());
+                sceneGestures.getOnMousePressedEventHandler());
         displayPane.addEventFilter(MouseEvent.MOUSE_DRAGGED,
-                                   sceneGestures.getOnMouseDraggedEventHandler());
+                sceneGestures.getOnMouseDraggedEventHandler());
         displayPane.addEventFilter(ScrollEvent.ANY, sceneGestures.getOnScrollEventHandler());
 
         // Make background.
@@ -533,9 +522,8 @@ public class Gui extends Application {
                 new EventHandler<CellEditEvent<TimeIntervalProto, String>>() {
                     @Override
                     public void handle(CellEditEvent<TimeIntervalProto, String> t) {
-                        ((TimeIntervalProto) t.getTableView().getItems().get(
-                                t.getTablePosition().getRow())
-                        ).setTimeInterval(t.getNewValue());
+                        t.getTableView().getItems().get(
+                                t.getTablePosition().getRow()).setTimeInterval(t.getNewValue());
                     }
                 }
         );
@@ -551,9 +539,8 @@ public class Gui extends Application {
                 new EventHandler<CellEditEvent<TimeIntervalProto, String>>() {
                     @Override
                     public void handle(CellEditEvent<TimeIntervalProto, String> t) {
-                        ((TimeIntervalProto) t.getTableView().getItems().get(
-                                t.getTablePosition().getRow())
-                        ).setCaptureTarget(t.getNewValue());
+                        t.getTableView().getItems().get(
+                                t.getTablePosition().getRow()).setCaptureTarget(t.getNewValue());
                     }
                 }
         );
@@ -643,8 +630,8 @@ public class Gui extends Application {
                     if (data.size() == 0) {
                         System.err.println("No intervals have been set");
                         Alert alert = new Alert(AlertType.ERROR,
-                                                "No intervals have been set",
-                                                ButtonType.OK);
+                                "No intervals have been set",
+                                ButtonType.OK);
                         alert.showAndWait();
                         return;
                     }
@@ -657,12 +644,12 @@ public class Gui extends Application {
 
                         try {
                             intervals.addInterval(Double.parseDouble(t_time),
-                                                  Double.parseDouble(t_value));
+                                    Double.parseDouble(t_value));
                         } catch (NumberFormatException | NullPointerException err) {
                             System.err.println("Invalid interval: (" + t.getTimeInterval() + ", " + t.getCaptureTarget() + ")");
                             Alert alert = new Alert(AlertType.ERROR,
-                                                    "Invalid interval: (" + t_time + ", " + t_value + ")",
-                                                    ButtonType.OK);
+                                    "Invalid interval: (" + t_time + ", " + t_value + ")",
+                                    ButtonType.OK);
                             alert.showAndWait();
                             return;
                         }
@@ -860,14 +847,14 @@ public class Gui extends Application {
                                  public void changed(ObservableValue<? extends String> selected,
                                                      String oldValue,
                                                      String newValue) {
-                                                selectedSolutionFileInterval =
-                                                        Integer.parseInt(newValue) - 1;
-                                                controlActions.selectSolution(loadedSolutionFile,
-                                                                              solutionValues,
-                                                                              selectedSolutionFileInterval);
-                                            }
-                                        }
-                           );
+                                     selectedSolutionFileInterval =
+                                             Integer.parseInt(newValue) - 1;
+                                     controlActions.selectSolution(loadedSolutionFile,
+                                             solutionValues,
+                                             selectedSolutionFileInterval);
+                                 }
+                             }
+                );
 
         // Run selection action.
         runChoice.getSelectionModel()
@@ -913,35 +900,6 @@ public class Gui extends Application {
         return new Scene(group, 1050, 660);
     }
 
-    public static class TimeIntervalProto {
-        private String timeInterval;
-        private String captureTarget;
-        private static String id = "0";
-
-        private TimeIntervalProto(String time_interval, String capture_target) {
-            TimeIntervalProto.id = String.valueOf(Integer.parseInt(id) + 1);
-            this.timeInterval = time_interval;
-            this.captureTarget = capture_target;
-        }
-
-        public String getTimeInterval() {
-            return this.timeInterval;
-        }
-
-        public void setTimeInterval(String time_interval) {
-            this.timeInterval = time_interval;
-        }
-
-        public String getCaptureTarget() {
-            return this.captureTarget;
-        }
-
-        public void setCaptureTarget(String capture_target) {
-            this.captureTarget = capture_target;
-        }
-
-    }
-
     public void displayCostSurface() {
         dispCostSurface.setSelected(true);
     }
@@ -963,7 +921,7 @@ public class Gui extends Application {
         Integer numIntervals = null;
 
         try {
-             numIntervals = Integer.parseInt(numIntervalsLabel);
+            numIntervals = Integer.parseInt(numIntervalsLabel);
         } catch (NumberFormatException err) {
             return;
         } finally {
@@ -996,7 +954,32 @@ public class Gui extends Application {
         return displayPane.getScale();
     }
 
-    public static void main(String[] args) {
-        launch(args);
+    public static class TimeIntervalProto {
+        private static String id = "0";
+        private String timeInterval;
+        private String captureTarget;
+
+        private TimeIntervalProto(String time_interval, String capture_target) {
+            TimeIntervalProto.id = String.valueOf(Integer.parseInt(id) + 1);
+            this.timeInterval = time_interval;
+            this.captureTarget = capture_target;
+        }
+
+        public String getTimeInterval() {
+            return this.timeInterval;
+        }
+
+        public void setTimeInterval(String time_interval) {
+            this.timeInterval = time_interval;
+        }
+
+        public String getCaptureTarget() {
+            return this.captureTarget;
+        }
+
+        public void setCaptureTarget(String capture_target) {
+            this.captureTarget = capture_target;
+        }
+
     }
 }

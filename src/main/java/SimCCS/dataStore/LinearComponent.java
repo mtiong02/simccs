@@ -10,49 +10,49 @@ public class LinearComponent {
     private double rowIntercept;
     private double maxCapacity;
 
-    private DataStorer data;
+    private final DataStorer data;
 
     public LinearComponent(DataStorer data) {
         this.data = data;
-    }
-
-    public void setConSlope(double conSlope) {
-        this.conSlope = conSlope;
-    }
-
-    public void setConIntercept(double conIntercept) {
-        this.conIntercept = conIntercept;
-    }
-
-    public void setRowSlope(double rowSlope) {
-        this.rowSlope = rowSlope;
-    }
-
-    public void setRowIntercept(double rowIntercept) {
-        this.rowIntercept = rowIntercept;
-    }
-
-    public void setMaxCapacity(double maxCapacity) {
-        this.maxCapacity = maxCapacity;
     }
 
     public double getConSlope() {
         return conSlope;
     }
 
+    public void setConSlope(double conSlope) {
+        this.conSlope = conSlope;
+    }
+
     public double getRowSlope() {
         return rowSlope;
+    }
+
+    public void setRowSlope(double rowSlope) {
+        this.rowSlope = rowSlope;
     }
 
     public double getConIntercept() {
         return conIntercept;
     }
 
+    public void setConIntercept(double conIntercept) {
+        this.conIntercept = conIntercept;
+    }
+
     public double getRowIntercept() {
         return rowIntercept;
     }
 
+    public void setRowIntercept(double rowIntercept) {
+        this.rowIntercept = rowIntercept;
+    }
+
     public double getMaxCapacity() {
         return maxCapacity;
+    }
+
+    public void setMaxCapacity(double maxCapacity) {
+        this.maxCapacity = maxCapacity;
     }
 }

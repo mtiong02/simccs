@@ -3,10 +3,9 @@ package gui;
 import com.sun.javafx.sg.prism.NGImageView;
 import com.sun.javafx.sg.prism.NGNode;
 import com.sun.prism.Graphics;
+import com.sun.prism.Image;
 import com.sun.prism.Texture;
 import com.sun.prism.impl.BaseResourceFactory;
-
-import com.sun.prism.Image;
 import javafx.scene.image.ImageView;
 
 /**
