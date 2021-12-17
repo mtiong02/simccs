@@ -1,7 +1,7 @@
 package gui;
 
+import java.util.List;
 import dataStore.TimeInterval;
-import dataStore.SolutionFileInfo;
 import javafx.application.Application;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -52,7 +52,6 @@ public class Gui extends Application {
     private TextArea messenger;
     private TitledPane timeSettingsContainer;
     private String loadedSolutionFile;
-    private SolutionFileInfo loaded_solution;
 
     public static void main(String[] args) {
         launch(args);
@@ -68,7 +67,6 @@ public class Gui extends Application {
     }
 
     public Scene buildGUI(Stage stage) {
-        loaded_solution = new SolutionFileInfo();
         Group group = new Group();
 
         // Build display pane.
@@ -847,11 +845,13 @@ public class Gui extends Application {
                                  public void changed(ObservableValue<? extends String> selected,
                                                      String oldValue,
                                                      String newValue) {
-                                     selectedSolutionFileInterval =
-                                             Integer.parseInt(newValue) - 1;
-                                     controlActions.selectSolution(loadedSolutionFile,
-                                             solutionValues,
-                                             selectedSolutionFileInterval);
+                                     if (newValue != null) {
+                                         selectedSolutionFileInterval =
+                                                 Integer.parseInt(newValue) - 1;
+                                         controlActions.selectSolution(loadedSolutionFile,
+                                                 solutionValues,
+                                                 selectedSolutionFileInterval);
+                                     }
                                  }
                              }
                 );
@@ -928,13 +928,18 @@ public class Gui extends Application {
             if (numIntervals == null) return;
         }
 
-        if (!timeIntervalChoices.getSelectionModel().isEmpty()) {
-            timeIntervalChoices.setItems(null);
+        if (!timeIntervalChoices.getSelectionModel().isEmpty() || timeIntervalChoices.getItems().size() > 0) {
+            timeIntervalChoices.getItems().removeAll(timeIntervalChoices.getItems());
         }
+
+        //System.out.println("breakpoint");
 
         for (int i = 0; i < numIntervals; i++) {
             timeIntervalChoices.getItems().add(String.valueOf(i + 1));
         }
+
+
+        //System.out.println("breakpoint 2");
 
         //timeIntervalChoices.getSelectionModel().selectFirst();
     }
