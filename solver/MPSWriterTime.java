@@ -5,10 +5,6 @@ import dataStore.*;
 import java.util.HashMap;
 import java.util.HashSet;
 
-/**
- * @author yaw and martin
- */
-
 public class MPSWriterTime extends MPSWriter {
     public static void writeCapPriceMPS(DataStorer data,
                                         double crf,
@@ -24,6 +20,9 @@ public class MPSWriterTime extends MPSWriter {
 
         // --------------------- Martin Ma  --------------------------------------------------------------
         Sinkcredit[] sinkcredits = data.getSinkcredits();
+        // -----------------------------------------------------------------------------------------------
+
+        // --------------------- Martin Ma  --------------------------------------------------------------
         SourceEvo[] sourceEvos = data.getSourceEvos();
         // -----------------------------------------------------------------------------------------------
 
@@ -381,160 +380,9 @@ public class MPSWriterTime extends MPSWriter {
                 }
             }
         }
+
         // --------------------------------------------------------------------------------------------------------------
 
-        // ----------------------------------- Martin Ma ---------------------------------------------------------------
-        // Have exist networks
-        if (data.existNetworkGraphEdgeIndex != null){
-            // Add existing pipelines and set the corresponding constraints
-            // 1st, set the existing pipelines are fully open, constraint type as "J"
-//            constraintCounter = 1;
-//            for (int t = 0; t < num_intervals; t++) {
-//                for (int e = 0; e < edgeToIndex.size(); e++) {
-//                    UnidirEdge unidirEdge = edgeIndexToEdge.get(e);
-//                    Edge bidirEdge = new Edge(unidirEdge.v1, unidirEdge.v2);
-//                    if ((data.existNetworkGraphEdgeIndex.containsKey(bidirEdge))) {
-//                        constraint = "J" + constraintCounter++;
-//                        for (int c = 0; c < linearComponents.length; c++) {
-//                            if (!intVariableToConstraints.containsKey(y[e][c][t])) {
-//                                intVariableToConstraints.put(y[e][c][t], new HashSet<ConstraintTerm>());
-//                            }
-//                            intVariableToConstraints.get(y[e][c][t]).add(new ConstraintTerm(constraint, 1));
-//                            constraintToSign.put(constraint, "L");
-//                            constraintRHS.put(constraint, 1.0);
-//                        }
-//                    }
-//                }
-//            }
-//            constraintCounter = 1;
-//            for (int t = 0; t < num_intervals; t++) {
-//                for (int e = 0; e < edgeToIndex.size(); e++) {
-//                    UnidirEdge unidirEdge = edgeIndexToEdge.get(e);
-//                    Edge bidirEdge = new Edge(unidirEdge.v1, unidirEdge.v2);
-//                    if ((data.existNetworkGraphEdgeIndex.containsKey(bidirEdge))) {
-//                        constraint = "N" + constraintCounter++;
-//                        for (int c = 0; c < linearComponents.length; c++) {
-//                            if (!intVariableToConstraints.containsKey(y[e][c][t])) {
-//                                intVariableToConstraints.put(y[e][c][t], new HashSet<ConstraintTerm>());
-//                            }
-//                            intVariableToConstraints.get(y[e][c][t]).add(new ConstraintTerm(constraint, 1));
-//                            constraintToSign.put(constraint, "G");
-//                            constraintRHS.put(constraint, 0.01);
-//                        }
-//                    }
-//                }
-//            }
-
-            // 2nd, set the existing pipelines are fully operated with their maximum capacity, constraint type as "K"
-            constraintCounter = 1;
-            for (int t = 0; t < num_intervals; t++) {
-                for (int e = 0; e < edgeToIndex.size(); e++) {
-                    UnidirEdge unidirEdge = edgeIndexToEdge.get(e);
-                    Edge bidirEdge = new Edge(unidirEdge.v1, unidirEdge.v2);
-                    if ((data.existNetworkGraphEdgeIndex.containsKey(bidirEdge)) && data.existNetworkSizes != null){
-                        constraint = "K" + constraintCounter++;
-                        for (int c = 0; c < linearComponents.length; c++) {
-                            if (!contVariableToConstraints.containsKey(p[e][c][t])) {
-                                contVariableToConstraints.put(p[e][c][t], new HashSet<ConstraintTerm>());
-                            }
-                            // Determine the best pipeline capacity for existing pipeline
-                            double PipelineCapacity = 6.68; // 16 inches
-                            if (data.existNetworkSizes.get(bidirEdge) == 4){
-                                PipelineCapacity = 0.19;
-                            }
-                            else if(data.existNetworkSizes.get(bidirEdge) == 6){
-                                PipelineCapacity = 0.54;
-                            }
-                            else if(data.existNetworkSizes.get(bidirEdge) == 8){
-                                PipelineCapacity = 1.13;
-                            }
-                            else if(data.existNetworkSizes.get(bidirEdge) == 12){
-                                PipelineCapacity = 3.25;
-                            }
-                            else if(data.existNetworkSizes.get(bidirEdge) == 16){
-                                PipelineCapacity = 6.68;
-                            }
-                            else if(data.existNetworkSizes.get(bidirEdge) == 20){
-                                PipelineCapacity = 12.26;
-                            }
-                            else if(data.existNetworkSizes.get(bidirEdge) == 24){
-                                PipelineCapacity = 19.69;
-                            }
-                            else if(data.existNetworkSizes.get(bidirEdge) == 36){
-                                PipelineCapacity = 56.46;
-                            }
-                            else if(data.existNetworkSizes.get(bidirEdge) == 42){
-                                PipelineCapacity = 83.95;
-                            }
-                            else if(data.existNetworkSizes.get(bidirEdge) == 48){
-                                PipelineCapacity = 119.16;
-                            }
-                            else{
-                                PipelineCapacity = linearComponents[c].getMaxCapacity();
-                            }
-                            contVariableToConstraints.get(p[e][c][t])
-                                    .add(new ConstraintTerm(constraint, 1));
-                            constraintToSign.put(constraint, "L");
-                            constraintRHS.put(constraint, PipelineCapacity);
-                        }
-                    }
-                    // No network size for exist networks, so set as the maximum capacity
-                    else if((data.existNetworkGraphEdgeIndex.containsKey(bidirEdge)) && data.existNetworkSizes == null){
-                        constraint = "K" + constraintCounter++;
-                        for (int c = 0; c < linearComponents.length; c++) {
-                            if (!contVariableToConstraints.containsKey(p[e][c][t])) {
-                                contVariableToConstraints.put(p[e][c][t], new HashSet<ConstraintTerm>());
-                            }
-                            contVariableToConstraints.get(p[e][c][t])
-                                    .add(new ConstraintTerm(constraint, 1));
-                            constraintToSign.put(constraint, "L");
-                            constraintRHS.put(constraint, linearComponents[c].getMaxCapacity());
-                        }
-                    }
-                }
-            }
-
-
-//            constraintCounter = 1;
-//            for (int t = 0; t < num_intervals; t++) {
-//                for (int e = 0; e < edgeToIndex.size(); e++) {
-//                    UnidirEdge unidirEdge = edgeIndexToEdge.get(e);
-//                    Edge bidirEdge = new Edge(unidirEdge.v1, unidirEdge.v2);
-//                    if ((data.existNetworkGraphEdgeIndex.containsKey(bidirEdge))){
-//                        constraint = "O" + constraintCounter++;
-//                        for (int c = 0; c < linearComponents.length; c++) {
-//                            if (!contVariableToConstraints.containsKey(p[e][c][t])) {
-//                                contVariableToConstraints.put(p[e][c][t], new HashSet<ConstraintTerm>());
-//                            }
-//                            contVariableToConstraints.get(p[e][c][t])
-//                                    .add(new ConstraintTerm(constraint, 1));
-//                            constraintToSign.put(constraint, "G");
-//                            //constraintRHS.put(constraint, 100.0);
-//                            constraintRHS.put(constraint, 0.001);
-//                        }
-//                    }
-//                }
-//            }
-        }
-        // --------------------------------------------------------------------------------------------------------------
-
-        // ------------------------- Martin Ma -------------------------------------------------------------------------
-        // Storage capped by max capacity for all the year
-        constraintCounter = 1;
-        for (Sink snk : sinks) {
-            String constraint3 = "M" + constraintCounter++;
-            for (int t = 0; t < num_intervals; t++) {
-                if (!contVariableToConstraints.containsKey(b[sinkCellToIndex.get(snk)][t])) {
-                    contVariableToConstraints.put(b[sinkCellToIndex.get(snk)][t],
-                            new HashSet<ConstraintTerm>());
-                }
-                contVariableToConstraints.get(b[sinkCellToIndex.get(snk)][t])
-                        .add(new ConstraintTerm(constraint3, intervals.getYears(t)));
-                constraintToSign.put(constraint3, "L");
-                constraintRHS.put(constraint3, snk.getCapacity());
-            }
-        }
-        // -------------------------------------------------------------------------------------------------------------
 
         // Hardcode constants.
         for (int t = 0; t < num_intervals; t++) {
@@ -598,92 +446,32 @@ public class MPSWriterTime extends MPSWriter {
             }
         }
 
-        // --------------------------------- Martin ----------------------------------------------------------------------
-        // Have exist networks
-        // Revised by considering existing pipelines
-        if (data.existNetworkGraphEdgeIndex != null){
-            for (int t = 0; t < num_intervals; t++) {
-                for (int e = 0; e < edgeToIndex.size(); e++) {
-                    for (int c = 0; c < linearComponents.length; c++) {
-                        UnidirEdge unidirEdge = edgeIndexToEdge.get(e);
-                        Edge bidirEdge = new Edge(unidirEdge.v1, unidirEdge.v2);
-                        if (!(data.existNetworkGraphEdgeIndex.containsKey(bidirEdge))) {
-                            if (!intVariableToConstraints.containsKey(y[e][c][t])) {
-                                intVariableToConstraints.put(y[e][c][t], new HashSet<ConstraintTerm>());
-                            }
-                            double coefficient = (linearComponents[c].getConIntercept() * edgeConstructionCosts.get(
-                                    bidirEdge) + linearComponents[c].getRowIntercept() * edgeRightOfWayCosts.get(
-                                    bidirEdge)) * crf;
-                            intVariableToConstraints.get(y[e][c][t])
-                                    .add(new ConstraintTerm(constraint, coefficient));
+        for (int t = 0; t < num_intervals; t++) {
+            for (int e = 0; e < edgeToIndex.size(); e++) {
+                for (int c = 0; c < linearComponents.length; c++) {
+                    UnidirEdge unidirEdge = edgeIndexToEdge.get(e);
+                    Edge bidirEdge = new Edge(unidirEdge.v1, unidirEdge.v2);
 
-                            if (!contVariableToConstraints.containsKey(p[e][c][t])) {
-                                contVariableToConstraints.put(p[e][c][t], new HashSet<ConstraintTerm>());
-                            }
-                            coefficient = (linearComponents[c].getConSlope() * edgeConstructionCosts.get(
-                                    bidirEdge) + linearComponents[c].getRowSlope() * edgeRightOfWayCosts.get(
-                                    bidirEdge)) * crf / pipeUtilization;
-                            contVariableToConstraints.get(p[e][c][t])
-                                    .add(new ConstraintTerm(constraint, coefficient));
-                        }
-                        // existing networks
-                        else{
-                            if (!intVariableToConstraints.containsKey(y[e][c][t])) {
-                                intVariableToConstraints.put(y[e][c][t], new HashSet<ConstraintTerm>());
-                            }
-
-                            // set the construction cost as 0$
-                            double coefficient = 0.0 * crf;
-                            intVariableToConstraints.get(y[e][c][t])
-                                    .add(new ConstraintTerm(constraint, coefficient));
-
-                            if (!contVariableToConstraints.containsKey(p[e][c][t])) {
-                                contVariableToConstraints.put(p[e][c][t], new HashSet<ConstraintTerm>());
-                            }
-                            coefficient = (linearComponents[c].getConSlope() * edgeConstructionCosts.get(
-                                    bidirEdge) + linearComponents[c].getRowSlope() * edgeRightOfWayCosts.get(
-                                    bidirEdge)) * crf / pipeUtilization;
-                            contVariableToConstraints.get(p[e][c][t])
-                                    .add(new ConstraintTerm(constraint, coefficient));
-
-                        }
+                    if (!intVariableToConstraints.containsKey(y[e][c][t])) {
+                        intVariableToConstraints.put(y[e][c][t], new HashSet<ConstraintTerm>());
                     }
+                    double coefficient = (linearComponents[c].getConIntercept() * edgeConstructionCosts.get(
+                            bidirEdge) + linearComponents[c].getRowIntercept() * edgeRightOfWayCosts.get(
+                            bidirEdge)) * crf;
+                    intVariableToConstraints.get(y[e][c][t])
+                            .add(new ConstraintTerm(constraint, coefficient));
+
+                    if (!contVariableToConstraints.containsKey(p[e][c][t])) {
+                        contVariableToConstraints.put(p[e][c][t], new HashSet<ConstraintTerm>());
+                    }
+                    coefficient = (linearComponents[c].getConSlope() * edgeConstructionCosts.get(
+                            bidirEdge) + linearComponents[c].getRowSlope() * edgeRightOfWayCosts.get(
+                            bidirEdge)) * crf / pipeUtilization;
+                    contVariableToConstraints.get(p[e][c][t])
+                            .add(new ConstraintTerm(constraint, coefficient));
                 }
             }
         }
-
-        // No exist network
-        else{
-            for (int t = 0; t < num_intervals; t++) {
-                for (int e = 0; e < edgeToIndex.size(); e++) {
-                    for (int c = 0; c < linearComponents.length; c++) {
-                        UnidirEdge unidirEdge = edgeIndexToEdge.get(e);
-                        Edge bidirEdge = new Edge(unidirEdge.v1, unidirEdge.v2);
-
-                        if (!intVariableToConstraints.containsKey(y[e][c][t])) {
-                            intVariableToConstraints.put(y[e][c][t], new HashSet<ConstraintTerm>());
-                        }
-                        double coefficient = (linearComponents[c].getConIntercept() * edgeConstructionCosts.get(
-                                bidirEdge) + linearComponents[c].getRowIntercept() * edgeRightOfWayCosts.get(
-                                bidirEdge)) * crf;
-                        intVariableToConstraints.get(y[e][c][t])
-                                .add(new ConstraintTerm(constraint, coefficient));
-
-                        if (!contVariableToConstraints.containsKey(p[e][c][t])) {
-                            contVariableToConstraints.put(p[e][c][t], new HashSet<ConstraintTerm>());
-                        }
-                        coefficient = (linearComponents[c].getConSlope() * edgeConstructionCosts.get(
-                                bidirEdge) + linearComponents[c].getRowSlope() * edgeRightOfWayCosts.get(
-                                bidirEdge)) * crf / pipeUtilization;
-                        contVariableToConstraints.get(p[e][c][t])
-                                .add(new ConstraintTerm(constraint, coefficient));
-                    }
-                }
-            }
-
-        }
-        // ----------------------------------------------------------------------------------------------------------------
-
 
         for (int t = 0; t < num_intervals; t++) {
             for (Sink snk : sinks) {

@@ -34,7 +34,7 @@ import java.util.*;
 import static utilities.Utilities.round;
 
 /**
- * @author yaw
+ * @author yaw and martin
  */
 public class ControlActions {
 
@@ -52,6 +52,10 @@ public class ControlActions {
     private Pane sinkLabelsLayer;
     private Pane shortestPathsLayer;
     private Pane candidateNetworkLayer;
+    // --------------- Martin Ma ----------------------------------------------------------------------------------
+    private Pane existNetworkLayer;
+    // ------------------------------------------------------------------------------------------------------------
+
     private Pane rawDelaunayLayer;
     private Pane solutionLayer;
     private TextArea messenger;
@@ -322,7 +326,11 @@ public class ControlActions {
             }
 
             // Copy mps file and make command files.
-            DateFormat dateFormat = new SimpleDateFormat("ddMMyyy-HHmmssss");
+
+            // -------------------- Martin Ma ---------------------------------------------------------------------------
+            // DateFormat dateFormat = new SimpleDateFormat("ddMMyyy-HHmmssss");
+            DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd-HHmmssss");
+            // ----------------------------------------------------------------------------------------------------------
             Date date = new Date();
             run += dateFormat.format(date);
             File solutionDirectory = new File(basePath + "/" + dataset + "/Scenarios/" + scenario + "/Results/" + run);
@@ -369,10 +377,28 @@ public class ControlActions {
                     osCommands.close();
                     osCommandsFile.setExecutable(true);
                 }
-            } catch (FileNotFoundException e) {
-            } catch (IOException e) {
-            }
+                // -------------------- Martin Ma ----------------------------------------------------------------------
+                else if (os.toLowerCase().contains("linux")) {
+                    PrintWriter cplexCommands = new PrintWriter(solutionDirectory + "/cplexCommands.txt");
+                    cplexCommands.println("read " + mpsFileName);
+                    cplexCommands.println("opt");
+                    cplexCommands.println("write solution.sol");
+                    cplexCommands.println("quit");
+                    cplexCommands.close();
 
+                    File osCommandsFile = new File(solutionDirectory + "/osCommands.sh");
+                    PrintWriter osCommands = new PrintWriter(osCommandsFile);
+                    osCommands.println("#!/bin/bash");
+                    osCommands.println("cplex < cplexCommands.txt");
+                    osCommands.close();
+                    osCommandsFile.setExecutable(true);
+                }
+                // -----------------------------------------------------------------------------------------------------
+            } catch (FileNotFoundException e) {
+
+            } catch (IOException e) {
+
+            }
             try {
                 if (os.toLowerCase().contains("mac")) {
                     String[] args = new String[]{"/usr/bin/open", "-a", "Terminal", solutionDirectory.getAbsolutePath() + "/osCommands.sh"};
@@ -385,9 +411,19 @@ public class ControlActions {
                     pb.directory(solutionDirectory);
                     Process p = pb.start();
                 }
+                // -------------------- Martin Ma ------------------------------------------------------------------------------------
+                else if (os.toLowerCase().contains("linux")) {
+                    String[] args = new String[]{"/bin/bash", "-c", "/usr/bin/xterm", solutionDirectory.getAbsolutePath() + "/osCommands.sh"};
+                    ProcessBuilder pb = new ProcessBuilder(args);
+                    pb.directory(solutionDirectory);
+                    Process p = pb.start();
+                }
+                // -------------------------------------------------------------------------------------------------------------------
+
             } catch (IOException e) {
             }
-        } catch (IOException e) {
+        } catch(IOException e)
+        {
             messenger.setText("Error: Make sure CPLEX is installed and in System PATH.");
         }
     }
@@ -416,27 +452,102 @@ public class ControlActions {
         }
     }
 
+    //    public void toggleCandidateNetworkDisplay(boolean show) {
+//        if (show) {
+//            HashSet<int[]> selectedRoutes = data.getGraphEdges();
+//            for (int[] route : selectedRoutes) {
+//                for (int src = 0; src < route.length - 1; src++) {
+//                    int dest = src + 1;
+//                    double[] rawSrc = data.cellLocationToRawXY(route[src]);
+//                    double[] rawDest = data.cellLocationToRawXY(route[dest]);
+//                    double sX = rawXtoDisplayX(rawSrc[0]);
+//                    double sY = rawYtoDisplayY(rawSrc[1]);
+//                    double dX = rawXtoDisplayX(rawDest[0]);
+//                    double dY = rawYtoDisplayY(rawDest[1]);
+//                    Line edge = new Line(sX, sY, dX, dY);
+//                    edge.setStroke(Color.PURPLE);
+//                    edge.setStrokeWidth(3.0 / gui.getScale());
+//                    edge.setStrokeLineCap(StrokeLineCap.ROUND);
+//                    candidateNetworkLayer.getChildren().add(edge);
+//                }
+//            }
+//        } else {
+//            candidateNetworkLayer.getChildren().clear();
+//        }
+//    }
+    // ------------- Martin Ma -----------------------------------------------------------------------------
     public void toggleCandidateNetworkDisplay(boolean show) {
         if (show) {
             HashSet<int[]> selectedRoutes = data.getGraphEdges();
             for (int[] route : selectedRoutes) {
-                for (int src = 0; src < route.length - 1; src++) {
-                    int dest = src + 1;
-                    double[] rawSrc = data.cellLocationToRawXY(route[src]);
-                    double[] rawDest = data.cellLocationToRawXY(route[dest]);
-                    double sX = rawXtoDisplayX(rawSrc[0]);
-                    double sY = rawYtoDisplayY(rawSrc[1]);
-                    double dX = rawXtoDisplayX(rawDest[0]);
-                    double dY = rawYtoDisplayY(rawDest[1]);
-                    Line edge = new Line(sX, sY, dX, dY);
-                    edge.setStroke(Color.PURPLE);
-                    edge.setStrokeWidth(3.0 / gui.getScale());
-                    edge.setStrokeLineCap(StrokeLineCap.ROUND);
-                    candidateNetworkLayer.getChildren().add(edge);
+                Edge edge1 = new Edge(route[0],route[route.length-1]);
+
+                if (data.existNetworkGraphEdgeIndex == null){
+                    for (int src = 0; src < route.length - 1; src++) {
+                        int dest = src + 1;
+                        double[] rawSrc = data.cellLocationToRawXY(route[src]);
+                        double[] rawDest = data.cellLocationToRawXY(route[dest]);
+                        double sX = rawXtoDisplayX(rawSrc[0]);
+                        double sY = rawYtoDisplayY(rawSrc[1]);
+                        double dX = rawXtoDisplayX(rawDest[0]);
+                        double dY = rawYtoDisplayY(rawDest[1]);
+                        Line edge = new Line(sX, sY, dX, dY);
+                        edge.setStroke(Color.PURPLE);
+                        edge.setStrokeWidth(3.0 / gui.getScale());
+                        edge.setStrokeLineCap(StrokeLineCap.ROUND);
+                        candidateNetworkLayer.getChildren().add(edge);
+                    }
+                }
+                else {
+                    if (!data.existNetworkGraphEdgeIndex.containsKey(edge1)) {
+                        for (int src = 0; src < route.length - 1; src++) {
+                            int dest = src + 1;
+                            double[] rawSrc = data.cellLocationToRawXY(route[src]);
+                            double[] rawDest = data.cellLocationToRawXY(route[dest]);
+                            double sX = rawXtoDisplayX(rawSrc[0]);
+                            double sY = rawYtoDisplayY(rawSrc[1]);
+                            double dX = rawXtoDisplayX(rawDest[0]);
+                            double dY = rawYtoDisplayY(rawDest[1]);
+                            Line edge = new Line(sX, sY, dX, dY);
+                            edge.setStroke(Color.PURPLE);
+                            edge.setStrokeWidth(3.0 / gui.getScale());
+                            edge.setStrokeLineCap(StrokeLineCap.ROUND);
+                            candidateNetworkLayer.getChildren().add(edge);
+                        }
+                    }
                 }
             }
         } else {
             candidateNetworkLayer.getChildren().clear();
+        }
+    }
+
+    public void toggleExistNetworkDisplay(boolean show) {
+        if (show) {
+            if (data.existNetworkGraphEdgeIndex != null){
+                HashSet<int[]> selectedRoutes = data.getGraphEdges();
+                for (int[] route : selectedRoutes) {
+                    Edge edge1 = new Edge(route[0],route[route.length-1]);
+                    if (data.existNetworkGraphEdgeIndex.containsKey(edge1)){
+                        for (int src = 0; src < route.length - 1; src++) {
+                            int dest = src + 1;
+                            double[] rawSrc = data.cellLocationToRawXY(route[src]);
+                            double[] rawDest = data.cellLocationToRawXY(route[dest]);
+                            double sX = rawXtoDisplayX(rawSrc[0]);
+                            double sY = rawYtoDisplayY(rawSrc[1]);
+                            double dX = rawXtoDisplayX(rawDest[0]);
+                            double dY = rawYtoDisplayY(rawDest[1]);
+                            Line edge = new Line(sX, sY, dX, dY);
+                            edge.setStroke(Color.BLACK);
+                            edge.setStrokeWidth(3.0 / gui.getScale());
+                            edge.setStrokeLineCap(StrokeLineCap.ROUND);
+                            existNetworkLayer.getChildren().add(edge);
+                        }
+                    }
+                }
+            }
+        } else {
+            existNetworkLayer.getChildren().clear();
         }
     }
 
@@ -485,7 +596,6 @@ public class ControlActions {
     public void displaySolution(String file, Solution soln, Label[] solutionValues) {
         solutionLayer.getChildren().clear();
         HashMap<Edge, int[]> graphEdgeRoutes = data.getGraphEdgeRoutes();
-
         for (Edge e : soln.getOpenedEdges()) {
             int[] route = graphEdgeRoutes.get(e);
             for (int src = 0; src < route.length - 1; src++) {
@@ -766,6 +876,13 @@ public class ControlActions {
     public void addCandidateNetworkLayer(Pane layer) {
         candidateNetworkLayer = layer;
     }
+
+    // ------------- Martin Ma -----------------------------------------------------------------------------
+    public void addExistNetworkLayer(Pane layer) {
+        existNetworkLayer = layer;
+    }
+    // ------------------------------------------------------------------------------------------------------
+
 
     public void addSolutionLayer(Pane layer) {
         solutionLayer = layer;

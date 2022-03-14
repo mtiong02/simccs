@@ -33,7 +33,7 @@ import javafx.stage.Stage;
 import java.io.File;
 
 /**
- * @author yaw
+ * @author yaw and martin
  */
 public class Gui extends Application {
 
@@ -42,6 +42,14 @@ public class Gui extends Application {
     private ChoiceBox scenarioChoice;
     private RadioButton dispDelaunayEdges;
     private RadioButton dispCandidateNetwork;
+
+
+    // ------------- Martin Ma -----------------------------------------------------------------------------
+    private RadioButton dispExistNetwork;
+    // -----------------------------------------------------------------------------------------------------
+
+
+
     private RadioButton sourceLabeled;
     private RadioButton sourceVisible;
     private RadioButton sinkLabeled;
@@ -228,7 +236,8 @@ public class Gui extends Application {
 
         dispDelaunayEdges = new RadioButton("Raw Delaunay Edges");
         dispDelaunayEdges.setLayoutX(4);
-        dispDelaunayEdges.setLayoutY(83);
+        // dispDelaunayEdges.setLayoutY(83);
+        dispDelaunayEdges.setLayoutY(75); // Martin --
         selectionPane.getChildren().add(dispDelaunayEdges);
 
         Pane rawDelaunayLayer = new Pane();
@@ -246,7 +255,8 @@ public class Gui extends Application {
 
         dispCandidateNetwork = new RadioButton("Candidate Network");
         dispCandidateNetwork.setLayoutX(4);
-        dispCandidateNetwork.setLayoutY(106);
+//        dispCandidateNetwork.setLayoutY(106);
+        dispCandidateNetwork.setLayoutY(95); // Martin --
         selectionPane.getChildren().add(dispCandidateNetwork);
         Pane candidateNetworkLayer = new Pane();
         sceneGestures.addEntityToResize(candidateNetworkLayer);
@@ -260,6 +270,25 @@ public class Gui extends Application {
                 controlActions.toggleCandidateNetworkDisplay(show);
             }
         });
+
+        // ------------- Martin Ma -----------------------------------------------------------------------------
+        dispExistNetwork = new RadioButton("Exist Network");
+        dispExistNetwork.setLayoutX(4);
+        dispExistNetwork.setLayoutY(115);
+        selectionPane.getChildren().add(dispExistNetwork);
+        Pane existNetworkLayer = new Pane();
+        sceneGestures.addEntityToResize(existNetworkLayer);
+        displayPane.getChildren().add(existNetworkLayer);
+        controlActions.addExistNetworkLayer(existNetworkLayer);
+        dispExistNetwork.selectedProperty().addListener(new ChangeListener<Boolean>() {
+            @Override
+            public void changed(ObservableValue<? extends Boolean> selected,
+                                Boolean oldVal,
+                                Boolean show) {
+                controlActions.toggleExistNetworkDisplay(show);
+            }
+        });
+        // -----------------------------------------------------------------------------------------------------
 
         Label sourceLabel = new Label("Sources:");
         sourceLabel.setLayoutX(2);
@@ -362,7 +391,8 @@ public class Gui extends Application {
         // Toggle cost surface button.
         dispCostSurface = new RadioButton("Cost Surface");
         dispCostSurface.setLayoutX(4);
-        dispCostSurface.setLayoutY(60);
+//        dispCostSurface.setLayoutY(60);
+        dispCostSurface.setLayoutY(55); // Martin -----
         selectionPane.getChildren().add(dispCostSurface);
         dispCostSurface.selectedProperty().addListener(new ChangeListener<Boolean>() {
             @Override
@@ -555,6 +585,11 @@ public class Gui extends Application {
             }
         });
 
+        // -------------Martin Ma -------------------------------------------------
+        // Add default values, capture target is the maximum of all sources
+         data.add(new TimeIntervalProto("5", "10"));
+        // -----------------------------------------------------------------------
+
         final Button subIntervalButton = new Button("-");
         subIntervalButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
@@ -624,7 +659,6 @@ public class Gui extends Application {
                     );
                 } else if (timeVersion.isSelected()) {
                     modelVersion = "t";
-
                     if (data.size() == 0) {
                         System.err.println("No intervals have been set");
                         Alert alert = new Alert(AlertType.ERROR,

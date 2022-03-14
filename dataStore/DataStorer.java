@@ -8,9 +8,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * @author yaw and martin
+ * @author yaw
  */
-
 public class DataStorer {
 
     public String basePath;
@@ -50,13 +49,8 @@ public class DataStorer {
     private HashMap<Edge, Double> graphEdgeLengths; // Length (km) of edge when following routing
 
     // --------------- Martin Ma ----------------------------------------------------------------------------------
-    public HashMap<Edge, Integer> existNetworkGraphEdgeIndex;   // Index for each edge between vertices for exist network
-    public HashMap<Edge, Integer> existNetworkSizes;   // Size each edge between vertices for exist network
-    // ------------------------------------------------------------------------------------------------------------
-
-    // --------------- Martin Ma ----------------------------------------------------------------------------------
-    private Sinkcredit[] sinkcredits;    // dynamic sink credit for each sink
-    private SourceEvo[] sourceEvos;      // dynamic source open/close for each source location
+    private Sinkcredit[] sinkcredits;
+    private SourceEvo[] sourceEvos;
     // ------------------------------------------------------------------------------------------------------------
 
     // Configuration data
@@ -212,16 +206,6 @@ public class DataStorer {
     public void setGraphEdgeCosts(HashMap<Edge, Double> edgeCosts) {
         graphEdgeCosts = edgeCosts;
     }
-
-
-    // --------- Martin Ma ------------------------------------------------------------------------------------------
-    public void setExistNetworkSizes(HashMap<Edge, Integer> edgeSizes) {
-        existNetworkSizes = edgeSizes;
-    }
-    public void setExistNetworkGraphEdgeIndex(HashMap<Edge, Integer> edgeIndex) {
-        existNetworkGraphEdgeIndex = edgeIndex;
-    }
-    // ---------------------------------------------------------------------------------------------------------------
 
     public HashMap<Edge, Double> getGraphEdgeRightOfWayCosts() {
         if (graphEdgeRightOfWayCosts == null) {
@@ -546,7 +530,10 @@ public class DataStorer {
     public void setSinkcredits(Sinkcredit[] sinkcredits) {
         this.sinkcredits = sinkcredits;
     }
+    // ----------------------------------------------------------------------------------------------------------
 
+
+    // --------------- Martin Ma --------------------------------------------------------------------------------
     public SourceEvo[] getSourceEvos() {
         return sourceEvos;
     }

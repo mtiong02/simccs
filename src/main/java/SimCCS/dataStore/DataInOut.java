@@ -18,8 +18,9 @@ import java.util.*;
 import static utilities.Utilities.*;
 
 /**
- * @author yaw
+ * @author yaw and martin
  */
+
 public class DataInOut {
 
     private String basePath;
@@ -37,6 +38,19 @@ public class DataInOut {
         loadGeography();
         System.out.println("Loading Source Data...");
         loadSources();
+
+        // ------------- Martin Ma -----------------------------------------------------------------------------
+        if (scenario.startsWith("time")) {
+            System.out.println("Loading Source Evolution Data...");
+            loadSourceEvo();
+            System.out.println("Loading Sink credits Data...");
+            loadSinkcredits();
+        }
+
+        System.out.println("Loading Exist Network Size...");
+        loadExistNetworkSizes();
+        // -----------------------------------------------------------------------------------------------------
+
         System.out.println("Loading Sink Data...");
         loadSinks();
         System.out.println("Loading Transport Data...");
@@ -368,6 +382,55 @@ public class DataInOut {
         }
     }
 
+
+    // Load dynamic source open/close----------------- Martin Ma --------------------------------------------------------------------------
+    private void loadSourceEvo() {
+        String sourceEvoPath = basePath + "/" + dataset + "/Scenarios/" + scenario + "/Sources/SourcesEvo.csv";
+        try (BufferedReader br = new BufferedReader(new FileReader(sourceEvoPath))) {
+            br.readLine();
+            br.readLine();
+            String line = br.readLine();
+            ArrayList<SourceEvo> sourceEvos = new ArrayList<>();
+            while (line != null && !line.startsWith(",") && !line.startsWith(" ")) {
+                String[] elements = line.split(",(?=([^\"]*\"[^\"]*\")*[^\"]*$)");
+                SourceEvo source_evo = new SourceEvo(data);
+
+                int num_source_evo_interval = elements.length - 2;
+
+                source_evo.setNumTimeInterval(num_source_evo_interval);
+
+                ArrayList<Integer> source_evo_indicator = new ArrayList<Integer>();
+
+                for (int i = 0; i < num_source_evo_interval; i++) {
+                    source_evo_indicator.add(Integer.parseInt(elements[i + 2]));
+                }
+                source_evo.setSourceEvo_indicator(source_evo_indicator);
+                sourceEvos.add(source_evo);
+                line = br.readLine();
+            }
+            data.setSourceEvos(sourceEvos.toArray(new SourceEvo[0]));
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+
+            Source[] sources = data.getSources();
+            ArrayList<SourceEvo> sourceEvos = new ArrayList<>();
+            for (int idx_src = 0; idx_src < sources.length; idx_src++) {
+                SourceEvo source_evo = new SourceEvo(data);
+                int num_source_evo_interval = 99;
+                source_evo.setNumTimeInterval(num_source_evo_interval);
+                ArrayList<Integer> source_evo_indicator = new ArrayList<Integer>();
+                for (int i = 0; i < num_source_evo_interval; i++) {
+                    source_evo_indicator.add(-1);
+                }
+                source_evo.setSourceEvo_indicator(source_evo_indicator);
+                sourceEvos.add(source_evo);
+            }
+            data.setSourceEvos(sourceEvos.toArray(new SourceEvo[0]));
+        }
+    }
+    // ------------------------------------------------------------------------------------------------------------
+
+
     private void loadSinks() {
         String sinkPath = basePath + "/" + dataset + "/Scenarios/" + scenario + "/Sinks/Sinks.csv";
         try (BufferedReader br = new BufferedReader(new FileReader(sinkPath))) {
@@ -461,6 +524,37 @@ public class DataInOut {
         }
     }
 
+    // Load dynamic tax credits ---------- Martin Ma -----------------------------------------------------------------
+    private void loadSinkcredits() {
+        String sinkCreditPath = basePath + "/" + dataset + "/Scenarios/" + scenario + "/Sinks/Sink credits.txt";
+        try (BufferedReader br = new BufferedReader(new FileReader(sinkCreditPath))) {
+            br.readLine();
+            String line = br.readLine();
+            ArrayList<Sinkcredit> sinkcredits = new ArrayList<>();
+            while (line != null) {
+                Sinkcredit sinkcredit = new Sinkcredit(data);
+                String[] elements = line.split("\\s+");
+                sinkcredit.setId_sinkcredit(Integer.parseInt(elements[0]));
+                sinkcredit.setSinkcredit(Double.parseDouble(elements[1]));
+                sinkcredits.add(sinkcredit);
+                line = br.readLine();
+            }
+            data.setSinkcredits(sinkcredits.toArray(new Sinkcredit[0]));
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+            ArrayList<Sinkcredit> sinkcredits = new ArrayList<>();
+            int max_num_internal = 99; // Assume the maximum number of interval is 99
+            for (int idx_tc = 0; idx_tc < max_num_internal; idx_tc++) {
+                Sinkcredit sinkcredit = new Sinkcredit(data);
+                sinkcredit.setId_sinkcredit(idx_tc + 1);
+                sinkcredit.setSinkcredit(0.0);
+                sinkcredits.add(sinkcredit);
+            }
+            data.setSinkcredits(sinkcredits.toArray(new Sinkcredit[0]));
+        }
+    }
+    // ---------------------------------------------------------------------------------------------------------------
+
     private void loadTransport() {
         String transportPath = basePath + "/" + dataset + "/Scenarios/" + scenario + "/Transport/Linear.txt";
         try (BufferedReader br = new BufferedReader(new FileReader(transportPath))) {
@@ -503,10 +597,13 @@ public class DataInOut {
         }
     }
 
+    // load revised candidate graph with existing pipelines-------------------- Martin Ma ------------------------------
     private void loadCandidateGraph() {
         // Check if file exists
         String candidateGraphPath = basePath + "/" + dataset + "/Scenarios/" + scenario + "/Network/CandidateNetwork/CandidateNetwork.txt";
-        if (new File(candidateGraphPath).exists()) {
+        String existNetworkPath = basePath + "/" + dataset + "/Scenarios/" + scenario + "/Network/ExistNetwork/ExistNetwork.txt";
+
+        if ((new File(candidateGraphPath).exists()) && !(new File(existNetworkPath).exists())) {
             // Load from file.
             try (BufferedReader br = new BufferedReader(new FileReader(candidateGraphPath))) {
                 String line = br.readLine();
@@ -529,6 +626,7 @@ public class DataInOut {
                 HashMap<Edge, Double> graphEdgeRightOfWayCosts = new HashMap<>();
 
                 HashMap<Edge, int[]> graphEdgeRoutes = new HashMap<>();
+
                 while (line != null) {
                     String[] elements = line.split("\\s+");
                     int v1 = Integer.parseInt(elements[0]);
@@ -582,10 +680,182 @@ public class DataInOut {
             } catch (IOException e) {
                 System.out.println(e.getMessage());
             }
-        } else {
+            System.out.println("Not Exist Networks.");
+
+        } else if ((new File(candidateGraphPath).exists()) && (new File(existNetworkPath).exists())) {
+            // Both canadiate and exist networks are exist
+            // Load from file.
+            try (BufferedReader br = new BufferedReader(new FileReader(candidateGraphPath))) {
+                String line = br.readLine();
+                // Determine data version
+                int routeStarting = 5;
+                if (!line.startsWith("Vertex1")) {
+                    routeStarting = 4;
+                    br.readLine();
+                    br.readLine();
+                    br.readLine();
+                }
+                if (!line.contains("ConCost")) {
+                    routeStarting = 3;
+                }
+                line = br.readLine();
+
+                HashSet<Integer> graphVertices = new HashSet<>();
+                HashMap<Edge, Double> graphEdgeCosts = new HashMap<>();
+                HashMap<Edge, Double> graphEdgeConstructionCosts = new HashMap<>();
+                HashMap<Edge, Double> graphEdgeRightOfWayCosts = new HashMap<>();
+                HashMap<Edge, int[]> graphEdgeRoutes = new HashMap<>();
+
+                // ----------------- Martin Ma ----------------------------------------------------------------
+                HashMap<Edge, Integer> ExistNetworkGraphEdgeIndex = new HashMap<>();
+                // --------------------------------------------------------------------------------------------
+                while (line != null) {
+                    String[] elements = line.split("\\s+");
+                    int v1 = Integer.parseInt(elements[0]);
+                    int v2 = Integer.parseInt(elements[1]);
+                    Edge edge = new Edge(v1, v2);
+                    graphVertices.add(v1);
+                    graphVertices.add(v2);
+                    double cost = Double.parseDouble(elements[2]);
+
+                    double conCost = 0;
+                    double rowCost = 0;
+                    if (routeStarting == 5) {
+                        conCost = Double.parseDouble(elements[3]);
+                        rowCost = Double.parseDouble(elements[4]);
+                    }
+
+                    ArrayList<Integer> route = new ArrayList<>();
+                    for (int i = routeStarting; i < elements.length; i++) {
+                        route.add(Integer.parseInt(elements[i]));
+                    }
+
+                    graphEdgeCosts.put(edge, cost);
+                    graphEdgeRoutes.put(edge, convertIntegerArray(route.toArray(new Integer[0])));
+
+                    if (routeStarting == 5) {
+                        graphEdgeConstructionCosts.put(edge, conCost);
+                        graphEdgeRightOfWayCosts.put(edge, rowCost);
+                    }
+
+                    // Prepare for next entry
+                    line = br.readLine();
+                }
+
+                try (BufferedReader br_e = new BufferedReader(new FileReader(existNetworkPath))) {
+                    int Num_candidateNetwork = 0;
+                    String line_e = br_e.readLine();
+                    // Determine data version
+                    routeStarting = 5;
+                    if (!line_e.startsWith("Vertex1")) {
+                        routeStarting = 4;
+                        br_e.readLine();
+                        br_e.readLine();
+                        br_e.readLine();
+                    }
+                    if (!line_e.contains("ConCost")) {
+                        routeStarting = 3;
+                    }
+                    line_e = br_e.readLine();
+
+                    // read exist networwork
+                    while (line_e != null) {
+                        Num_candidateNetwork = Num_candidateNetwork + 1;
+                        String[] elements = line_e.split("\\s+");
+                        int v1 = Integer.parseInt(elements[0]);
+                        int v2 = Integer.parseInt(elements[1]);
+                        Edge edge = new Edge(v1, v2);
+                        graphVertices.add(v1);
+                        graphVertices.add(v2);
+                        double cost = Double.parseDouble(elements[2]);
+
+                        double conCost = 0;
+                        double rowCost = 0;
+                        if (routeStarting == 5) {
+                            conCost = Double.parseDouble(elements[3]);
+                            rowCost = Double.parseDouble(elements[4]);
+                        }
+
+                        ArrayList<Integer> route = new ArrayList<>();
+                        for (int i = routeStarting; i < elements.length; i++) {
+                            route.add(Integer.parseInt(elements[i]));
+                        }
+
+                        graphEdgeCosts.put(edge, cost);
+                        graphEdgeRoutes.put(edge, convertIntegerArray(route.toArray(new Integer[0])));
+
+                        // --------------------- Martin Ma ----------------------------------------------------------------
+                        ExistNetworkGraphEdgeIndex.put(edge, Num_candidateNetwork);
+                        // ------------------------------------------------------------------------------------------------
+
+                        if (routeStarting == 5) {
+                            graphEdgeConstructionCosts.put(edge, conCost);
+                            graphEdgeRightOfWayCosts.put(edge, rowCost);
+                        }
+
+                        // Prepare for next entry
+                        line_e = br_e.readLine();
+                    }
+                } catch (IOException e) {
+                    System.out.println(e.getMessage());
+                }
+
+                int[] vertices = new int[graphVertices.size()];
+                int i = 0;
+                for (int vertex : graphVertices) {
+                    vertices[i++] = vertex;
+                }
+                Arrays.sort(vertices);
+
+                data.setGraphVertices(vertices);
+                data.setGraphEdgeCosts(graphEdgeCosts);
+                data.setGraphEdgeRoutes(graphEdgeRoutes);
+                // ------------------------------ Martin Ma ------------------------------------------------------------
+                data.setExistNetworkGraphEdgeIndex(ExistNetworkGraphEdgeIndex);
+                // -----------------------------------------------------------------------------------------------------
+                if (routeStarting == 5) {
+                    data.setGraphEdgeConstructionCosts(graphEdgeConstructionCosts);
+                    data.setGraphEdgeRightOfWayCosts(graphEdgeRightOfWayCosts);
+                }
+
+                System.out.println();
+            } catch (IOException e) {
+                System.out.println(e.getMessage());
+            }
+        } else if (!(new File(candidateGraphPath).exists())) {
             System.out.println("Not Yet Generated.");
         }
     }
+    
+    // load existing pipeline sizes ------------------ Martin Ma -------------------------------------------------------
+    private void loadExistNetworkSizes() {
+        String existNetworkSizesPath = basePath + "/" + dataset + "/Scenarios/" + scenario + "/Network/ExistNetwork/ExistNetworkSizes.txt";
+        if (new File(existNetworkSizesPath).exists()) {
+            // Load from file.
+            try (BufferedReader br = new BufferedReader(new FileReader(existNetworkSizesPath))){
+                String line = br.readLine();
+                line = br.readLine();
+                HashSet<Integer> graphVertices = new HashSet<>();
+                HashMap<Edge, Integer> existNetworkSizes = new HashMap<>();
+                while (line != null) {
+                    String[] elements = line.split("\\s+");
+                    int v1 = Integer.parseInt(elements[0]);
+                    int v2 = Integer.parseInt(elements[1]);
+                    Edge edge = new Edge(v1, v2);
+                    graphVertices.add(v1);
+                    graphVertices.add(v2);
+                    Integer size = Integer.parseInt(elements[2]);
+                    existNetworkSizes.put(edge, size);
+                    // Prepare for next entry
+                    line = br.readLine();
+                }
+                data.setExistNetworkSizes(existNetworkSizes);
+            } catch (IOException e) {
+                System.out.println(e.getMessage());
+            }
+        }
+    }
+
 
     private void loadDelaunayPairs() {
         // Check if file exists
@@ -953,6 +1223,10 @@ public class DataInOut {
         HashMap<Edge, Double> edgeTransportAmounts = soln.getEdgeTransportAmounts();
         HashMap<Edge, int[]> graphEdgeRoutes = data.getGraphEdgeRoutes();
         HashMap<Edge, Double> graphEdgeLengths = data.getGraphEdgeLengths();
+
+        // ------------- Martin Ma -----------------------------------------------------------------------------
+//        HashMap<Edge, int[]> ExistNetworkgraphEdgeRoutes = data.getExistNetworkGraphEdgeRoutes();
+        // -----------------------------------------------------------------------------------------------------
 
         // Make source shapefiles.
         EsriPointList sourceList = new EsriPointList();
@@ -1407,7 +1681,11 @@ public class DataInOut {
             URL url = new URL(urlPath);
             connection = (HttpURLConnection) url.openConnection();
 
-            DateFormat dateFormat = new SimpleDateFormat("ddMMyyy-HHmmssss");
+            // change the time formate ------------------- Martin Ma ----------------------------------------------------
+            // DateFormat dateFormat = new SimpleDateFormat("ddMMyyy-HHmmssss");
+            DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd-HHmmssss");
+            // ----------------------------------------------------------------------------------------------------------
+
             Date date = new Date();
             String run = "run" + dateFormat.format(date);
 
