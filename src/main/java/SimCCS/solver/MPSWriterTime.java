@@ -97,6 +97,7 @@ public class MPSWriterTime extends MPSWriter {
             }
         }
 
+        // --------------------------------------------------------------------------------------------------------
 
         // Capture amounts
         String[][] a = new String[sources.length][num_intervals];

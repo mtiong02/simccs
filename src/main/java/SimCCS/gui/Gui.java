@@ -272,7 +272,7 @@ public class Gui extends Application {
         });
 
         // ------------- Martin Ma -----------------------------------------------------------------------------
-        dispExistNetwork = new RadioButton("Exist Network");
+        dispExistNetwork = new RadioButton("Existing Network");
         dispExistNetwork.setLayoutX(4);
         dispExistNetwork.setLayoutY(115);
         selectionPane.getChildren().add(dispExistNetwork);
