@@ -334,10 +334,12 @@ public class ControlActions {
             Date date = new Date();
             run += dateFormat.format(date);
             File solutionDirectory = new File(basePath + "/" + dataset + "/Scenarios/" + scenario + "/Results/" + run);
+            File solutionInputsDirectory = new File(basePath + "/" + dataset + "/Scenarios/" + scenario + "/Results/" + run + "/Inputs/");
 
             String os = System.getProperty("os.name");
             try {
                 solutionDirectory.mkdir();
+                solutionInputsDirectory.mkdir();
 
                 // Copy MPS file into results file.
                 mipPath += mpsFileName;
@@ -345,6 +347,41 @@ public class ControlActions {
                 Path from = Paths.get(mipPath);
                 Path to = Paths.get(solutionDirectory + "/" + mpsFileName);
                 Files.copy(from, to, StandardCopyOption.REPLACE_EXISTING);
+
+                // ------------------ Martin Ma ------------------------------------------------------------------------------\
+                // copy sources/sinks inputs to result folder
+                Path sourcePath_1 = Paths.get(basePath + "/" + dataset + "/Scenarios/" + scenario + "/Sources/Sources.csv");
+                Path sourceEvoPath_1 = Paths.get(basePath + "/" + dataset + "/Scenarios/" + scenario + "/Sources/SourcesEvo.csv");
+                Path SourceTargetEvoPath_1 = Paths.get(basePath + "/" + dataset + "/Scenarios/" + scenario + "/Sources/SourceTargetEvo.csv");
+                Path SinkPath_1 = Paths.get(basePath + "/" + dataset + "/Scenarios/" + scenario + "/Sinks/Sinks.csv");
+                Path SinkCreditPath_1 = Paths.get(basePath + "/" + dataset + "/Scenarios/" + scenario + "/Sinks/Sink credits.txt");
+
+                Path sourcePath_2 = Paths.get(solutionInputsDirectory + "/" + "Sources.csv");
+                Path sourceEvoPath_2 = Paths.get(solutionInputsDirectory + "/" + "SourcesEvo.csv");
+                Path SourceTargetEvoPath_2 = Paths.get(solutionInputsDirectory + "/" + "SourceTargetEvo.csv");
+                Path SinkPath_2 = Paths.get(solutionInputsDirectory + "/" + "Sinks.csv");
+                Path SinkCreditPath_2 = Paths.get(solutionInputsDirectory + "/" + "Sinks credits.txt");
+
+                if (sourcePath_1.toFile().isFile()) {
+                    Files.copy(sourcePath_1, sourcePath_2, StandardCopyOption.REPLACE_EXISTING);
+                }
+
+                if (sourceEvoPath_1.toFile().isFile()) {
+                    Files.copy(sourceEvoPath_1, sourceEvoPath_2, StandardCopyOption.REPLACE_EXISTING);
+                }
+
+                if (SourceTargetEvoPath_1.toFile().isFile()) {
+                    Files.copy(SourceTargetEvoPath_1, SourceTargetEvoPath_2, StandardCopyOption.REPLACE_EXISTING);
+                }
+
+                if (SinkPath_1.toFile().isFile()) {
+                    Files.copy(SinkPath_1, SinkPath_2, StandardCopyOption.REPLACE_EXISTING);
+                }
+
+                if (SinkCreditPath_1.toFile().isFile()) {
+                    Files.copy(SinkCreditPath_1, SinkCreditPath_2, StandardCopyOption.REPLACE_EXISTING);
+                }
+                // -----------------------------------------------------------------------------------------------------------
 
                 // Make OS script file and cplex commands file.
                 if (os.toLowerCase().contains("mac")) {
