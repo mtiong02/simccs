@@ -600,7 +600,7 @@ public class MPSWriterTime extends MPSWriter {
         }
 
         // --------------------------------- Martin ----------------------------------------------------------------------
-        // Have exist networks
+        // Have existing networks
         // Revised by considering existing pipelines
         if (data.existNetworkGraphEdgeIndex != null){
             for (int t = 0; t < num_intervals; t++) {

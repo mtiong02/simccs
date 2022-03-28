@@ -342,6 +342,41 @@ public class ControlActions {
                 Path to = Paths.get(solutionDirectory + "/" + mpsFileName);
                 Files.copy(from, to, StandardCopyOption.REPLACE_EXISTING);
 
+                // ------------------ Martin Ma ------------------------------------------------------------------------------
+                Path sourcePath_1 = Paths.get(basePath + "/" + dataset + "/Scenarios/" + scenario + "/Sources/Sources.cvs");
+                Path sourceEvoPath_1 = Paths.get(basePath + "/" + dataset + "/Scenarios/" + scenario + "/Sources/SourcesEvo.cvs");
+                Path SourceTargetEvoPath_1 = Paths.get(basePath + "/" + dataset + "/Scenarios/" + scenario + "/Sources/SourceTargetEvo.cvs");
+                Path SinkPath_1 = Paths.get(basePath + "/" + dataset + "/Scenarios/" + scenario + "/Sinks/Sinks.cvs");
+                Path SinkCreditPath_1 = Paths.get(basePath + "/" + dataset + "/Scenarios/" + scenario + "/Sinks credits.txt");
+
+                Path sourcePath_2 = Paths.get(solutionDirectory + "/" + "Sources.cvs");
+                Path sourceEvoPath_2 = Paths.get(solutionDirectory + "/" + "SourcesEvo.cvs");
+                Path SourceTargetEvoPath_2 = Paths.get(solutionDirectory + "/" + "SourceTargetEvo.cvs");
+                Path SinkPath_2 = Paths.get(solutionDirectory + "/" + "Sinks.cvs");
+                Path SinkCreditPath_2 = Paths.get(solutionDirectory + "/" + "Sinks credits.txt");
+
+                if (sourcePath_1.toFile().isFile()) {
+                    Files.copy(sourcePath_1, sourcePath_2, StandardCopyOption.REPLACE_EXISTING);
+                }
+
+                if (sourceEvo_1.toFile().isFile()) {
+                    Files.copy(sourceEvo_1, sourceEvo_2, StandardCopyOption.REPLACE_EXISTING);
+                }
+
+                if (SourceTargetEvoPath_1.toFile().isFile()) {
+                    Files.copy(SourceTargetEvoPath_1, SourceTargetEvoPath_2, StandardCopyOption.REPLACE_EXISTING);
+                }
+
+                if (SinkPath_1.toFile().isFile()) {
+                    Files.copy(SinkPath_1, SinkPath_2, StandardCopyOption.REPLACE_EXISTING);
+                }
+
+                if (SinkCredit_1.toFile().isFile()) {
+                    Files.copy(SinkCredit_1, SinkCredit_2, StandardCopyOption.REPLACE_EXISTING);
+                }
+                // -----------------------------------------------------------------------------------------------------------
+
+
                 // Make OS script file and cplex commands file.
                 if (os.toLowerCase().contains("mac")) {
                     PrintWriter cplexCommands = new PrintWriter(solutionDirectory + "/cplexCommands.txt");
@@ -821,4 +856,3 @@ public class ControlActions {
     public DataStorer getData() {
         return data;
     }
-}
