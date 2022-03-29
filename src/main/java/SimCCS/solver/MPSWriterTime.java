@@ -535,6 +535,30 @@ public class MPSWriterTime extends MPSWriter {
                 constraintRHS.put(constraint3, snk.getCapacity());
             }
         }
+        // --------- Martin Ma -----------------------------------------------------------------------------------------
+        // Pipeline between i and j can only be constructed once all the year
+        constraintCounter = 1;
+        for (int e = 0; e < edgeToIndex.size(); e+=2) {
+            String constrain4 = "Z" + constraintCounter++;
+            for (int t = 0; t < num_intervals; t++) {
+                for (int c = 0; c < linearComponents.length; c++) {
+                    if (!intVariableToConstraints.containsKey(y[e][c][t])) {
+                        intVariableToConstraints.put(y[e][c][t], new HashSet<ConstraintTerm>());
+                    }
+                    intVariableToConstraints.get(y[e][c][t]).add(new ConstraintTerm(constrain4, 1));
+                }
+            }
+            for (int t = 0; t < num_intervals; t++) {
+                for (int c = 0; c < linearComponents.length; c++) {
+                    if (!intVariableToConstraints.containsKey(y[e+1][c][t])) {
+                        intVariableToConstraints.put(y[e+1][c][t], new HashSet<ConstraintTerm>());
+                    }
+                    intVariableToConstraints.get(y[e+1][c][t]).add(new ConstraintTerm(constrain4, 1));
+                }
+            }
+            constraintToSign.put(constrain4, "L");
+            constraintRHS.put(constrain4, 1.0);
+        }
         // -------------------------------------------------------------------------------------------------------------
 
         // Hardcode constants.
@@ -653,7 +677,7 @@ public class MPSWriterTime extends MPSWriter {
             }
         }
 
-        // No exist network
+        // No existing network
         else{
             for (int t = 0; t < num_intervals; t++) {
                 for (int e = 0; e < edgeToIndex.size(); e++) {
@@ -681,7 +705,6 @@ public class MPSWriterTime extends MPSWriter {
                     }
                 }
             }
-
         }
         // ----------------------------------------------------------------------------------------------------------------
 
