@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 
 /**
- * @author yaw
+ * @author yaw and martin
  */
 public class Solution {
 
@@ -18,13 +18,16 @@ public class Solution {
     private HashMap<Sink, Double> sinkCosts;
 
     // Opened edges.
-    private HashMap<Edge, Double> edgeTransportAmounts;
+    public HashMap<Edge, Double> edgeTransportAmounts;
     private HashMap<Edge, Double> edgeCosts;
+    public HashMap<Edge, Double> edgeConstructCosts;
     private final HashMap<Edge, Integer> edgeTrends;
+    public HashMap<Edge, Integer> PipelineSize;
 
     // Other.
     private double captureAmountPerYear;
     private int projectLength;
+    private int projectLength_curInterval;
     private int interval;
     private int totalIntervals;
     private double crf;
@@ -39,6 +42,8 @@ public class Solution {
         edgeCosts = new HashMap<>();
         sinkNumWells = new HashMap<>();
         edgeTrends = new HashMap<>();
+        edgeConstructCosts = new HashMap<>();
+        PipelineSize = new HashMap<>();
     }
 
     public void addSourceCaptureAmount(Source src, double captureAmount) {
@@ -93,6 +98,13 @@ public class Solution {
             edgeCosts.put(edg, 0.0);
         }
         edgeCosts.put(edg, edgeCosts.get(edg) + cost);
+    }
+
+    public void addEdgeConstructionCostComponent(Edge edg, double cost) {
+        if (!edgeConstructCosts.containsKey(edg)) {
+            edgeConstructCosts.put(edg, 0.0);
+        }
+        edgeConstructCosts.put(edg, edgeConstructCosts.get(edg) + cost);
     }
 
     public void setSolutionCosts(DataStorer data) {
@@ -218,6 +230,54 @@ public class Solution {
         this.projectLength = projectLength;
     }
 
+    public void setProjectLengthCurInterval(int projectLength_curInterval) {
+        this.projectLength_curInterval = projectLength_curInterval;
+    }
+    //  --------------- Martin Ma ---------------------------------------------------
+    // Determine pipeline sizes
+    public void setPipelineSize(Edge edg, Double max_flowrate) {
+        Integer diameter = 0;
+        if (max_flowrate < 0.19){
+            diameter = 4;
+        }
+        else if(max_flowrate < 0.54 && max_flowrate >= 0.19){
+            diameter = 6;
+        }
+        else if(max_flowrate < 1.13 && max_flowrate >= 0.54){
+            diameter = 8;
+        }
+        else if(max_flowrate < 3.25 && max_flowrate >= 1.13){
+            diameter = 12;
+        }
+        else if(max_flowrate < 6.68 && max_flowrate >= 3.25){
+            diameter = 16;
+        }
+        else if(max_flowrate < 12.26 && max_flowrate >= 6.68){
+            diameter = 20;
+        }
+        else if(max_flowrate < 19.69 && max_flowrate >= 12.26){
+            diameter = 24;
+        }
+        else if(max_flowrate < 56.46 && max_flowrate >= 19.69){
+            diameter = 36;
+        }
+        else if(max_flowrate < 83.95 && max_flowrate >= 56.46){
+            diameter = 42;
+        }
+        else if(max_flowrate < 119.16 && max_flowrate >= 83.95){
+            diameter = 48;
+        }
+        PipelineSize.put(edg, diameter);
+    }
+
+    public int getPipelineSize(Edge edg) {
+        return PipelineSize.get(edg);
+    }
+
+    public int getProjectLengthCurInterval() {
+        return projectLength_curInterval;
+    }
+
     public double getCRF() {
         return crf;
     }
@@ -271,6 +331,30 @@ public class Solution {
         }
         return cost;
     }
+
+    //  --------------- Martin Ma ---------------------------------------------------
+    public double getTotalAnnualConstructionCost() {
+        double cost = 0;
+        for (Edge edg : edgeConstructCosts.keySet()) {
+            cost += edgeConstructCosts.get(edg);
+        }
+        return cost;
+    }
+
+    public int getConstructedPipelines() {
+        int num_NewPipelines = 0;
+        num_NewPipelines = edgeConstructCosts.size();
+        return num_NewPipelines;
+    }
+
+
+    public double getUnitConstructionCost() {
+        if (captureAmountPerYear == 0) {
+            return 0;
+        }
+        return getTotalAnnualConstructionCost() / captureAmountPerYear;
+    }
+    // --------------------------------------------------------------------------------------------------
 
     public double getUnitTransportCost() {
         if (captureAmountPerYear == 0) {

@@ -1,5 +1,9 @@
 package gui;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import dataStore.TimeInterval;
 import javafx.application.Application;
@@ -121,7 +125,6 @@ public class Gui extends Application {
         messenger.setLayoutY(5);
         messengerPane.getChildren().add(messenger);
         controlActions.addMessenger(messenger);
-
         // Build tab pane and tabs.
         TabPane tabPane = new TabPane();
         tabPane.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
@@ -236,7 +239,6 @@ public class Gui extends Application {
 
         dispDelaunayEdges = new RadioButton("Raw Delaunay Edges");
         dispDelaunayEdges.setLayoutX(4);
-        // dispDelaunayEdges.setLayoutY(83);
         dispDelaunayEdges.setLayoutY(75); // Martin --
         selectionPane.getChildren().add(dispDelaunayEdges);
 
@@ -272,7 +274,7 @@ public class Gui extends Application {
         });
 
         // ------------- Martin Ma -----------------------------------------------------------------------------
-        dispExistNetwork = new RadioButton("Existing Network");
+        dispExistNetwork = new RadioButton("Exist Network");
         dispExistNetwork.setLayoutX(4);
         dispExistNetwork.setLayoutY(115);
         selectionPane.getChildren().add(dispExistNetwork);
@@ -535,7 +537,6 @@ public class Gui extends Application {
         //////////////////////////////////////////////////////////////////
 
         ObservableList<TimeIntervalProto> data = FXCollections.observableArrayList();
-
         TableView timeTable = new TableView();
         timeTable.setEditable(true);
 
@@ -572,7 +573,6 @@ public class Gui extends Application {
                     }
                 }
         );
-
         timeTable.setItems(data);
         timeTable.getColumns().addAll(intervalYearsCol, intervalValuesCol);
 
@@ -585,10 +585,16 @@ public class Gui extends Application {
             }
         });
 
-        // -------------Martin Ma -------------------------------------------------
-        // Add default values, capture target is the maximum of all sources
-         data.add(new TimeIntervalProto("5", "10"));
-        // -----------------------------------------------------------------------
+        // Martin Ma for DOE ---------------------------------------------------------------------------------
+        final Button ReadIntervalDataButton = new Button("Read data");
+        ReadIntervalDataButton.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent e) {
+                Boolean show = true;
+                controlActions.toggleSourceTargetEvo(show, timeTable, data);
+            }
+        });
+        // -----------------------------------------------------------------------------------------------
 
         final Button subIntervalButton = new Button("-");
         subIntervalButton.setOnAction(new EventHandler<ActionEvent>() {
@@ -603,7 +609,12 @@ public class Gui extends Application {
 
         final HBox timeIntervalBtnHBox = new HBox();
         addIntervalButton.setMinWidth(50);
-        timeIntervalBtnHBox.getChildren().addAll(addIntervalButton, subIntervalButton);
+        // Martin Ma for DOE ---------------------------------------------------------------------------------
+        subIntervalButton.setMinWidth(50);
+        // timeIntervalBtnHBox.getChildren().addAll(addIntervalButton, subIntervalButton);
+        ReadIntervalDataButton.setMinWidth(100);
+        timeIntervalBtnHBox.getChildren().addAll(addIntervalButton, subIntervalButton, ReadIntervalDataButton);
+        // Martin Ma for DOE ---------------------------------------------------------------------------------
 
         final VBox timeTableVBox = new VBox();
         timeTableVBox.setSpacing(5);
@@ -668,10 +679,14 @@ public class Gui extends Application {
                         return;
                     }
 
+                    int cum_t = 0;
+                    System.out.println("Current time" + "\t" + "Cumulative project length" + "\t" + "Current capature amount");
                     for (TimeIntervalProto t : data) {
-                        System.out.println(t);
                         String t_time = t.getTimeInterval();
                         String t_value = t.getCaptureTarget();
+                        cum_t = cum_t + Integer.parseInt(t_time);
+                        System.out.println(t_time + "\t\t\t\t" + Integer.toString(cum_t) + "\t\t\t\t" + t_value);
+
                         if (t_time.isEmpty() && t_value.isEmpty()) continue;
 
                         try {
@@ -687,7 +702,6 @@ public class Gui extends Application {
                         }
                     }
                 }
-
                 controlActions.generateMPSFile(crfValue.getText(), intervals, modelVersion);
             }
         });
@@ -722,9 +736,9 @@ public class Gui extends Application {
         runChoice.setLayoutX(20);
         runChoice.setLayoutY(4);
 
-        ////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         // SOLUTIONS PANE
-        ////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
         solutionPane = new AnchorPane();
         solutionPane.setPrefSize(190, 30);
@@ -768,7 +782,7 @@ public class Gui extends Application {
 
         // Solution labels.
         Label sources = new Label("Sources:");
-        sources.setLayoutX(69);
+        sources.setLayoutX(75);
         sources.setLayoutY(0);
         Label sourcesValue = new Label("-");
         sourcesValue.setLayoutX(135);
@@ -784,7 +798,7 @@ public class Gui extends Application {
         solutionDisplayPane.getChildren().addAll(sinks, sinksValue);
 
         Label stored = new Label("Annual CO2 Stored:");
-        stored.setLayoutX(2);
+        stored.setLayoutX(18);
         stored.setLayoutY(40);
         Label storedValue = new Label("-");
         storedValue.setLayoutX(135);
@@ -792,84 +806,104 @@ public class Gui extends Application {
         solutionDisplayPane.getChildren().addAll(stored, storedValue);
 
         Label edges = new Label("Edges:");
-        edges.setLayoutX(81);
+        edges.setLayoutX(85);
         edges.setLayoutY(60);
         Label edgesValue = new Label("-");
         edgesValue.setLayoutX(135);
         edgesValue.setLayoutY(60);
         solutionDisplayPane.getChildren().addAll(edges, edgesValue);
 
+        Label edges_new = new Label("New Edges:");
+        edges_new.setLayoutX(60);
+        edges_new.setLayoutY(80);
+        Label edges_newValue = new Label("-");
+        edges_newValue.setLayoutX(135);
+        edges_newValue.setLayoutY(80);
+        solutionDisplayPane.getChildren().addAll(edges_new, edges_newValue);
+
         Label length = new Label("Project Length:");
-        length.setLayoutX(30);
-        length.setLayoutY(80);
+        length.setLayoutX(43);
+        length.setLayoutY(100);
         Label lengthValue = new Label("-");
         lengthValue.setLayoutX(135);
-        lengthValue.setLayoutY(80);
+        lengthValue.setLayoutY(100);
         solutionDisplayPane.getChildren().addAll(length, lengthValue);
 
         Label total = new Label("Total Cost\n   ($m/yr)");
         total.setLayoutX(65);
-        total.setLayoutY(120);
+        total.setLayoutY(140);
         Label unit = new Label("Unit Cost\n ($/tCO2)");
         unit.setLayoutX(150);
-        unit.setLayoutY(120);
+        unit.setLayoutY(140);
         solutionDisplayPane.getChildren().addAll(total, unit);
 
         Label cap = new Label("Capture:");
         cap.setLayoutX(4);
-        cap.setLayoutY(160);
+        cap.setLayoutY(180);
         Label capT = new Label("-");
         capT.setLayoutX(75);
-        capT.setLayoutY(160);
+        capT.setLayoutY(180);
         Label capU = new Label("-");
         capU.setLayoutX(160);
-        capU.setLayoutY(160);
+        capU.setLayoutY(180);
         solutionDisplayPane.getChildren().addAll(cap, capT, capU);
+
+        Label cons = new Label("Construction:");
+        cons.setLayoutX(4);
+        cons.setLayoutY(200);
+        Label consT = new Label("-");
+        consT.setLayoutX(75);
+        consT.setLayoutY(200);
+        Label consU = new Label("-");
+        consU.setLayoutX(160);
+        consU.setLayoutY(200);
+        solutionDisplayPane.getChildren().addAll(cons, consT, consU);
 
         Label trans = new Label("Transport:");
         trans.setLayoutX(4);
-        trans.setLayoutY(180);
+        trans.setLayoutY(220);
         Label transT = new Label("-");
         transT.setLayoutX(75);
-        transT.setLayoutY(180);
+        transT.setLayoutY(220);
         Label transU = new Label("-");
         transU.setLayoutX(160);
-        transU.setLayoutY(180);
+        transU.setLayoutY(220);
         solutionDisplayPane.getChildren().addAll(trans, transT, transU);
 
         Label stor = new Label("Storage:");
         stor.setLayoutX(4);
-        stor.setLayoutY(200);
+        stor.setLayoutY(240);
         Label storT = new Label("-");
         storT.setLayoutX(75);
-        storT.setLayoutY(200);
+        storT.setLayoutY(240);
         Label storU = new Label("-");
         storU.setLayoutX(160);
-        storU.setLayoutY(200);
+        storU.setLayoutY(240);
         solutionDisplayPane.getChildren().addAll(stor, storT, storU);
 
         Label tot = new Label("Total:");
         tot.setLayoutX(4);
-        tot.setLayoutY(220);
+        tot.setLayoutY(260);
         Label totT = new Label("-");
         totT.setLayoutX(75);
-        totT.setLayoutY(220);
+        totT.setLayoutY(260);
         Label totU = new Label("-");
         totU.setLayoutX(160);
-        totU.setLayoutY(220);
+        totU.setLayoutY(260);
         solutionDisplayPane.getChildren().addAll(tot, totT, totU);
 
         Label solnIntervals = new Label("Solution Intervals:");
         solnIntervals.setLayoutX(30);
-        solnIntervals.setLayoutY(260);
+        solnIntervals.setLayoutY(280);
         Label solnIntervalsValue = new Label("-");
         solnIntervalsValue.setLayoutX(135);
-        solnIntervalsValue.setLayoutY(260);
+        solnIntervalsValue.setLayoutY(280);
         solutionDisplayPane.getChildren().addAll(solnIntervals, solnIntervalsValue);
 
         Label[] solutionValues = new Label[]{
-                sourcesValue, sinksValue, storedValue, edgesValue,
-                lengthValue, capT, capU, transT, transU, storT, storU,
+                sourcesValue, sinksValue, storedValue, edgesValue,edges_newValue,
+                lengthValue, capT, capU, consT, consU,
+                transT, transU, storT, storU,
                 totT, totU, solnIntervalsValue};
 
         timeIntervalChoices.getSelectionModel()
@@ -901,7 +935,7 @@ public class Gui extends Application {
                         loadedSolutionFile = newSolution;
                         selectedSolutionFileInterval = 0;
                         controlActions.selectSolution(newSolution, solutionValues, 0);
-                        setNumIntervalChoices(timeIntervalChoices, solutionValues[13].getText());
+                        setNumIntervalChoices(timeIntervalChoices, solutionValues[16].getText());
                     }
                 });
         runChoice.showingProperty().addListener((obs, wasShowing, isShowing) -> {
@@ -966,16 +1000,9 @@ public class Gui extends Application {
             timeIntervalChoices.getItems().removeAll(timeIntervalChoices.getItems());
         }
 
-        //System.out.println("breakpoint");
-
         for (int i = 0; i < numIntervals; i++) {
             timeIntervalChoices.getItems().add(String.valueOf(i + 1));
         }
-
-
-        //System.out.println("breakpoint 2");
-
-        //timeIntervalChoices.getSelectionModel().selectFirst();
     }
 
     public void softReset() {
@@ -998,7 +1025,7 @@ public class Gui extends Application {
         private String timeInterval;
         private String captureTarget;
 
-        private TimeIntervalProto(String time_interval, String capture_target) {
+        public TimeIntervalProto(String time_interval, String capture_target) {
             TimeIntervalProto.id = String.valueOf(Integer.parseInt(id) + 1);
             this.timeInterval = time_interval;
             this.captureTarget = capture_target;

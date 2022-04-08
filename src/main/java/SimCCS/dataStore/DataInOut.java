@@ -1070,6 +1070,7 @@ public class DataInOut {
         }
 
         HashMap<String, Double> variableValues = new HashMap<>();
+        HashMap<String, Double> variableValues_new = new HashMap<>();
 
         Integer numIntervals = this.parseNumberOfIntervals(solutionPath);
         Solution[] allSolutions = new Solution[numIntervals];
@@ -1078,6 +1079,7 @@ public class DataInOut {
             allSolutions[i] = new Solution();
             allSolutions[i].setInterval(i);
             allSolutions[i].setTotalIntervals(numIntervals);
+            allSolutions[i].setProjectLengthCurInterval(numIntervals);
         }
 
         Solution soln = allSolutions[0];
@@ -1093,7 +1095,7 @@ public class DataInOut {
                 String[] partition = line.split("\"");
                 String[] variable = new String[]{partition[1], partition[3], partition[5]};
 
-                if (Double.parseDouble(variable[2]) > threshold) {
+                if (Double.parseDouble(variable[2]) > threshold && variable[0].charAt(0) != 'z') {
                     variableValues.put(variable[0], Double.parseDouble(variable[2]));
                     String[] components = variable[0].split("\\]\\[|\\[|\\]");
 
@@ -1151,6 +1153,16 @@ public class DataInOut {
                 }
                 line = br.readLine();
             }
+            variableValues.forEach((key, value)
+                            -> {if (key.charAt(0) == 'p'){
+                        variableValues_new.put(key, value);
+                        variableValues_new.put(key.replace('p','z'), 1.0);
+                    }
+                    else{
+                        variableValues_new.put(key, value);
+                    }
+                    }
+            );
         } catch (IOException e) {
             System.out.println(e.getMessage());
         }
@@ -1159,6 +1171,12 @@ public class DataInOut {
         for (int i = 0; i < numIntervals; i++) {
             totalProjectLength += allSolutions[i].getProjectLength();
             allSolutions[i].setProjectLength(totalProjectLength);
+            if (i == 0){
+                allSolutions[i].setProjectLengthCurInterval(allSolutions[i].getProjectLength());
+            }
+            else{
+                allSolutions[i].setProjectLengthCurInterval(allSolutions[i].getProjectLength() - allSolutions[i-1].getProjectLength());
+            }
         }
 
         // load costs into solution.
@@ -1172,23 +1190,22 @@ public class DataInOut {
 
             while (!line.equals("RHS")) {
                 String[] column = line.replaceFirst("\\s+", "").split("\\s+");
-                if (column[1].equals("OBJ") && variableValues.containsKey(column[0])) {
+                if (column[1].equals("OBJ") && variableValues_new.containsKey(column[0])) {
                     String[] components = column[0].split("\\]\\[|\\[|\\]");
 
                     if (isTimeScenario && components.length > 1) {
                         Integer interval = Integer.parseInt(components[components.length - 1]);
                         soln = allSolutions[interval];
                     }
-
                     if (column[0].charAt(0) == 's' || column[0].charAt(0) == 'a') {
-                        double cost = variableValues.get(column[0]) * Double.parseDouble(column[2]);
+                        double cost = variableValues_new.get(column[0]) * Double.parseDouble(column[2]);
                         soln.addSourceCostComponent(sources[Integer.parseInt(components[1])], cost);
                     } else if (column[0].charAt(0) == 'r' || column[0].charAt(0) == 'w' || column[0].charAt(
                             0) == 'b') {
-                        double cost = variableValues.get(column[0]) * Double.parseDouble(column[2]);
+                        double cost = variableValues_new.get(column[0]) * Double.parseDouble(column[2]);
                         soln.addSinkCostComponent(sinks[Integer.parseInt(components[1])], cost);
-                    } else if (column[0].charAt(0) == 'p' || column[0].charAt(0) == 'y') {
-                        double cost = variableValues.get(column[0]) * Double.parseDouble(column[2]);
+                    } else if (column[0].charAt(0) == 'p') {
+                        double cost = variableValues_new.get(column[0]) * Double.parseDouble(column[2]);
                         if (components.length == 4 + offset) {
                             soln.addEdgeCostComponent(new Edge(vertexIndexToCell.get(Integer.parseInt(
                                     components[1])),
@@ -1198,6 +1215,17 @@ public class DataInOut {
                             UnidirEdge unidirEdge = edgeIndexToEdge.get(Integer.parseInt(components[1]));
                             soln.addEdgeCostComponent(new Edge(unidirEdge.v1, unidirEdge.v2), cost);
                         }
+                    } else if (column[0].charAt(0) == 'z'){
+                        double cost = variableValues_new.get(column[0]) * Double.parseDouble(column[2]) / soln.getProjectLengthCurInterval();
+                        if (components.length == 4 + offset) {
+                            soln.addEdgeConstructionCostComponent(new Edge(vertexIndexToCell.get(Integer.parseInt(
+                                    components[1])),
+                                    vertexIndexToCell.get(Integer.parseInt(
+                                            components[2]))), cost);
+                        } else {
+                            UnidirEdge unidirEdge = edgeIndexToEdge.get(Integer.parseInt(components[1]));
+                            soln.addEdgeConstructionCostComponent(new Edge(unidirEdge.v1, unidirEdge.v2), cost);
+                        }
                     }
                 }
                 line = br.readLine();
@@ -1206,9 +1234,39 @@ public class DataInOut {
             System.out.println(e.getMessage());
         }
 
-        //return soln;
+        // --------------------------------------------------------------------------------------------------------
+        for (int idx = 1; idx < numIntervals; idx++) {
+            int idx2 = 0;
+            while (idx2 < idx){
+                for (int ll = allSolutions[idx].edgeConstructCosts.size()-1; ll >-1; ll--){
+                    if (allSolutions[idx2].edgeConstructCosts.containsKey(allSolutions[idx].edgeConstructCosts.keySet().toArray()[ll]) == true){
+                        allSolutions[idx].edgeConstructCosts.remove(allSolutions[idx].edgeConstructCosts.keySet().toArray()[ll]);
+                    }
+                }
+                idx2++;
+            }
+        }
+        // -------------------------------------------------------------------------------------------------------
+        HashMap<Edge, Double> edgeTransportAmounts_max = new HashMap<>();
+        for (int idx = 0; idx < numIntervals; idx++) {
+            for (Edge e : allSolutions[idx].edgeTransportAmounts.keySet()) {
+                if (edgeTransportAmounts_max.containsKey(e) == true) {
+                    if (edgeTransportAmounts_max.get(e) < allSolutions[idx].edgeTransportAmounts.get(e)) {
+                        edgeTransportAmounts_max.replace(e, allSolutions[idx].edgeTransportAmounts.get(e));
+                    }
+                } else {
+                    edgeTransportAmounts_max.put(e, allSolutions[idx].edgeTransportAmounts.get(e));
+                }
+            }
+        }
+        for (int idx = 0; idx < numIntervals; idx++) {
+            for (Edge e : allSolutions[idx].edgeTransportAmounts.keySet()) {
+                allSolutions[idx].setPipelineSize(e, edgeTransportAmounts_max.get(e));
+            }
+        }
         return allSolutions;
     }
+
 
     public void makeShapeFiles(String path, Solution soln) {
         // Make shapefiles if they do not already exist.
@@ -1223,10 +1281,6 @@ public class DataInOut {
         HashMap<Edge, Double> edgeTransportAmounts = soln.getEdgeTransportAmounts();
         HashMap<Edge, int[]> graphEdgeRoutes = data.getGraphEdgeRoutes();
         HashMap<Edge, Double> graphEdgeLengths = data.getGraphEdgeLengths();
-
-        // ------------- Martin Ma -----------------------------------------------------------------------------
-//        HashMap<Edge, int[]> ExistNetworkgraphEdgeRoutes = data.getExistNetworkGraphEdgeRoutes();
-        // -----------------------------------------------------------------------------------------------------
 
         // Make source shapefiles.
         EsriPointList sourceList = new EsriPointList();
@@ -1259,7 +1313,6 @@ public class DataInOut {
                     EsriPoint source = new EsriPoint(data.cellToLatLon(src.getCellNum())[0],
                             data.cellToLatLon(src.getCellNum())[1]);
                     sourceList.add(source);
-
                     // Add attributes.
                     ArrayList row = new ArrayList();
                     row.add(src.getLabel());
@@ -1279,9 +1332,9 @@ public class DataInOut {
 
         EsriShapeExport writeSourceShapefiles = new EsriShapeExport(sourceList,
                 sourceAttributeTable,
-                newDir + "/Sources");
+                newDir + "/Sources_" + Integer.toString(soln.getInterval() + 1));
         writeSourceShapefiles.export();
-        makeProjectionFile("Sources", newDir.toString());
+        makeProjectionFile("Sources_" + Integer.toString(soln.getInterval() + 1), newDir.toString());
 
         // Make sink shapefiles.
         EsriPointList sinkList = new EsriPointList();
@@ -1335,9 +1388,9 @@ public class DataInOut {
 
         EsriShapeExport writeSinkShapefiles = new EsriShapeExport(sinkList,
                 sinkAttributeTable,
-                newDir + "/Sinks");
+                newDir + "/Sinks_" + Integer.toString(soln.getInterval() + 1));
         writeSinkShapefiles.export();
-        makeProjectionFile("Sinks", newDir.toString());
+        makeProjectionFile("Sinks_" + Integer.toString(soln.getInterval() + 1), newDir.toString());
 
         // Make network shapefiles.
         EsriPolylineList edgeList = new EsriPolylineList();
@@ -1386,9 +1439,9 @@ public class DataInOut {
 
         EsriShapeExport writeEdgeShapefiles = new EsriShapeExport(edgeList,
                 edgeAttributeTable,
-                newDir + "/Network");
+                newDir + "/Network_" + Integer.toString(soln.getInterval() + 1));
         writeEdgeShapefiles.export();
-        makeProjectionFile("Network", newDir.toString());
+        makeProjectionFile("Network_" + Integer.toString(soln.getInterval() + 1), newDir.toString());
     }
 
     public void makeCandidateShapeFiles(String path) {
@@ -1565,6 +1618,7 @@ public class DataInOut {
             bw.write("Annual Capture Amount (MTCO2/yr)," + soln.getAnnualCaptureAmount() + "\n");
             bw.write("Total Cost ($M/yr)," + soln.getTotalCost() + "\n");
             bw.write("Capture Cost ($M/yr)," + soln.getTotalAnnualCaptureCost() + "\n");
+            bw.write("Pipeline Construction Cost ($M/yr)," + soln.getTotalAnnualConstructionCost() + "\n");
             bw.write("Transport Cost ($M/yr)," + soln.getTotalAnnualTransportCost() + "\n");
             bw.write("Storage Cost ($M/yr)," + soln.getTotalAnnualStorageCost() + "\n\n");
             bw.write("Source,Capture Amount (MTCO2/yr),Capture Cost ($M/yr)\n");
@@ -1601,6 +1655,7 @@ public class DataInOut {
             System.out.println(e.getMessage());
         }
     }
+
 
     public void makeGenerateFile(String path, Solution soln) {
         File newDir = new File(path + "/genFiles");

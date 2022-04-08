@@ -7,9 +7,11 @@ import com.bbn.openmap.dataAccess.shape.EsriShapeExport;
 import com.bbn.openmap.omGraphics.OMGraphic;
 import dataStore.*;
 import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -54,6 +56,7 @@ public class ControlActions {
     private Pane candidateNetworkLayer;
     // --------------- Martin Ma ----------------------------------------------------------------------------------
     private Pane existNetworkLayer;
+    private TableView timeTable;
     // ------------------------------------------------------------------------------------------------------------
 
     private Pane rawDelaunayLayer;
@@ -587,6 +590,31 @@ public class ControlActions {
             existNetworkLayer.getChildren().clear();
         }
     }
+    // Martin Ma for DOE ---------------------------------------------------------------------------------
+    public void toggleSourceTargetEvo(boolean show, TableView timeTable, ObservableList<gui.Gui.TimeIntervalProto> data){
+        if(!basePath.isEmpty()){
+            String sourceTargetEvoPath = basePath + "/" + dataset + "/Scenarios/" + scenario + "/Sources/SourceTargetEvo.csv";
+//            ObservableList<gui.Gui.TimeIntervalProto> data2 = FXCollections.observableArrayList();
+            try (BufferedReader br = new BufferedReader(new FileReader(sourceTargetEvoPath))) {
+                br.readLine();
+                String line = br.readLine();
+                ArrayList<Integer> time_periods = new ArrayList<Integer>();
+                ArrayList<Double> max_targets = new ArrayList<Double>();
+                timeTable.setItems(data);
+                while (line != null && !line.startsWith(",") && !line.startsWith(" ")) {
+                    String[] elements = line.split(",(?=([^\"]*\"[^\"]*\")*[^\"]*$)");
+                    data.add(new gui.Gui.TimeIntervalProto(elements[1], elements[2]));
+                    line = br.readLine();
+                }
+            } catch (IOException e) {
+                System.out.println("Please manually add time intervals and yearly capture amounts!!");
+            }
+        }
+        else{
+            System.out.println("Please select case, first!");
+        }
+    }
+    // ----------------------------------------------------------------------------------------------------
 
     public void initializeSolutionSelection(ChoiceBox runChoice) {
         if (basePath != "" && dataset != "" && scenario != "") {
@@ -635,6 +663,7 @@ public class ControlActions {
         HashMap<Edge, int[]> graphEdgeRoutes = data.getGraphEdgeRoutes();
         for (Edge e : soln.getOpenedEdges()) {
             int[] route = graphEdgeRoutes.get(e);
+            int pipelinesize = soln.getPipelineSize(e);
             for (int src = 0; src < route.length - 1; src++) {
                 int dest = src + 1;
                 double[] rawSrc = data.cellLocationToRawXY(route[src]);
@@ -645,11 +674,125 @@ public class ControlActions {
                 double dY = rawYtoDisplayY(rawDest[1]);
                 Line edge = new Line(sX, sY, dX, dY);
                 edge.setStroke(Color.GREEN);
-                edge.setStrokeWidth(5.0 / gui.getScale());
+//              edge.setStrokeWidth(5.0 / gui.getScale());
+                edge.setStrokeWidth(pipelinesize/10.0/gui.getScale());
                 edge.setStrokeLineCap(StrokeLineCap.ROUND);
                 solutionLayer.getChildren().add(edge);
             }
         }
+
+        // Add pipeline size legends
+        Pane legendPane = new Pane();
+        legendPane.setStyle("-fx-background-color: white; -fx-border-color: lightgrey");
+        legendPane.setPrefSize(110, 120);
+        legendPane.setLayoutX(120);
+        legendPane.setLayoutY(350);
+
+        Label figurelegendLabel = new Label("Pipeline size:");
+        figurelegendLabel.setLayoutX(4);
+        figurelegendLabel.setLayoutY(0);
+        legendPane.getChildren().addAll(figurelegendLabel);
+
+        Line edge_1 = new Line(20, 25, 30, 25);
+        edge_1.setStroke(Color.GREEN);
+        edge_1.setStrokeWidth(4/10.0/gui.getScale());
+        legendPane.getChildren().addAll(edge_1);
+
+        Label edge_name_1 = new Label("4\"");
+        edge_name_1.setLayoutX(35);
+        edge_name_1.setLayoutY(20);
+        legendPane.getChildren().addAll(edge_name_1);
+
+        Line edge_2 = new Line(60, 25, 70, 25);
+        edge_2.setStroke(Color.GREEN);
+        edge_2.setStrokeWidth(6/10.0/gui.getScale());
+        legendPane.getChildren().addAll(edge_2);
+
+        Label edge_name_2 = new Label("6\"");
+        edge_name_2.setLayoutX(75);
+        edge_name_2.setLayoutY(20);
+        legendPane.getChildren().addAll(edge_name_2);
+
+        Line edge_3 = new Line(20, 45, 30, 45);
+        edge_3.setStroke(Color.GREEN);
+        edge_3.setStrokeWidth(8/10.0/gui.getScale());
+        legendPane.getChildren().addAll(edge_3);
+
+        Label edge_name_3 = new Label("8\"");
+        edge_name_3.setLayoutX(35);
+        edge_name_3.setLayoutY(40);
+        legendPane.getChildren().addAll(edge_name_3);
+
+        Line edge_4 = new Line(60, 45, 70, 45);
+        edge_4.setStroke(Color.GREEN);
+        edge_4.setStrokeWidth(12/10.0/gui.getScale());
+        legendPane.getChildren().addAll(edge_4);
+
+        Label edge_name_4 = new Label("12\"");
+        edge_name_4.setLayoutX(75);
+        edge_name_4.setLayoutY(40);
+        legendPane.getChildren().addAll(edge_name_4);
+
+        Line edge_5 = new Line(20, 65, 30, 65);
+        edge_5.setStroke(Color.GREEN);
+        edge_5.setStrokeWidth(16/10.0/gui.getScale());
+        legendPane.getChildren().addAll(edge_5);
+
+        Label edge_name_5 = new Label("16\"");
+        edge_name_5.setLayoutX(35);
+        edge_name_5.setLayoutY(60);
+        legendPane.getChildren().addAll(edge_name_5);
+
+        Line edge_6 = new Line(60, 65, 70, 65);
+        edge_6.setStroke(Color.GREEN);
+        edge_6.setStrokeWidth(20/10.0/gui.getScale());
+        legendPane.getChildren().addAll(edge_6);
+
+        Label edge_name_6 = new Label("20\"");
+        edge_name_6.setLayoutX(75);
+        edge_name_6.setLayoutY(60);
+        legendPane.getChildren().addAll(edge_name_6);
+
+        Line edge_7 = new Line(20, 85, 30, 85);
+        edge_7.setStroke(Color.GREEN);
+        edge_7.setStrokeWidth(24/10.0/gui.getScale());
+        legendPane.getChildren().addAll(edge_7);
+
+        Label edge_name_7 = new Label("24\"");
+        edge_name_7.setLayoutX(35);
+        edge_name_7.setLayoutY(80);
+        legendPane.getChildren().addAll(edge_name_7);
+
+        Line edge_8 = new Line(60, 85, 70, 85);
+        edge_8.setStroke(Color.GREEN);
+        edge_8.setStrokeWidth(36/10.0/gui.getScale());
+        legendPane.getChildren().addAll(edge_8);
+
+        Label edge_name_8 = new Label("36\"");
+        edge_name_8.setLayoutX(75);
+        edge_name_8.setLayoutY(80);
+        legendPane.getChildren().addAll(edge_name_8);
+
+        Line edge_9 = new Line(20, 105, 30, 105);
+        edge_9.setStroke(Color.GREEN);
+        edge_9.setStrokeWidth(42/10.0/gui.getScale());
+        legendPane.getChildren().addAll(edge_9);
+
+        Label edge_name_9 = new Label("42\"");
+        edge_name_9.setLayoutX(35);
+        edge_name_9.setLayoutY(100);
+        legendPane.getChildren().addAll(edge_name_9);
+
+        Line edge_10 = new Line(60, 105, 70, 105);
+        edge_10.setStroke(Color.GREEN);
+        edge_10.setStrokeWidth(48/10.0/gui.getScale());
+        legendPane.getChildren().addAll(edge_10);
+
+        Label edge_name_10 = new Label("48\"");
+        edge_name_10.setLayoutX(75);
+        edge_name_10.setLayoutY(100);
+        legendPane.getChildren().addAll(edge_name_10);
+        solutionLayer.getChildren().add(legendPane);
 
         for (Source source : soln.getOpenedSources()) {
             double[] rawXYLocation = data.cellLocationToRawXY(source.getCellNum());
@@ -706,16 +849,19 @@ public class ControlActions {
         solutionValues[1].setText(Integer.toString(soln.getNumOpenedSinks()));
         solutionValues[2].setText(Double.toString(round(soln.getAnnualCaptureAmount(), 2)));
         solutionValues[3].setText(Integer.toString(soln.getNumEdgesOpened()));
-        solutionValues[4].setText(Integer.toString(soln.getProjectLength()));
-        solutionValues[5].setText(Double.toString(round(soln.getTotalAnnualCaptureCost(), 2)));
-        solutionValues[6].setText(Double.toString(round(soln.getUnitCaptureCost(), 2)));
-        solutionValues[7].setText(Double.toString(round(soln.getTotalAnnualTransportCost(), 2)));
-        solutionValues[8].setText(Double.toString(round(soln.getUnitTransportCost(), 2)));
-        solutionValues[9].setText(Double.toString(round(soln.getTotalAnnualStorageCost(), 2)));
-        solutionValues[10].setText(Double.toString(round(soln.getUnitStorageCost(), 2)));
-        solutionValues[11].setText(Double.toString(round(soln.getTotalCost(), 2)));
-        solutionValues[12].setText(Double.toString(round(soln.getUnitTotalCost(), 2)));
-        solutionValues[13].setText(Integer.toString(soln.getTotalIntervals()));
+        solutionValues[4].setText(Integer.toString(soln.getConstructedPipelines()));
+        solutionValues[5].setText(Integer.toString(soln.getProjectLength()));
+        solutionValues[6].setText(Double.toString(round(soln.getTotalAnnualCaptureCost(), 2)));
+        solutionValues[7].setText(Double.toString(round(soln.getUnitCaptureCost(), 2)));
+        solutionValues[8].setText(Double.toString(round(soln.getTotalAnnualConstructionCost(), 2)));
+        solutionValues[9].setText(Double.toString(round(soln.getUnitConstructionCost(), 2)));
+        solutionValues[10].setText(Double.toString(round(soln.getTotalAnnualTransportCost(), 2)));
+        solutionValues[11].setText(Double.toString(round(soln.getUnitTransportCost(), 2)));
+        solutionValues[12].setText(Double.toString(round(soln.getTotalAnnualStorageCost(), 2)));
+        solutionValues[13].setText(Double.toString(round(soln.getUnitStorageCost(), 2)));
+        solutionValues[14].setText(Double.toString(round(soln.getTotalCost(), 2)));
+        solutionValues[15].setText(Double.toString(round(soln.getUnitTotalCost(), 2)));
+        solutionValues[16].setText(Integer.toString(soln.getTotalIntervals()));
 
         // Write to shapefiles.
         data.makeShapeFiles(basePath + "/" + dataset + "/Scenarios/" + scenario + "/Results/" + file,
