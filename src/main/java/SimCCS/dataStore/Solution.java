@@ -347,6 +347,9 @@ public class Solution {
         return num_NewPipelines;
     }
 
+    public HashMap<Edge, Double> getedgeConstructCosts() {
+        return edgeConstructCosts;
+    }
 
     public double getUnitConstructionCost() {
         if (captureAmountPerYear == 0) {

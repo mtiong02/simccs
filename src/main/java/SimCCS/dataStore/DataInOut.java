@@ -1642,13 +1642,17 @@ public class DataInOut {
 
             bw.write("\n");
 
-            bw.write("Edge Source,Edge Sink,Amount (MTCO2/yr),Transport Cost ($M/yr),Length (km)\n");
+            bw.write("Edge Source,Edge Sink,Amount (MTCO2/yr),Transport Cost ($M/yr), Pipeline Construction Cost ($M/yr), Pipeline Size (inch), Length (km)\n");
             HashMap<Edge, Double> edgeTransportAmounts = soln.getEdgeTransportAmounts();
             HashMap<Edge, Double> edgeCosts = soln.getEdgeCosts();
+            HashMap<Edge, Double> edgeConstructCosts = soln.getedgeConstructCosts();
+
             for (Edge edg : edgeTransportAmounts.keySet()) {
                 bw.write(edg.v1 + "," + edg.v2 + ",");
                 bw.write(edgeTransportAmounts.get(edg) + ",");
                 bw.write(edgeCosts.get(edg) + ",");
+                bw.write(edgeConstructCosts.get(edg) + ",");
+                bw.write(soln.getPipelineSize(edg) + ",");
                 bw.write(graphEdgeLengths.get(edg) + "\n");
             }
         } catch (IOException e) {
