@@ -37,7 +37,7 @@ import javafx.stage.Stage;
 import java.io.File;
 
 /**
- * @author yaw and martin
+ * @author yaw and martin 2022
  */
 public class Gui extends Application {
 
