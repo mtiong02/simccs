@@ -237,34 +237,34 @@ public class Solution {
     // Determine pipeline sizes
     public void setPipelineSize(Edge edg, Double max_flowrate) {
         Integer diameter = 0;
-        if (max_flowrate < 0.19){
+        if (max_flowrate <= 0.19){
             diameter = 4;
         }
-        else if(max_flowrate < 0.54 && max_flowrate >= 0.19){
+        else if(max_flowrate <= 0.54 && max_flowrate > 0.19){
             diameter = 6;
         }
-        else if(max_flowrate < 1.13 && max_flowrate >= 0.54){
+        else if(max_flowrate <= 1.13 && max_flowrate > 0.54){
             diameter = 8;
         }
-        else if(max_flowrate < 3.25 && max_flowrate >= 1.13){
+        else if(max_flowrate <= 3.25 && max_flowrate > 1.13){
             diameter = 12;
         }
-        else if(max_flowrate < 6.68 && max_flowrate >= 3.25){
+        else if(max_flowrate <= 6.68 && max_flowrate > 3.25){
             diameter = 16;
         }
-        else if(max_flowrate < 12.26 && max_flowrate >= 6.68){
+        else if(max_flowrate <= 12.26 && max_flowrate > 6.68){
             diameter = 20;
         }
-        else if(max_flowrate < 19.69 && max_flowrate >= 12.26){
+        else if(max_flowrate <= 19.69 && max_flowrate > 12.26){
             diameter = 24;
         }
-        else if(max_flowrate < 56.46 && max_flowrate >= 19.69){
+        else if(max_flowrate <= 56.46 && max_flowrate > 19.69){
             diameter = 36;
         }
-        else if(max_flowrate < 83.95 && max_flowrate >= 56.46){
+        else if(max_flowrate <= 83.95 && max_flowrate > 56.46){
             diameter = 42;
         }
-        else if(max_flowrate < 119.16 && max_flowrate >= 83.95){
+        else if(max_flowrate <= 119.16 && max_flowrate > 83.95){
             diameter = 48;
         }
         PipelineSize.put(edg, diameter);
