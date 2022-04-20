@@ -826,7 +826,7 @@ public class DataInOut {
             System.out.println("Not Yet Generated.");
         }
     }
-    
+
     // load existing pipeline sizes ------------------ Martin Ma -------------------------------------------------------
     private void loadExistNetworkSizes() {
         String existNetworkSizesPath = basePath + "/" + dataset + "/Scenarios/" + scenario + "/Network/ExistNetwork/ExistNetworkSizes.txt";
@@ -1079,7 +1079,6 @@ public class DataInOut {
             allSolutions[i] = new Solution();
             allSolutions[i].setInterval(i);
             allSolutions[i].setTotalIntervals(numIntervals);
-            allSolutions[i].setProjectLengthCurInterval(numIntervals);
         }
 
         Solution soln = allSolutions[0];
@@ -1264,9 +1263,36 @@ public class DataInOut {
                 allSolutions[idx].setPipelineSize(e, edgeTransportAmounts_max.get(e));
             }
         }
+
+        for (int idx = 0; idx < numIntervals; idx++) {
+            if (idx == 0){
+                for (int i = 0; i < sinks.length; i++) {
+                    if (allSolutions[idx].getSinkStorageAmounts().get(sinks[i]) == null)
+                    {
+                        allSolutions[idx].addSinkCumStorageAmounts(sinks[i], 0.0);
+                    }
+                    else{
+                        allSolutions[idx].addSinkCumStorageAmounts(sinks[i], allSolutions[idx].getSinkStorageAmounts().get(sinks[i])
+                                * allSolutions[idx].projectLength_curInterval);
+                    }
+                }
+            }
+            else{
+                for (int i = 0; i < sinks.length; i++) {
+                    if (allSolutions[idx].getSinkStorageAmounts().get(sinks[i]) == null)
+                    {
+                        allSolutions[idx].addSinkCumStorageAmounts(sinks[i], 0.0);
+                    }
+                    else{
+                        allSolutions[idx].addSinkCumStorageAmounts(sinks[i], allSolutions[idx].getSinkStorageAmounts().get(sinks[i])
+                                * allSolutions[idx].projectLength_curInterval
+                                + allSolutions[idx-1].getSinkCumStorageAmounts().get(sinks[i]));
+                    }
+                }
+            }
+        }
         return allSolutions;
     }
-
 
     public void makeShapeFiles(String path, Solution soln) {
         // Make shapefiles if they do not already exist.

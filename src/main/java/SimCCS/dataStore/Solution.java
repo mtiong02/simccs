@@ -17,6 +17,9 @@ public class Solution {
     private final HashMap<Sink, Integer> sinkNumWells;
     private HashMap<Sink, Double> sinkCosts;
 
+    // All sinks.
+    private HashMap<Sink, Double> sinkCumStorageAmounts;
+
     // Opened edges.
     public HashMap<Edge, Double> edgeTransportAmounts;
     private HashMap<Edge, Double> edgeCosts;
@@ -27,7 +30,7 @@ public class Solution {
     // Other.
     private double captureAmountPerYear;
     private int projectLength;
-    private int projectLength_curInterval;
+    public int projectLength_curInterval;
     private int interval;
     private int totalIntervals;
     private double crf;
@@ -37,6 +40,7 @@ public class Solution {
         sourceCaptureAmounts = new HashMap<>();
         sourceCosts = new HashMap<>();
         sinkStorageAmounts = new HashMap<>();
+        sinkCumStorageAmounts = new HashMap<>();
         sinkCosts = new HashMap<>();
         edgeTransportAmounts = new HashMap<>();
         edgeCosts = new HashMap<>();
@@ -66,6 +70,13 @@ public class Solution {
             sinkStorageAmounts.put(snk, 0.0);
         }
         sinkStorageAmounts.put(snk, sinkStorageAmounts.get(snk) + captureAmount);
+    }
+
+    public void addSinkCumStorageAmounts(Sink snk, double captureAmount) {
+        if (!sinkCumStorageAmounts.containsKey(snk)) {
+            sinkCumStorageAmounts.put(snk, 0.0);
+        }
+        sinkCumStorageAmounts.put(snk, sinkCumStorageAmounts.get(snk) + captureAmount);
     }
 
     public void addSinkNumWells(Sink snk, int numWells) {
@@ -169,6 +180,11 @@ public class Solution {
     public HashMap<Sink, Double> getSinkStorageAmounts() {
         return sinkStorageAmounts;
     }
+
+    public HashMap<Sink, Double> getSinkCumStorageAmounts() {
+        return sinkCumStorageAmounts;
+    }
+
 
     public void setSinkStorageAmounts(HashMap<Sink, Double> sinkStorageAmounts) {
         this.sinkStorageAmounts = sinkStorageAmounts;
@@ -399,6 +415,6 @@ public class Solution {
     }
 
     public double getPercentStored(Sink sink) {
-        return (sinkStorageAmounts.get(sink) * projectLength) / sink.getCapacity();
+        return (sinkCumStorageAmounts.get(sink)) / sink.getCapacity();
     }
 }
