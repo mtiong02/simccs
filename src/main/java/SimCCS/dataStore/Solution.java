@@ -274,7 +274,10 @@ public class Solution {
         else if(max_flowrate <= 19.69 && max_flowrate > 12.26){
             diameter = 24;
         }
-        else if(max_flowrate <= 56.46 && max_flowrate > 19.69){
+        else if(max_flowrate <= 35.13 && max_flowrate > 19.69){
+            diameter = 30;
+        }
+        else if(max_flowrate <= 56.46 && max_flowrate > 35.13){
             diameter = 36;
         }
         else if(max_flowrate <= 83.95 && max_flowrate > 56.46){
