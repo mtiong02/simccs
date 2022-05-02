@@ -855,13 +855,15 @@ public class ControlActions {
         solutionValues[7].setText(Double.toString(round(soln.getUnitCaptureCost(), 2)));
         solutionValues[8].setText(Double.toString(round(soln.getTotalAnnualConstructionCost(), 2)));
         solutionValues[9].setText(Double.toString(round(soln.getUnitConstructionCost(), 2)));
-        solutionValues[10].setText(Double.toString(round(soln.getTotalAnnualTransportCost(), 2)));
-        solutionValues[11].setText(Double.toString(round(soln.getUnitTransportCost(), 2)));
-        solutionValues[12].setText(Double.toString(round(soln.getTotalAnnualStorageCost(), 2)));
-        solutionValues[13].setText(Double.toString(round(soln.getUnitStorageCost(), 2)));
-        solutionValues[14].setText(Double.toString(round(soln.getTotalCost(), 2)));
-        solutionValues[15].setText(Double.toString(round(soln.getUnitTotalCost(), 2)));
-        solutionValues[16].setText(Integer.toString(soln.getTotalIntervals()));
+        solutionValues[10].setText(Double.toString(round(soln.getTotalAnnualOMCost(), 2)));
+        solutionValues[11].setText(Double.toString(round(soln.getUnitOMCost(), 2)));
+        solutionValues[12].setText(Double.toString(round(soln.getTotalAnnualEnergyCost(), 2)));
+        solutionValues[13].setText(Double.toString(round(soln.getUnitEnergyCost(), 2)));
+        solutionValues[14].setText(Double.toString(round(soln.getTotalAnnualStorageCost(), 2)));
+        solutionValues[15].setText(Double.toString(round(soln.getUnitStorageCost(), 2)));
+        solutionValues[16].setText(Double.toString(round(soln.getTotalCost(), 2)));
+        solutionValues[17].setText(Double.toString(round(soln.getUnitTotalCost(), 2)));
+        solutionValues[18].setText(Integer.toString(soln.getTotalIntervals()));
 
         // Write to shapefiles.
         data.makeShapeFiles(basePath + "/" + dataset + "/Scenarios/" + scenario + "/Results/" + file,

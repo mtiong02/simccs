@@ -859,51 +859,64 @@ public class Gui extends Application {
         consU.setLayoutY(200);
         solutionDisplayPane.getChildren().addAll(cons, consT, consU);
 
-        Label trans = new Label("Transport:");
-        trans.setLayoutX(4);
-        trans.setLayoutY(220);
-        Label transT = new Label("-");
-        transT.setLayoutX(75);
-        transT.setLayoutY(220);
-        Label transU = new Label("-");
-        transU.setLayoutX(160);
-        transU.setLayoutY(220);
-        solutionDisplayPane.getChildren().addAll(trans, transT, transU);
+        Label om = new Label("O&M:");
+        om.setLayoutX(4);
+        om.setLayoutY(220);
+        Label omT = new Label("-");
+        omT.setLayoutX(75);
+        omT.setLayoutY(220);
+        Label omU = new Label("-");
+        omU.setLayoutX(160);
+        omU.setLayoutY(220);
+        solutionDisplayPane.getChildren().addAll(om, omT, omU);
+
+        Label energy = new Label("Energy:");
+        energy.setLayoutX(4);
+        energy.setLayoutY(240);
+        Label energyT = new Label("-");
+        energyT.setLayoutX(75);
+        energyT.setLayoutY(240);
+        Label energyU = new Label("-");
+        energyU.setLayoutX(160);
+        energyU.setLayoutY(240);
+        solutionDisplayPane.getChildren().addAll(energy, energyT, energyU);
 
         Label stor = new Label("Storage:");
         stor.setLayoutX(4);
-        stor.setLayoutY(240);
+        stor.setLayoutY(260);
         Label storT = new Label("-");
         storT.setLayoutX(75);
-        storT.setLayoutY(240);
+        storT.setLayoutY(260);
         Label storU = new Label("-");
         storU.setLayoutX(160);
-        storU.setLayoutY(240);
+        storU.setLayoutY(260);
         solutionDisplayPane.getChildren().addAll(stor, storT, storU);
 
         Label tot = new Label("Total:");
         tot.setLayoutX(4);
-        tot.setLayoutY(260);
+        tot.setLayoutY(280);
         Label totT = new Label("-");
         totT.setLayoutX(75);
-        totT.setLayoutY(260);
+        totT.setLayoutY(280);
         Label totU = new Label("-");
         totU.setLayoutX(160);
-        totU.setLayoutY(260);
+        totU.setLayoutY(280);
         solutionDisplayPane.getChildren().addAll(tot, totT, totU);
 
         Label solnIntervals = new Label("Solution Intervals:");
         solnIntervals.setLayoutX(30);
-        solnIntervals.setLayoutY(280);
+        solnIntervals.setLayoutY(300);
         Label solnIntervalsValue = new Label("-");
         solnIntervalsValue.setLayoutX(135);
-        solnIntervalsValue.setLayoutY(280);
+        solnIntervalsValue.setLayoutY(300);
         solutionDisplayPane.getChildren().addAll(solnIntervals, solnIntervalsValue);
 
         Label[] solutionValues = new Label[]{
                 sourcesValue, sinksValue, storedValue, edgesValue,edges_newValue,
                 lengthValue, capT, capU, consT, consU,
-                transT, transU, storT, storU,
+                omT, omU,
+                energyT, energyU,
+                storT, storU,
                 totT, totU, solnIntervalsValue};
 
         timeIntervalChoices.getSelectionModel()
@@ -935,7 +948,7 @@ public class Gui extends Application {
                         loadedSolutionFile = newSolution;
                         selectedSolutionFileInterval = 0;
                         controlActions.selectSolution(newSolution, solutionValues, 0);
-                        setNumIntervalChoices(timeIntervalChoices, solutionValues[16].getText());
+                        setNumIntervalChoices(timeIntervalChoices, solutionValues[18].getText());
                     }
                 });
         runChoice.showingProperty().addListener((obs, wasShowing, isShowing) -> {

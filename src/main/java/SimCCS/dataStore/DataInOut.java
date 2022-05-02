@@ -1246,6 +1246,25 @@ public class DataInOut {
                 idx2++;
             }
         }
+
+        for (int idx = 0; idx < numIntervals; idx++){
+            if (idx == 0){
+                for (Edge e : allSolutions[idx].edgeConstructCosts.keySet()) {
+                    allSolutions[idx].addEdgeCumConstructCosts(e, allSolutions[idx].edgeConstructCosts.get(e)
+                            * allSolutions[idx].projectLength_curInterval);
+                }
+            }
+            else{
+                for (Edge e : allSolutions[idx].edgeConstructCosts.keySet()) {
+                    allSolutions[idx].addEdgeCumConstructCosts(e, allSolutions[idx].edgeConstructCosts.get(e)
+                            * allSolutions[idx].projectLength_curInterval);
+                }
+                for (Edge e : allSolutions[idx-1].edgeCumConstructCosts.keySet()) {
+                    allSolutions[idx].addEdgeCumConstructCosts(e, allSolutions[idx-1].edgeCumConstructCosts.get(e));
+                }
+            }
+        }
+
         // -------------------------------------------------------------------------------------------------------
         HashMap<Edge, Double> edgeTransportAmounts_max = new HashMap<>();
         for (int idx = 0; idx < numIntervals; idx++) {
@@ -1646,7 +1665,9 @@ public class DataInOut {
             bw.write("Total Cost ($M/yr)," + soln.getTotalCost() + "\n");
             bw.write("Capture Cost ($M/yr)," + soln.getTotalAnnualCaptureCost() + "\n");
             bw.write("Pipeline Construction Cost ($M/yr)," + soln.getTotalAnnualConstructionCost() + "\n");
-            bw.write("Transport Cost ($M/yr)," + soln.getTotalAnnualTransportCost() + "\n");
+//            bw.write("Transport Cost ($M/yr)," + soln.getTotalAnnualTransportCost() + "\n");
+            bw.write("O&M Cost ($M/yr)," + soln.getTotalAnnualOMCost() + "\n");
+            bw.write("Energy Cost ($M/yr)," + soln.getTotalAnnualEnergyCost() + "\n");
             bw.write("Storage Cost ($M/yr)," + soln.getTotalAnnualStorageCost() + "\n\n");
             bw.write("Source,Capture Amount (MTCO2/yr),Capture Cost ($M/yr)\n");
             HashMap<Source, Double> sourceCaptureAmounts = soln.getSourceCaptureAmounts();

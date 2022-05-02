@@ -24,6 +24,7 @@ public class Solution {
     public HashMap<Edge, Double> edgeTransportAmounts;
     private HashMap<Edge, Double> edgeCosts;
     public HashMap<Edge, Double> edgeConstructCosts;
+    public HashMap<Edge, Double> edgeCumConstructCosts;
     private final HashMap<Edge, Integer> edgeTrends;
     public HashMap<Edge, Integer> PipelineSize;
 
@@ -48,6 +49,7 @@ public class Solution {
         edgeTrends = new HashMap<>();
         edgeConstructCosts = new HashMap<>();
         PipelineSize = new HashMap<>();
+        edgeCumConstructCosts =  new HashMap<>();
     }
 
     public void addSourceCaptureAmount(Source src, double captureAmount) {
@@ -351,6 +353,22 @@ public class Solution {
         return cost;
     }
 
+    public double getTotalAnnualOMCost() {
+        double cost = 0;
+        for (Edge edg : edgeCumConstructCosts.keySet()) {
+            cost += edgeCumConstructCosts.get(edg);
+        }
+        return cost * 0.04;
+    }
+
+    public double getTotalAnnualEnergyCost() {
+        double cost = 0;
+        for (Edge edg : edgeCumConstructCosts.keySet()) {
+            cost += edgeCumConstructCosts.get(edg);
+        }
+        return cost * 0.248;
+    }
+
     //  --------------- Martin Ma ---------------------------------------------------
     public double getTotalAnnualConstructionCost() {
         double cost = 0;
@@ -385,8 +403,24 @@ public class Solution {
         return getTotalAnnualTransportCost() / captureAmountPerYear;
     }
 
+    public double getUnitOMCost() {
+        if (captureAmountPerYear == 0) {
+            return 0;
+        }
+        return getTotalAnnualOMCost() / captureAmountPerYear;
+    }
+
+    public double getUnitEnergyCost() {
+        if (captureAmountPerYear == 0) {
+            return 0;
+        }
+        return getTotalAnnualEnergyCost() / captureAmountPerYear;
+    }
+
+
     public double getTotalCost() {
-        return getTotalAnnualCaptureCost() + getTotalAnnualStorageCost() + getTotalAnnualTransportCost() + getTotalAnnualConstructionCost();
+        return getTotalAnnualCaptureCost() + getTotalAnnualStorageCost()
+                + getTotalAnnualConstructionCost() + getTotalAnnualOMCost() + getTotalAnnualEnergyCost();
     }
 
     public String getFilePrefix() {
@@ -409,8 +443,15 @@ public class Solution {
         this.totalIntervals = totalIntervals;
     }
 
+    public void addEdgeCumConstructCosts(Edge e, double cost) {
+        if (!edgeCumConstructCosts.containsKey(e)) {
+            edgeCumConstructCosts.put(e, 0.0);
+        }
+        edgeCumConstructCosts.put(e, edgeCumConstructCosts.get(e) + cost);
+    }
+
     public double getUnitTotalCost() {
-        return getUnitCaptureCost() + getUnitStorageCost() + getUnitTransportCost();
+        return getUnitCaptureCost() + getUnitStorageCost() + getUnitEnergyCost() + getUnitOMCost();
     }
 
     public double getPercentCaptured(Source source) {
