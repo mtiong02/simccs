@@ -383,7 +383,7 @@ public class Solution {
     }
 
     public double getTotalCost() {
-        return getTotalAnnualCaptureCost() + getTotalAnnualStorageCost() + getTotalAnnualTransportCost();
+        return getTotalAnnualCaptureCost() + getTotalAnnualStorageCost() + getTotalAnnualTransportCost() + getTotalAnnualConstructionCost();
     }
 
     public String getFilePrefix() {

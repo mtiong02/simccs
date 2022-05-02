@@ -576,7 +576,8 @@ public class DataInOut {
 
             // Set max pipeline capacities.
             for (int c = 0; c < linearComponents.size(); c++) {
-                double maxCap = data.getMaxAnnualCapturable();  // Do not make Double.MaxValue. CPLEX does not do well with infinity here.
+                // double maxCap = data.getMaxAnnualCapturable();  // Do not make Double.MaxValue. CPLEX does not do well with infinity here.
+                double maxCap = 119.16; // based on 48 inch pipeline
                 if (c < linearComponents.size() - 1) {
                     double slope1 = linearComponents.get(c).getConSlope() + linearComponents.get(c)
                             .getRowSlope();

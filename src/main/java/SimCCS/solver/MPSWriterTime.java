@@ -432,6 +432,9 @@ public class MPSWriterTime extends MPSWriter {
                             else if(data.existNetworkSizes.get(bidirEdge) == 24){
                                 PipelineCapacity = 19.69;
                             }
+                            else if(data.existNetworkSizes.get(bidirEdge) == 30){
+                                PipelineCapacity = 35.13;
+                            }
                             else if(data.existNetworkSizes.get(bidirEdge) == 36){
                                 PipelineCapacity = 56.46;
                             }
