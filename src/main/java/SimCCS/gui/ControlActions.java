@@ -684,7 +684,7 @@ public class ControlActions {
         // Add pipeline size legends
         Pane legendPane = new Pane();
         legendPane.setStyle("-fx-background-color: white; -fx-border-color: lightgrey");
-        legendPane.setPrefSize(110, 120);
+        legendPane.setPrefSize(110, 140);
         legendPane.setLayoutX(120);
         legendPane.setLayoutY(350);
 
@@ -765,34 +765,172 @@ public class ControlActions {
 
         Line edge_8 = new Line(60, 85, 70, 85);
         edge_8.setStroke(Color.GREEN);
-        edge_8.setStrokeWidth(36/10.0/gui.getScale());
+        edge_8.setStrokeWidth(30/10.0/gui.getScale());
         legendPane.getChildren().addAll(edge_8);
 
-        Label edge_name_8 = new Label("36\"");
+        Label edge_name_8 = new Label("30\"");
         edge_name_8.setLayoutX(75);
         edge_name_8.setLayoutY(80);
         legendPane.getChildren().addAll(edge_name_8);
 
         Line edge_9 = new Line(20, 105, 30, 105);
         edge_9.setStroke(Color.GREEN);
-        edge_9.setStrokeWidth(42/10.0/gui.getScale());
+        edge_9.setStrokeWidth(36/10.0/gui.getScale());
         legendPane.getChildren().addAll(edge_9);
 
-        Label edge_name_9 = new Label("42\"");
+        Label edge_name_9 = new Label("36\"");
         edge_name_9.setLayoutX(35);
         edge_name_9.setLayoutY(100);
         legendPane.getChildren().addAll(edge_name_9);
 
         Line edge_10 = new Line(60, 105, 70, 105);
         edge_10.setStroke(Color.GREEN);
-        edge_10.setStrokeWidth(48/10.0/gui.getScale());
+        edge_10.setStrokeWidth(42/10.0/gui.getScale());
         legendPane.getChildren().addAll(edge_10);
 
-        Label edge_name_10 = new Label("48\"");
+        Label edge_name_10 = new Label("42\"");
         edge_name_10.setLayoutX(75);
         edge_name_10.setLayoutY(100);
         legendPane.getChildren().addAll(edge_name_10);
+
+        Line edge_11 = new Line(20, 125, 30, 125);
+        edge_11.setStroke(Color.GREEN);
+        edge_11.setStrokeWidth(48/10.0/gui.getScale());
+        legendPane.getChildren().addAll(edge_11);
+
+        Label edge_name_11 = new Label("48\"");
+        edge_name_11.setLayoutX(35);
+        edge_name_11.setLayoutY(120);
+        legendPane.getChildren().addAll(edge_name_11);
         solutionLayer.getChildren().add(legendPane);
+
+
+        // Add pipeline size legends
+        Pane legendPane_V = new Pane();
+        legendPane_V.setStyle("-fx-background-color: white; -fx-border-color: lightgrey");
+        legendPane_V.setPrefSize(70, 240);
+        legendPane_V.setLayoutX(-50);
+        legendPane_V.setLayoutY(45);
+
+        Label figurelegendLabel_V = new Label("Pipeline size:");
+        figurelegendLabel_V.setLayoutX(4);
+        figurelegendLabel_V.setLayoutY(0);
+        legendPane_V.getChildren().addAll(figurelegendLabel_V);
+
+        Line edge_V_1 = new Line(20, 25, 30, 25);
+        edge_V_1.setStroke(Color.GREEN);
+        edge_V_1.setStrokeWidth(4/10.0/gui.getScale());
+        legendPane_V.getChildren().addAll(edge_V_1);
+
+        Label edge_V_name_1 = new Label("4\"");
+        edge_V_name_1.setLayoutX(35);
+        edge_V_name_1.setLayoutY(20);
+        legendPane_V.getChildren().addAll(edge_V_name_1);
+
+        Line edge_V_2 = new Line(20, 45, 30, 45);
+        edge_V_2.setStroke(Color.GREEN);
+        edge_V_2.setStrokeWidth(6/10.0/gui.getScale());
+        legendPane_V.getChildren().addAll(edge_V_2);
+
+        Label edge_V_name_2 = new Label("6\"");
+        edge_V_name_2.setLayoutX(35);
+        edge_V_name_2.setLayoutY(40);
+        legendPane_V.getChildren().addAll(edge_V_name_2);
+
+
+        Line edge_V_3 = new Line(20, 65, 30, 65);
+        edge_V_3.setStroke(Color.GREEN);
+        edge_V_3.setStrokeWidth(8/10.0/gui.getScale());
+        legendPane_V.getChildren().addAll(edge_V_3);
+
+        Label edge_V_name_3 = new Label("8\"");
+        edge_V_name_3.setLayoutX(35);
+        edge_V_name_3.setLayoutY(60);
+        legendPane_V.getChildren().addAll(edge_V_name_3);
+
+
+        Line edge_V_4 = new Line(20, 85, 30, 85);
+        edge_V_4.setStroke(Color.GREEN);
+        edge_V_4.setStrokeWidth(12/10.0/gui.getScale());
+        legendPane_V.getChildren().addAll(edge_V_4);
+
+        Label edge_V_name_4 = new Label("12\"");
+        edge_V_name_4.setLayoutX(35);
+        edge_V_name_4.setLayoutY(80);
+        legendPane_V.getChildren().addAll(edge_V_name_4);
+
+
+        Line edge_V_5 = new Line(20, 105, 30, 105);
+        edge_V_5.setStroke(Color.GREEN);
+        edge_V_5.setStrokeWidth(16/10.0/gui.getScale());
+        legendPane_V.getChildren().addAll(edge_V_5);
+
+        Label edge_V_name_5 = new Label("16\"");
+        edge_V_name_5.setLayoutX(35);
+        edge_V_name_5.setLayoutY(100);
+        legendPane_V.getChildren().addAll(edge_V_name_5);
+
+        Line edge_V_6 = new Line(20, 125, 30, 125);
+        edge_V_6.setStroke(Color.GREEN);
+        edge_V_6.setStrokeWidth(20/10.0/gui.getScale());
+        legendPane_V.getChildren().addAll(edge_V_6);
+
+        Label edge_V_name_6 = new Label("20\"");
+        edge_V_name_6.setLayoutX(35);
+        edge_V_name_6.setLayoutY(120);
+        legendPane_V.getChildren().addAll(edge_V_name_6);
+
+        Line edge_V_7 = new Line(20, 145, 30, 145);
+        edge_V_7.setStroke(Color.GREEN);
+        edge_V_7.setStrokeWidth(24/10.0/gui.getScale());
+        legendPane_V.getChildren().addAll(edge_V_7);
+
+        Label edge_V_name_7 = new Label("24\"");
+        edge_V_name_7.setLayoutX(35);
+        edge_V_name_7.setLayoutY(140);
+        legendPane_V.getChildren().addAll(edge_V_name_7);
+
+
+        Line edge_V_8 = new Line(20, 165, 30, 165);
+        edge_V_8.setStroke(Color.GREEN);
+        edge_V_8.setStrokeWidth(30/10.0/gui.getScale());
+        legendPane_V.getChildren().addAll(edge_V_8);
+
+        Label edge_V_name_8 = new Label("30\"");
+        edge_V_name_8.setLayoutX(35);
+        edge_V_name_8.setLayoutY(160);
+        legendPane_V.getChildren().addAll(edge_V_name_8);
+
+        Line edge_V_9 = new Line(20, 185, 30, 185);
+        edge_V_9.setStroke(Color.GREEN);
+        edge_V_9.setStrokeWidth(36/10.0/gui.getScale());
+        legendPane_V.getChildren().addAll(edge_V_9);
+
+        Label edge_V_name_9 = new Label("36\"");
+        edge_V_name_9.setLayoutX(35);
+        edge_V_name_9.setLayoutY(180);
+        legendPane_V.getChildren().addAll(edge_V_name_9);
+
+        Line edge_V_10 = new Line(20, 205, 30, 205);
+        edge_V_10.setStroke(Color.GREEN);
+        edge_V_10.setStrokeWidth(42/10.0/gui.getScale());
+        legendPane_V.getChildren().addAll(edge_V_10);
+
+        Label edge_V_name_10 = new Label("42\"");
+        edge_V_name_10.setLayoutX(35);
+        edge_V_name_10.setLayoutY(200);
+        legendPane_V.getChildren().addAll(edge_V_name_10);
+
+        Line edge_V_11 = new Line(20, 225, 30, 225);
+        edge_V_11.setStroke(Color.GREEN);
+        edge_V_11.setStrokeWidth(48/10.0/gui.getScale());
+        legendPane_V.getChildren().addAll(edge_V_11);
+
+        Label edge_V_name_11 = new Label("48\"");
+        edge_V_name_11.setLayoutX(35);
+        edge_V_name_11.setLayoutY(220);
+        legendPane_V.getChildren().addAll(edge_V_name_11);
+        solutionLayer.getChildren().add(legendPane_V);
 
         for (Source source : soln.getOpenedSources()) {
             double[] rawXYLocation = data.cellLocationToRawXY(source.getCellNum());
