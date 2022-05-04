@@ -526,7 +526,7 @@ public class DataInOut {
 
     // Load dynamic tax credits ---------- Martin Ma -----------------------------------------------------------------
     private void loadSinkcredits() {
-        String sinkCreditPath = basePath + "/" + dataset + "/Scenarios/" + scenario + "/Sinks/Sink credits.txt";
+        String sinkCreditPath = basePath + "/" + dataset + "/Scenarios/" + scenario + "/Sinks/Sinks credits.txt";
         try (BufferedReader br = new BufferedReader(new FileReader(sinkCreditPath))) {
             br.readLine();
             String line = br.readLine();
