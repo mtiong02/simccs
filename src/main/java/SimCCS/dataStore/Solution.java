@@ -285,7 +285,7 @@ public class Solution {
         else if(max_flowrate <= 83.95 && max_flowrate > 56.46){
             diameter = 42;
         }
-        else if(max_flowrate <= 119.16 && max_flowrate > 83.95){
+        else if(max_flowrate <= 119.16 + 0.1 && max_flowrate > 83.95){
             diameter = 48;
         }
         PipelineSize.put(edg, diameter);

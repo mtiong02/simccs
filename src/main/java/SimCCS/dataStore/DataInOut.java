@@ -1440,14 +1440,14 @@ public class DataInOut {
 
         // Make network shapefiles.
         EsriPolylineList edgeList = new EsriPolylineList();
-        String[] edgeAttributeNames = {"Id", "CapID", "CapValue", "Flow", "Cost", "LengKM", "LengROW", "LengCONS", "Variable"};
-        int[] edgeAttributeDecimals = {0, 0, 0, 6, 0, 3, 0, 0, 0};
+        String[] edgeAttributeNames = {"Id", "CapID", "CapValue", "Flow", "Cost", "LengKM", "LengROW", "LengCONS", "Variable", "PipeSize"};
+        int[] edgeAttributeDecimals = {0, 0, 0, 6, 0, 3, 0, 0, 0, 1};
         DbfTableModel edgeAttributeTable = new DbfTableModel(edgeAttributeNames.length);   //12
         for (int colNum = 0; colNum < edgeAttributeNames.length; colNum++) {
             edgeAttributeTable.setColumnName(colNum, edgeAttributeNames[colNum]);
             edgeAttributeTable.setDecimalCount(colNum, (byte) edgeAttributeDecimals[colNum]);
-            edgeAttributeTable.setLength(colNum, 10);
-            if (edgeAttributeNames[colNum].equals("Id")) {
+            edgeAttributeTable.setLength(colNum, 20);
+            if (edgeAttributeNames[colNum].equals("PipeSize")) {
                 edgeAttributeTable.setType(colNum, DbfTableModel.TYPE_CHARACTER);
             } else {
                 edgeAttributeTable.setType(colNum, DbfTableModel.TYPE_NUMERIC);
@@ -1470,19 +1470,23 @@ public class DataInOut {
 
             // Add attributes.
             ArrayList row = new ArrayList();
+
             for (int i = 0; i < 3; i++) {
                 row.add(0);
             }
+
             row.add(edgeTransportAmounts.get(edg));
             row.add(0);
             row.add(graphEdgeLengths.get(edg));
+
             for (int i = 0; i < 3; i++) {
                 row.add(0);
             }
 
+            row.add(Integer.toString(soln.getPipelineSize(edg)));
+
             edgeAttributeTable.addRecord(row);
         }
-
         EsriShapeExport writeEdgeShapefiles = new EsriShapeExport(edgeList,
                 edgeAttributeTable,
                 newDir + "/Network_" + Integer.toString(soln.getInterval() + 1));

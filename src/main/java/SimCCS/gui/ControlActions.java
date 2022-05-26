@@ -194,8 +194,8 @@ public class ControlActions {
                 Circle c = new Circle(rawXtoDisplayX(rawXYLocation[0]),
                         rawYtoDisplayY(rawXYLocation[1]),
                         5 / gui.getScale());
-                c.setStroke(Color.GOLD);
-                c.setFill(Color.GOLD);
+                c.setStroke(Color.SALMON);
+                c.setFill(Color.SALMON);
                 //c.setStroke(Color.RED);
                 //c.setFill(Color.RED);
                 sourceLocationsLayer.getChildren().add(c);
@@ -938,8 +938,8 @@ public class ControlActions {
                     rawYtoDisplayY(rawXYLocation[1]),
                     arcRadius / gui.getScale());
             c.setStrokeWidth(0);
-            c.setStroke(Color.GOLD);
-            c.setFill(Color.GOLD);
+            c.setStroke(Color.SALMON);
+            c.setFill(Color.SALMON);
             solutionLayer.getChildren().add(c);
 
             // Pie chart nodes.
@@ -952,8 +952,8 @@ public class ControlActions {
             arc.setLength(soln.getPercentCaptured(source) * 360);
             arc.setStrokeWidth(0);
             arc.setType(ArcType.ROUND);
-            arc.setStroke(Color.ORANGE);
-            arc.setFill(Color.ORANGE);
+            arc.setStroke(Color.RED);
+            arc.setFill(Color.RED);
             solutionLayer.getChildren().add(arc);
         }
 
