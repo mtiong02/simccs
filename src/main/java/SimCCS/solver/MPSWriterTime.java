@@ -613,6 +613,7 @@ public class MPSWriterTime extends MPSWriter {
                 constraintToSign.put(constrain7, "G");
             }
         }
+
         // ------------------------- Martin Ma -------------------------------------------------------------------------
         // Storage capped by max capacity for all the year
         constraintCounter = 1;

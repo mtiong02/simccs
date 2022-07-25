@@ -193,7 +193,7 @@ public class ControlActions {
                 double[] rawXYLocation = data.cellLocationToRawXY(source.getCellNum());
                 Circle c = new Circle(rawXtoDisplayX(rawXYLocation[0]),
                         rawYtoDisplayY(rawXYLocation[1]),
-                        5 / gui.getScale());
+                        5 / gui.getScale() / 2);
                 c.setStroke(Color.SALMON);
                 c.setFill(Color.SALMON);
                 //c.setStroke(Color.RED);
@@ -241,7 +241,7 @@ public class ControlActions {
                 double[] rawXYLocation = data.cellLocationToRawXY(sink.getCellNum());
                 Circle c = new Circle(rawXtoDisplayX(rawXYLocation[0]),
                         rawYtoDisplayY(rawXYLocation[1]),
-                        5 / gui.getScale());
+                        5 / gui.getScale()/ 2);
                 c.setStroke(Color.CORNFLOWERBLUE);
                 c.setFill(Color.CORNFLOWERBLUE);
                 //c.setStroke(Color.BLUE);
@@ -936,7 +936,7 @@ public class ControlActions {
             double[] rawXYLocation = data.cellLocationToRawXY(source.getCellNum());
             Circle c = new Circle(rawXtoDisplayX(rawXYLocation[0]),
                     rawYtoDisplayY(rawXYLocation[1]),
-                    arcRadius / gui.getScale());
+                    arcRadius / gui.getScale() / 2);
             c.setStrokeWidth(0);
             c.setStroke(Color.SALMON);
             c.setFill(Color.SALMON);
@@ -946,8 +946,8 @@ public class ControlActions {
             Arc arc = new Arc();
             arc.setCenterX(rawXtoDisplayX(rawXYLocation[0]));
             arc.setCenterY(rawYtoDisplayY(rawXYLocation[1]));
-            arc.setRadiusX(arcRadius / gui.getScale());
-            arc.setRadiusY(arcRadius / gui.getScale());
+            arc.setRadiusX(arcRadius / gui.getScale() /2);
+            arc.setRadiusY(arcRadius / gui.getScale() /2);
             arc.setStartAngle(0);
             arc.setLength(soln.getPercentCaptured(source) * 360);
             arc.setStrokeWidth(0);
@@ -961,7 +961,7 @@ public class ControlActions {
             double[] rawXYLocation = data.cellLocationToRawXY(sink.getCellNum());
             Circle c = new Circle(rawXtoDisplayX(rawXYLocation[0]),
                     rawYtoDisplayY(rawXYLocation[1]),
-                    arcRadius / gui.getScale());
+                    arcRadius / gui.getScale() /1.5);
             c.setStrokeWidth(0);
             c.setStroke(Color.CORNFLOWERBLUE);
             c.setFill(Color.CORNFLOWERBLUE);
@@ -971,8 +971,8 @@ public class ControlActions {
             Arc arc = new Arc();
             arc.setCenterX(rawXtoDisplayX(rawXYLocation[0]));
             arc.setCenterY(rawYtoDisplayY(rawXYLocation[1]));
-            arc.setRadiusX(arcRadius / gui.getScale());
-            arc.setRadiusY(arcRadius / gui.getScale());
+            arc.setRadiusX(arcRadius / gui.getScale() /1.5);
+            arc.setRadiusY(arcRadius / gui.getScale() /1.5);
             arc.setStartAngle(0);
             arc.setLength(soln.getPercentStored(sink) * 360);
             arc.setStrokeWidth(0);
