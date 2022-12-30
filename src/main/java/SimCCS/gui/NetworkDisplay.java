@@ -16,7 +16,7 @@ import javafx.scene.text.Font;
 import java.util.ArrayList;
 
 /**
- * @author yaw
+ * @author yaw & martin
  */
 class NetworkDisplay extends Pane {
 
@@ -165,7 +165,7 @@ class SceneGestures {
                         arc.setRadiusY(radius / newScale);
                     } else if (n instanceof Label) {
                         Label l = (Label) n;
-                       // l.setFont(new Font("System Regular", fontSize / Math.max(newScale / 4, 1)));
+                        // Updated by Martin Ma
                         l.setStyle(String.format("-fx-font-size:%s;", fontSize / newScale));
                         // TODO: Going to have to be more clever to shift labels...
                     } else if (n instanceof Line) {
