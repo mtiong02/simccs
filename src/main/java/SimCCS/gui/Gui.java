@@ -74,7 +74,7 @@ public class Gui extends Application {
         Scene scene = buildGUI(stage);
         scene.getRoot().setStyle("-fx-font-family: 'serif'");
         stage.setScene(scene);
-        stage.setTitle("SimCCS");
+        stage.setTitle("SimCCS version 3.0: Developed by Los Alamos National Laboratory.");
         stage.show();
     }
 
