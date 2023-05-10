@@ -609,12 +609,12 @@ public class Gui extends Application {
 
         final HBox timeIntervalBtnHBox = new HBox();
         addIntervalButton.setMinWidth(50);
-        // Martin Ma for DOE ---------------------------------------------------------------------------------
+        // Martin Ma ---------------------------------------------------------------------------------
         subIntervalButton.setMinWidth(50);
         // timeIntervalBtnHBox.getChildren().addAll(addIntervalButton, subIntervalButton);
         ReadIntervalDataButton.setMinWidth(100);
         timeIntervalBtnHBox.getChildren().addAll(addIntervalButton, subIntervalButton, ReadIntervalDataButton);
-        // Martin Ma for DOE ---------------------------------------------------------------------------------
+        // ---------------------------------------------------------------------------------
 
         final VBox timeTableVBox = new VBox();
         timeTableVBox.setSpacing(5);

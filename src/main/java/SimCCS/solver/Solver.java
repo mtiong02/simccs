@@ -277,10 +277,6 @@ public class Solver {
     // Modfidied dijkstra for operating on cost surface and allowing to change edge weights
     public Object[] dijkstra(int src, int[] destinations, double edgeCostModification) {
 
-//        System.out.println(src);
-//        System.out.println(destinations);
-//        System.out.println("-----------");
-
         HashSet<Integer> connectedDests = new HashSet<>();
         for (int cell : destinations) {
             connectedDests.add(cell);

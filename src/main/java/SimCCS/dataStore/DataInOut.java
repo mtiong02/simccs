@@ -383,7 +383,7 @@ public class DataInOut {
     }
 
 
-    // Load dynamic source open/close----------------- Martin Ma --------------------------------------------------------------------------
+    // Load dynamic source open/close----------------- Martin Ma ------------------------------------------------
     private void loadSourceEvo() {
         String sourceEvoPath = basePath + "/" + dataset + "/Scenarios/" + scenario + "/Sources/SourcesEvo.csv";
         try (BufferedReader br = new BufferedReader(new FileReader(sourceEvoPath))) {
@@ -1669,7 +1669,7 @@ public class DataInOut {
             bw.write("Total Cost ($M/yr)," + soln.getTotalCost() + "\n");
             bw.write("Capture Cost ($M/yr)," + soln.getTotalAnnualCaptureCost() + "\n");
             bw.write("Pipeline Construction Cost ($M/yr)," + soln.getTotalAnnualConstructionCost() + "\n");
-//            bw.write("Transport Cost ($M/yr)," + soln.getTotalAnnualTransportCost() + "\n");
+            //bw.write("Transport Cost ($M/yr)," + soln.getTotalAnnualTransportCost() + "\n");
             bw.write("O&M Cost ($M/yr)," + soln.getTotalAnnualOMCost() + "\n");
             bw.write("Energy Cost ($M/yr)," + soln.getTotalAnnualEnergyCost() + "\n");
             bw.write("Storage Cost ($M/yr)," + soln.getTotalAnnualStorageCost() + "\n\n");
@@ -1793,7 +1793,6 @@ public class DataInOut {
             connection = (HttpURLConnection) url.openConnection();
 
             // change the time formate ------------------- Martin Ma ----------------------------------------------------
-            // DateFormat dateFormat = new SimpleDateFormat("ddMMyyy-HHmmssss");
             DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd-HHmmssss");
             // ----------------------------------------------------------------------------------------------------------
 
