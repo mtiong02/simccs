@@ -1,5 +1,6 @@
 package gui;
 
+import java.beans.FeatureDescriptor;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -33,7 +34,11 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
-
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.File;
 
 /**
@@ -47,19 +52,19 @@ public class Gui extends Application {
     private RadioButton dispDelaunayEdges;
     private RadioButton dispCandidateNetwork;
 
-
-    // ------------- Martin Ma -----------------------------------------------------------------------------
+    // ------------- Martin Ma ----------------------------------------------------------------------------
     private RadioButton dispExistNetwork;
+    private ImageView imageView;
+    private TitledPane ModelsContainer;
+    private ChoiceBox runChoice;
+    private Pane LogoPane;
     // -----------------------------------------------------------------------------------------------------
-
-
 
     private RadioButton sourceLabeled;
     private RadioButton sourceVisible;
     private RadioButton sinkLabeled;
     private RadioButton sinkVisible;
     private RadioButton dispCostSurface;
-    private ChoiceBox runChoice;
     private AnchorPane solutionPane;
     private TextArea messenger;
     private TitledPane timeSettingsContainer;
@@ -175,6 +180,28 @@ public class Gui extends Application {
         dataPane.getChildren().add(scenarioContainer);
         runChoice = new ChoiceBox();
 
+        // Build display pane for SimCCS logo.
+        LogoPane = new Pane();
+        LogoPane.setTranslateX(220);
+
+        try {
+            //creating the image object
+            FileInputStream input = new FileInputStream("SimCCS.png");
+            Image image = new Image(input);
+            ImageView imageView = new ImageView(image);
+            imageView.setImage(image);
+            imageView.setX(50);
+            imageView.setY(50);
+            imageView.setFitWidth(600);
+            imageView.setSmooth(true);
+            imageView.setCache(true);
+            imageView.setPreserveRatio(true);
+            imageView.fitWidthProperty().bind(stage.heightProperty());
+            LogoPane.getChildren().add(imageView);
+        } catch (Exception e){
+            System.out.println(e.getClass());
+        }
+
         scenarioChoice.getSelectionModel()
                 .selectedItemProperty()
                 .addListener(new ChangeListener<String>() {
@@ -274,7 +301,7 @@ public class Gui extends Application {
         });
 
         // ------------- Martin Ma -----------------------------------------------------------------------------
-        dispExistNetwork = new RadioButton("Exist Network");
+        dispExistNetwork = new RadioButton("Existing Network");
         dispExistNetwork.setLayoutX(4);
         dispExistNetwork.setLayoutY(115);
         selectionPane.getChildren().add(dispExistNetwork);
@@ -977,7 +1004,7 @@ public class Gui extends Application {
         sceneGestures.addEntityToResize(solutionLayer);
 
         // Add everything to group and display.
-        group.getChildren().addAll(displayPane, tabPane, messengerPane);
+        group.getChildren().addAll(LogoPane, displayPane, tabPane, messengerPane);
         return new Scene(group, 1050, 660);
     }
 
