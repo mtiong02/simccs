@@ -226,6 +226,7 @@ public class Gui extends Application {
                 if (selectedDataset != null) {
                     openDataset.setText(selectedDataset.getName());
                     controlActions.selectDataset(selectedDataset, scenarioChoice);
+                    LogoPane.getChildren().clear();
                 }
             }
         });
